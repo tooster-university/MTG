@@ -1,0 +1,18 @@
+name: Trusty Packbeast
+mana: 2W
+typse:
+  - creature
+subtypes:
+  - beast
+power: 2
+toughness: 3
+trigges:
+  - on: enter
+    by: self
+    do: return
+    target:
+      type: artifact
+      controller: self
+      from: graveyard
+      to: hand
+

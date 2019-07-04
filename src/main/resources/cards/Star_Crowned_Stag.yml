@@ -1,0 +1,16 @@
+name: Star Crowned Stag
+mana: 3W
+types:
+  - creature
+subtypes:
+  - elk
+power: 3
+toughness: 3
+trigges:
+  - on: attack
+    by: self
+    do: tap
+    target:
+      type: creature
+      controller: opponent
+

@@ -1,0 +1,10 @@
+name: Rustwing Falcon
+mana: W
+types:
+  - creature
+subtypes:
+  - bird
+abilities:
+  - flying
+power: 1
+toughness: 2

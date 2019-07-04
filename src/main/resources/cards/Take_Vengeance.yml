@@ -1,0 +1,12 @@
+name: Take Vengeance
+mana: 1W
+types:
+  - sorcery
+triggers:
+  - do: destroy
+    target:
+      type: creature
+      controller: opponent
+      check:
+        - tapped
+
