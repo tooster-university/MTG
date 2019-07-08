@@ -1,4 +1,4 @@
-package me.tooster.exceptions;
+package me.tooster.common;
 
 public class CommandException extends Exception {
     public CommandException(String message) {

@@ -1,8 +1,9 @@
-package me.tooster.MTG;
+package me.tooster.server.MTG;
 
-import me.tooster.ResourceManager;
-import me.tooster.exceptions.CardException;
-import me.tooster.exceptions.DeckException;
+import me.tooster.server.Player;
+import me.tooster.server.ResourceManager;
+import me.tooster.server.exceptions.CardException;
+import me.tooster.server.exceptions.DeckException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -63,7 +64,7 @@ public class Deck {
     /**
      * Resets deck - puts all cards in library, shuffles, changes mulligan counter to 0
      */
-    void reset() {
+    public void reset() {
         piles.get(Pile.LIBRARY).addAll(piles.get(Pile.HAND));
         piles.get(Pile.LIBRARY).addAll(piles.get(Pile.GRAVEYARD));
         piles.get(Pile.LIBRARY).addAll(piles.get(Pile.EXILE));

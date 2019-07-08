@@ -1,11 +1,11 @@
-package me.tooster;
+package me.tooster.server;
 
-import me.tooster.MTG.Card;
-import me.tooster.MTG.Deck;
-import me.tooster.MTG.Mana;
-import me.tooster.exceptions.CardException;
-import me.tooster.exceptions.DeckException;
-import me.tooster.exceptions.ManaFormatException;
+import me.tooster.server.MTG.Card;
+import me.tooster.server.MTG.Deck;
+import me.tooster.server.MTG.Mana;
+import me.tooster.server.exceptions.CardException;
+import me.tooster.server.exceptions.DeckException;
+import me.tooster.server.exceptions.ManaFormatException;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 

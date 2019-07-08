@@ -1,7 +1,7 @@
-package me.tooster.MTG;
+package me.tooster.server.MTG;
 
-import me.tooster.exceptions.InsufficientManaException;
-import me.tooster.exceptions.ManaFormatException;
+import me.tooster.server.exceptions.InsufficientManaException;
+import me.tooster.server.exceptions.ManaFormatException;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

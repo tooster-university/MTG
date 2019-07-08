@@ -1,8 +1,10 @@
-package me.tooster.MTG;
+package me.tooster.server;
 
-import me.tooster.Hub;
-import me.tooster.Parser;
-import me.tooster.exceptions.CommandException;
+import me.tooster.common.MessageFormatter;
+import me.tooster.common.Parser;
+import me.tooster.common.CommandException;
+import me.tooster.server.MTG.Deck;
+import me.tooster.server.MTG.Mana;
 
 import java.io.*;
 import java.net.Socket;
@@ -17,11 +19,12 @@ public class Player implements AutoCloseable {
     private PrintWriter out;
     private Socket socket;
 
-    private String nick;
-    private int tag;                // unique tag per server
+    private final String nick;
+    private final int tag;                // unique tag per server
+    private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
+
     private Hub hub;                // connected Hub
     private Deck deck;
-    private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
 
 
     private final EnumSet<Parser.Command> enabledCommands = EnumSet.of(Parser.Command.HELP);
@@ -133,7 +136,7 @@ public class Player implements AutoCloseable {
      *
      * @param deck deck to set
      */
-    void setDeck(Deck deck) { this.deck = deck; }
+    public void setDeck(Deck deck) { this.deck = deck; }
 
     /**
      * @return returns player's flags
@@ -141,7 +144,7 @@ public class Player implements AutoCloseable {
     public EnumSet<Flag> getFlags() { return flags; }
 
     /**
-     * Fetches and runs next command from player
+     * Fetches and runs process command from player
      */
     public void listen() throws IOException, CommandException {
             while (!flags.contains(Flag.AFK)) {
@@ -153,9 +156,10 @@ public class Player implements AutoCloseable {
                     Parser.CompiledCommand cc = Parser.parse(this, command);
                     hub.issueCommand(cc);
                 } catch (CommandException e) {// invalid command
-                    transmit(e.getMessage());
+                    transmit(MessageFormatter.error(e.getMessage()));
+                    transmit(MessageFormatter.tip("use 'help' to get available commands"));
                 } catch (SocketTimeoutException e){
-                    hub.issueCommand(new Parser.CompiledCommand(Parser.Command.TIMEOUT));
+                    hub.issueCommand(new Parser.CompiledCommand(context, Parser.Command.TIMEOUT, args));
                     throw e;
                 }
             }
@@ -175,7 +179,7 @@ public class Player implements AutoCloseable {
      *
      * @param msg description of requested action to send to the player
      */
-    public synchronized void prompt(String msg) { transmit(String.format("@%s ! %s", nick, msg)); }
+    public synchronized void prompt(String msg) { transmit(MessageFormatter.prompt(msg)); }
 
     /**
      * Checks if player can cast a card with given ID

@@ -1,13 +1,12 @@
-package me.tooster;
+package me.tooster.server;
 
-import me.tooster.MTG.Player;
+import me.tooster.common.MessageFormatter;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server implements Runnable {
@@ -95,7 +94,7 @@ public class Server implements Runnable {
                     socket.setSoTimeout(0); // 3 minute timeout
                     player.listen();
                 } else
-                    player.transmit(Utils.formatError("Game is already in progress, cannot join the hub"));
+                    player.transmit(MessageFormatter.error("Game is already in progress, cannot join the hub"));
 
             } catch (SocketTimeoutException | SocketException e) {
                 LOGGER.info("Player timeouted or connection reset.");
