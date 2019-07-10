@@ -3,6 +3,8 @@ package me.tooster.common;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -38,6 +40,7 @@ public class Parser<CMD extends Enum<CMD> & Command> {
 
     /**
      * Disables commands according to arguments and commandMask.
+     *
      * @param commands
      */
     public void disableCommands(CMD... commands) {
@@ -48,6 +51,7 @@ public class Parser<CMD extends Enum<CMD> & Command> {
 
     /**
      * Sets up the commands aka disables all and enables specified according to args and commandMask.
+     *
      * @param commands
      */
     public void setCommands(CMD... commands) {
@@ -57,30 +61,12 @@ public class Parser<CMD extends Enum<CMD> & Command> {
         enableCommands(commands);
     }
 
-
     /**
-     * Parses input line into command object with argument list.
-     * Only player's inputted commands are checked against predicate and availability.
+     * Returns tru if command is enabled. Doesn't use mask.
      *
-     * @param input input to parse
-     * @return returns pair &lt;Command, args&gt; for parsed input or nil if input was empty
-     * @throws CommandException if argument's don't fulfill predicate or command is not enabled right now
+     * @param command command to check
+     * @return true iff command is enabled
      */
-    public final CMD.Compiled parse(@NotNull String input) throws CommandException {
-        List<String> parts = Arrays.asList(input.split("\\s+"));
-        String cname = parts.get(0);
-        parts.remove(0);
-
-        for (CMD c : enumClass.getEnumConstants()) {
-            if (enabledCommands.contains(c)) {
-                if (c.getClass().getAnnotation(Command.Alias.class) != null)
-                    for (String alias : c.getClass().getAnnotation(Command.Alias.class).value()) // check all aliases
-                        // matching alias
-                        if (cname.toUpperCase().equals(alias))  // first arg is command
-                            return new CMD.Compiled<>(c, (String[]) parts.toArray());
-            } else throw new CommandException("Command disabled.");
-        }
-        throw new CommandException("Cannot parse the command.");
-    }
+    public boolean isEnabled(CMD command) { return enabledCommands.contains(command); }
 
 }

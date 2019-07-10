@@ -1,10 +1,22 @@
 package me.tooster.common;
 
-public abstract class FiniteStateMachine<C, I> {
-    private State<C, I> currentState;
-    private boolean autoNext = false;
+/**
+ * Abstract finite state machine that holds current state and has auto-go feature.
+ *
+ * @param <I> Input type for machine states
+ * @param <C> Context type for machine states
+ */
+public abstract class FiniteStateMachine<I, C> {
+    private State<I, C> currentState;
+    private boolean     autoNext = false;
 
-    protected FiniteStateMachine(State<C, I> initialState) {currentState = initialState;}
+    /**
+     * Create new FSM with initial state.
+     *
+     * @param initialState Initial state for machine. Machine won't execute initial state's <code>onEnter()</code>
+     *                     first time.
+     */
+    protected FiniteStateMachine(State<I, C> initialState) {currentState = initialState;}
 
     /**
      * Advances the state of FSM. It will keep processing with Hub and CompiledCommand until <code>disableAuto()</code>
@@ -12,16 +24,16 @@ public abstract class FiniteStateMachine<C, I> {
      *
      * @param input   input for the FSM
      * @param context represents the context in which the state machine is updated. All data for state update should
- *                be included in context. Used to contain data for FSM to use
+     *                be included in context. Used to contain data for FSM to use
      */
     // FIXME: Add lock() to lock the process() of FSM and executeIf(State, <lambda>) to execute actions atomically
     //  and lock if FSM is in given state
     public synchronized void process(I input, C context) {
         do {
-            State<C, I> nextState = currentState.process(input, context);
+            State<I, C> nextState = currentState.process(input, context);
             if (currentState != nextState) {
                 currentState.onExit(nextState, context);
-                State<C, I> previousState = currentState;
+                State<I, C> previousState = currentState;
                 currentState = nextState;
                 nextState.onEnter(previousState, context);
             }
@@ -31,7 +43,7 @@ public abstract class FiniteStateMachine<C, I> {
     /**
      * @return returns current state
      */
-    public State<C, I> getCurrentState() { return currentState; }
+    public State<I, C> getCurrentState() { return currentState; }
 
     /**
      * Enables auto-advance mode of FSM, so that it won't wait for input command (external call to <code>process()
@@ -46,18 +58,19 @@ public abstract class FiniteStateMachine<C, I> {
 
     /**
      * Interface for States.
-     * @param <C> context that State accepts
+     *
      * @param <I> Input that State accepts
+     * @param <C> context that State accepts
      */
-    public interface State<C, I> {
+    public interface State<I, C>{
         /**
          * Processes the CompiledCommand inside State. Returns next state to go to, or this if state doesn't change
          *
-         * @param input      CompiledCommand to process
+         * @param input   CompiledCommand to process
          * @param context context for machine
          * @return next state or this if state stays the same
          */
-        State<C, I> process(I input, C context);
+        State<I, C> process(I input, C context);
 
         /**
          * Method invoked when new state is entered.
@@ -66,7 +79,7 @@ public abstract class FiniteStateMachine<C, I> {
          *
          * @param context context for machine
          */
-        default void onEnter(State<C, I> prevState, C context) {}
+        default void onEnter(State<I, C> prevState, C context) {}
 
         /**
          * Method invoked when exiting a state to enter other state.
@@ -74,7 +87,7 @@ public abstract class FiniteStateMachine<C, I> {
          *
          * @param context context for machine
          */
-        default void onExit(State<C, I> nextState, C context) {}
+        default void onExit(State<I, C> nextState, C context) {}
 
     }
 

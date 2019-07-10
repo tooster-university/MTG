@@ -32,13 +32,9 @@ public enum ServerCommand implements Command {
 
     END_GAME,                                                 // thrown from GameStateFSM when game ends
     TIMEOUT,                                                  // executed if a player timeouted
-
     ;
 
     private static final ServerCommand[] _cachedValues = ServerCommand.values();
-
-    @Override
-    public ServerCommand[] cachedValues() { return _cachedValues; }
 
     public class Compiled extends Command.Compiled<ServerCommand> {
         private Player player;

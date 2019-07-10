@@ -11,10 +11,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-class StageStateMachine extends FiniteStateMachine<Hub, ServerCommand.Compiled> {
+class StageStateMachine extends FiniteStateMachine<ServerCommand.Compiled, Hub> {
 
     StageStateMachine() { super(Stage.PREPARE); }
-    enum Stage implements FiniteStateMachine.State<Hub, ServerCommand.Compiled> {
+    enum Stage implements FiniteStateMachine.State<ServerCommand.Compiled, Hub> {
         PREPARE { // players can import decks and select a deck.
 
 

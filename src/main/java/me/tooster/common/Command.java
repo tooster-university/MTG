@@ -7,14 +7,18 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Interface for commands with alias. Each command can be compiled with code in format
  * <pre>new ServerCommand.Compiled(ServerCommand.ECHO, data)</pre>
  * Command interface works best when used with enums enums. Compiled command
  */
-public interface Command{
+public interface Command {
 
     /**
      * Used to alias the commands. Command without alias won't be matched.
@@ -25,17 +29,18 @@ public interface Command{
         String[] value() default {};
     }
 
-    /**
-     * @return Returns list of commands from cached array, so there is no runtime memory overhead.
-     */
-    Command[] cachedValues();
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Cmd{
+        boolean enabled() default false;
+    }
 
     /**
      * Compiled command consists of Command enum and arguments as ArrayList&lt;String&gt;
      */
     class Compiled<CMD> {
         @NotNull
-        public final CMD command;
+        public final CMD      command;
         @NotNull
         public final String[] args; // arguments as array of strings
 
@@ -62,4 +67,28 @@ public interface Command{
             return command + " " + String.join(" ", args);
         }
     }
+
+    /**
+     * @return returns list of all defined commands.
+     */
+    static Command[] values(){return new Command[0];}
+
+    static Compiled parse(@NotNull String input) throws CommandException {
+        List<String> matchList    = new ArrayList<>();
+        Pattern      regex        = Pattern.compile("[^\\s\"]+|\"([^\"]*)\""); // matches: (abcd) "(xy zv)" (x)
+        Matcher      regexMatcher = regex.matcher(input);
+        while (regexMatcher.find())
+            matchList.add(regexMatcher.group(1) != null ? regexMatcher.group(1) : regexMatcher.group());
+
+        String cname = matchList.remove(0); // command name
+        for (Command c : values()) {
+            if (c.getClass().getAnnotation(Command.Alias.class) != null) // check for alias annotation
+                for (String alias : c.getClass().getAnnotation(Command.Alias.class).value()) // check all aliases
+                    // matching alias
+                    if (cname.toUpperCase().equals(alias))  // first arg is command
+                        return new Compiled<>(c, (String[]) matchList.toArray()); // rest is argument's list
+        }
+        throw new CommandException("No such command.");
+    }
+
 }

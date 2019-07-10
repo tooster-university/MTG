@@ -16,7 +16,7 @@ public class GameStateMachine extends FiniteStateMachine<Hub, > {
 
     public Player getWinner() { return winner; }
 
-    enum Phase implements State<Hub, Parser.CompiledCommand> {
+    enum Phase implements State<Parser.CompiledCommand, Hub> {
         // game prepare gamePhase
         DECK_SETUP {
             @Override

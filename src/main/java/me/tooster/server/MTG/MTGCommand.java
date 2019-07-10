@@ -23,15 +23,11 @@ public enum MTGCommand implements Command {
     ,
     @Alias({"DR", "DRAW"}) DRAW,
     @Alias({"M", "MULLIGAN"}) MULLIGAN,
-    @Alias({">", "C", "CAST"}) CAST
-    ;
+    @Alias({">", "C", "CAST"}) CAST;
 
     public class Compiled extends Command.Compiled<MTGCommand> {
         public Compiled(@NotNull MTGCommand command, @Nullable String... args) { super(command, args); }
     }
 
-    private final static MTGCommand[] _cachedValues = MTGCommand.values();
-
-    @Override
-    public Command[] cachedValues() { return cachedValues(); }
+    public final static MTGCommand[] _cachedValues = MTGCommand.values();
 }
