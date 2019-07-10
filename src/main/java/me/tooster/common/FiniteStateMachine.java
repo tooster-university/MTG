@@ -10,15 +10,15 @@ public abstract class FiniteStateMachine<C, I> {
      * Advances the state of FSM. It will keep processing with Hub and CompiledCommand until <code>disableAuto()</code>
      * is called. To change the parameters passed to next state in auto mode, use setters for Hub and CompiledCommand.
      *
-     * @param context represents the context in which the state machine is updated. All data for state update should
-     *                be included in context. Used to contain data for FSM to use
      * @param input   input for the FSM
+     * @param context represents the context in which the state machine is updated. All data for state update should
+ *                be included in context. Used to contain data for FSM to use
      */
     // FIXME: Add lock() to lock the process() of FSM and executeIf(State, <lambda>) to execute actions atomically
     //  and lock if FSM is in given state
-    public synchronized void process(C context, I input ) {
+    public synchronized void process(I input, C context) {
         do {
-            State<C, I> nextState = currentState.process(context, input);
+            State<C, I> nextState = currentState.process(input, context);
             if (currentState != nextState) {
                 currentState.onExit(nextState, context);
                 State<C, I> previousState = currentState;
@@ -44,15 +44,20 @@ public abstract class FiniteStateMachine<C, I> {
      */
     void disableAuto() {autoNext = false;}
 
-    public interface State<Context, Input> {
+    /**
+     * Interface for States.
+     * @param <C> context that State accepts
+     * @param <I> Input that State accepts
+     */
+    public interface State<C, I> {
         /**
          * Processes the CompiledCommand inside State. Returns next state to go to, or this if state doesn't change
          *
-         * @param context context for machine
          * @param input      CompiledCommand to process
+         * @param context context for machine
          * @return next state or this if state stays the same
          */
-        State<Context, Input> process(Context context, Input input);
+        State<C, I> process(I input, C context);
 
         /**
          * Method invoked when new state is entered.
@@ -61,7 +66,7 @@ public abstract class FiniteStateMachine<C, I> {
          *
          * @param context context for machine
          */
-        default void onEnter(State<Context, Input> prevState, Context context) {}
+        default void onEnter(State<C, I> prevState, C context) {}
 
         /**
          * Method invoked when exiting a state to enter other state.
@@ -69,7 +74,7 @@ public abstract class FiniteStateMachine<C, I> {
          *
          * @param context context for machine
          */
-        default void onExit(State<Context, Input> nextState, Context context) {}
+        default void onExit(State<C, I> nextState, C context) {}
 
     }
 

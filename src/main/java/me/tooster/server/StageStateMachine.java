@@ -2,7 +2,6 @@ package me.tooster.server;
 
 import me.tooster.common.FiniteStateMachine;
 import me.tooster.common.MessageFormatter;
-import me.tooster.common.Parser;
 import me.tooster.server.MTG.Deck;
 import me.tooster.server.MTG.GameStateMachine;
 import me.tooster.server.exceptions.CardException;
@@ -12,16 +11,16 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-class StageStateMachine extends FiniteStateMachine<Hub, Parser.CompiledCommand> {
+class StageStateMachine extends FiniteStateMachine<Hub, ServerCommand.Compiled> {
 
     StageStateMachine() { super(Stage.PREPARE); }
-    enum Stage implements State<Hub, Parser.CompiledCommand> {
+    enum Stage implements FiniteStateMachine.State<Hub, ServerCommand.Compiled> {
         PREPARE { // players can import decks and select a deck.
 
 
             @Override
-            public Stage process(Hub hub, Parser.CompiledCommand cc) {
-                switch (cc.getCommand()) {
+            public Stage process(ServerCommand.Compiled cc, Hub hub) {
+                switch (cc.command) {
                     case LIST_DECKS: {
                         String[] decks = ResourceManager.getInstance().getDecks().toArray(new String[]{});
                         Arrays.sort(decks);
@@ -30,18 +29,18 @@ class StageStateMachine extends FiniteStateMachine<Hub, Parser.CompiledCommand> 
                     }
                     case SHOW_DECK: {
                         Set<Map.Entry<String, Object>> cards =
-                                ResourceManager.getInstance().getDeck(cc.getArg(0)).entrySet();
+                                ResourceManager.getInstance().getDeck(cc.args[0]).entrySet();
                         String[] strings =
                                 cards.stream().map(e -> e.getKey() + " x" + e.getValue()).toArray(String[]::new);
                         Arrays.sort(strings);
 
-                        cc.getPlayer().transmit(MessageFormatter.response("Cards in '" + cc.getArg(0) + "':\n"
+                        cc.getPlayer().transmit(MessageFormatter.response("Cards in '" + cc.args[0] + "':\n"
                                 + MessageFormatter.list(strings)));
                         return this;
                     }
                     case SELECT_DECK: {
                         try {
-                            Deck deck = Deck.build(cc.getPlayer(), cc.getArg(1));
+                            Deck deck = Deck.build(cc.getPlayer(), cc.args[1]);
                             cc.getPlayer().setDeck(deck);
                         } catch (DeckException | CardException e) {
                             cc.getPlayer().transmit(MessageFormatter.error(e.getMessage()));
@@ -74,8 +73,8 @@ class StageStateMachine extends FiniteStateMachine<Hub, Parser.CompiledCommand> 
         // game phase with it's own state machine.
         GAME {
             @Override
-            public Stage process(Hub hub, Parser.CompiledCommand cc) {
-                if (cc.getCommand() == Parser.Command.END_GAME) {
+            public Stage process(ServerCommand.Compiled cc, Hub hub) {
+                if (cc.command == ServerCommand.END_GAME) {
                     return PREPARE;
                 }
                 return this; // same state
@@ -85,6 +84,6 @@ class StageStateMachine extends FiniteStateMachine<Hub, Parser.CompiledCommand> 
             public void onExit(State nextState, Hub hub) {
                 hub.broadcast(MessageFormatter.broadcast("Winner: " + hub.getGameFSM().getWinner()));
             }
-        }
+        };
     }
 }

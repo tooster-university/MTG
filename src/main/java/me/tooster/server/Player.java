@@ -1,17 +1,16 @@
 package me.tooster.server;
 
-import me.tooster.common.MessageFormatter;
 import me.tooster.common.Parser;
-import me.tooster.common.CommandException;
 import me.tooster.server.MTG.Deck;
+import me.tooster.server.MTG.MTGCommand;
 import me.tooster.server.MTG.Mana;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
+
+import static me.tooster.server.ServerCommand.*;
 
 public class Player implements AutoCloseable {
 
@@ -23,11 +22,11 @@ public class Player implements AutoCloseable {
     private final int tag;                // unique tag per server
     private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
 
+    public final Parser<ServerCommand> scParser = new Parser<>(ServerCommand.class);
+    public final Parser<MTGCommand>mtgParser = new Parser<>(MTGCommand.class);
+
     private Hub hub;                // connected Hub
     private Deck deck;
-
-
-    private final EnumSet<Parser.Command> enabledCommands = EnumSet.of(Parser.Command.HELP);
 
 
     // MTG specific things
@@ -60,6 +59,9 @@ public class Player implements AutoCloseable {
         this.out = new PrintWriter(socket.getOutputStream(), true);
 
         this.tag = tag;
+
+        scParser.enableCommands(HELP, PING, CONFIG, DISCONNECT);
+        scParser.commandMask.remove(HELP);
 
         String[] config;
         try {
@@ -97,36 +99,6 @@ public class Player implements AutoCloseable {
     public Hub getHub() { return hub; }
 
     /**
-     * Specifies, which commands are enabled. HELP is always added as side effect
-     *
-     * @param commands commands to enable, and nothing besides them
-     */
-    public void setCommands(Parser.Command... commands) {
-        enabledCommands.clear();
-        enabledCommands.add(Parser.Command.HELP);
-        enabledCommands.addAll(Arrays.asList(commands));
-    }
-
-    /**
-     * Enables commands. HELP can be enabled again with it, but why would it even be disabled...
-     *
-     * @param commands commands to enable
-     */
-    public void enableCommands(Parser.Command... commands) { enabledCommands.addAll(Arrays.asList(commands)); }
-
-    /**
-     * Disables commands. HELP can be disabled only here, but seriously tho, why??
-     *
-     * @param commands commands to disable
-     */
-    public void disableCommands(Parser.Command... commands) { enabledCommands.removeAll(Arrays.asList(commands)); }
-
-    /**
-     * @return set of enabled commands for player at given moment
-     */
-    public EnumSet<Parser.Command> getEnabledCommands() { return enabledCommands; }
-
-    /**
      * @return player's deck
      */
     public Deck getDeck() { return deck; }
@@ -146,20 +118,14 @@ public class Player implements AutoCloseable {
     /**
      * Fetches and runs process command from player
      */
-    public void listen() throws IOException, CommandException {
+    public void listen() throws IOException {
             while (!flags.contains(Flag.AFK)) {
 
                 try {
-                    String s = in.readLine();
-                    if (s == null || s.isEmpty()) continue;
-                    ArrayList<String> command = new ArrayList<>(Arrays.asList(s.split("\\s+")));
-                    Parser.CompiledCommand cc = Parser.parse(this, command);
-                    hub.issueCommand(cc);
-                } catch (CommandException e) {// invalid command
-                    transmit(MessageFormatter.error(e.getMessage()));
-                    transmit(MessageFormatter.tip("use 'help' to get available commands"));
-                } catch (SocketTimeoutException e){
-                    hub.issueCommand(new Parser.CompiledCommand(context, Parser.Command.TIMEOUT, args));
+                    String cmd = in.readLine();
+                    if (cmd == null || cmd.isEmpty()) continue;
+                    hub.process(this, cmd);
+                } catch (SocketTimeoutException e){ // FIXME: Timeout
                     throw e;
                 }
             }
@@ -173,13 +139,6 @@ public class Player implements AutoCloseable {
     public synchronized void transmit(String data) {
         out.println(data);
     }
-
-    /**
-     * Sends a prompt requesting player action.
-     *
-     * @param msg description of requested action to send to the player
-     */
-    public synchronized void prompt(String msg) { transmit(MessageFormatter.prompt(msg)); }
 
     /**
      * Checks if player can cast a card with given ID

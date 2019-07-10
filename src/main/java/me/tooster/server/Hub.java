@@ -1,12 +1,14 @@
 package me.tooster.server;
 
 
+import me.tooster.common.CommandException;
 import me.tooster.common.MessageFormatter;
 import me.tooster.common.Parser;
 import me.tooster.server.MTG.GameStateMachine;
-import me.tooster.common.CommandException;
 
 import java.util.*;
+
+import static me.tooster.server.ServerCommand.*;
 
 /**
  * Hub manages connected players and
@@ -57,11 +59,11 @@ public class Hub {
 
         players.add(player);
         player.setHub(this);
-        player.setCommands(
-                Parser.Command.LIST_DECKS,
-                Parser.Command.SELECT_DECK,
-                Parser.Command.SHOW_DECK,
-                Parser.Command.READY);
+        player.scParser.setCommands(
+                LIST_DECKS,
+                SELECT_DECK,
+                SHOW_DECK,
+                READY);
         broadcast(" Player " + player.getNick() + " joined the hub. " + "Current players: " + players.size());
         player.transmit("Use HELP anytime to see available commands.");
 
@@ -86,22 +88,28 @@ public class Hub {
     /**
      * issues a command on this hub. Right now acts as a proxy to the StageStateMachine
      *
-     * @param cc compiled command from parser.
+     * @param player input author
+     * @param input input to process.
      */
-    void issueCommand(Parser.CompiledCommand cc) throws CommandException {
-        System.err.println(cc.toString());
+    void process(Player player, String input){
+        System.err.println(input);
+        try {
+            ServerCommand.Compiled scc = (ServerCommand.Compiled) player.scParser.parse(input);
+        } catch (CommandException e) {
+            e.printStackTrace();
+        }
         // FIXME: AFK handle
 
-        // player cry for help always enabled
-        if (cc.getCommand() == Parser.Command.HELP && !cc.isInternal()) {
-            cc.getPlayer().transmit(
-                    MessageFormatter.response(MessageFormatter.list(cc.getPlayer().getEnabledCommands().stream()
-                            .filter(c -> c.getAliases().length > 0)
-                            .map(c -> "[" + c.getAliases()[1] + "]\t" + c.getAliases()[0])
-                            .toArray()))
-            );
-        } else
-            stageFSM.process(this, cc);
+//        // player cry for help always enabled
+//        if (cc.getCommand() == Parser.Command.HELP && !cc.isInternal()) {
+//            cc.getPlayer().transmit(
+//                    MessageFormatter.response(MessageFormatter.list(cc.getPlayer().getEnabledCommands().stream()
+//                            .filter(c -> c.getAliases().length > 0)
+//                            .map(c -> "[" + c.getAliases()[1] + "]\t" + c.getAliases()[0])
+//                            .toArray()))
+//            );
+//        } else
+//            stageFSM.process(cc, this);
     }
 
     /**
