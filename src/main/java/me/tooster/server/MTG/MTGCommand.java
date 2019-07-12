@@ -1,6 +1,7 @@
 package me.tooster.server.MTG;
 
 import me.tooster.common.Command;
+import me.tooster.common.CommandException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,9 +26,16 @@ public enum MTGCommand implements Command {
     @Alias({"M", "MULLIGAN"}) MULLIGAN,
     @Alias({">", "C", "CAST"}) CAST;
 
+    // -----------------------------------------------------
+    // COPY PASTE TEMPLATE
+    // -----------------------------------------------------
+    public static final MTGCommand[] cachedValues = MTGCommand.values();
+
     public class Compiled extends Command.Compiled<MTGCommand> {
         public Compiled(@NotNull MTGCommand command, @Nullable String... args) { super(command, args); }
     }
 
-    public final static MTGCommand[] _cachedValues = MTGCommand.values();
+    public static Compiled parse(@NotNull String input) throws CommandException {
+        return (Compiled) Command._parse(MTGCommand.class, input);
+    }
 }

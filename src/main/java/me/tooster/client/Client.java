@@ -1,6 +1,5 @@
 package me.tooster.client;
 
-import me.tooster.server.Player;
 import me.tooster.server.Server;
 
 import java.io.*;

@@ -1,6 +1,8 @@
 package me.tooster.server;
 
 import me.tooster.common.Command;
+import me.tooster.common.CommandException;
+import org.jetbrains.annotations.NotNull;
 
 public enum ServerCommand implements Command {
 
@@ -9,7 +11,7 @@ public enum ServerCommand implements Command {
 
     @Alias({"?", "HELP"}) HELP,                             // returns list of enabled commands
     @Alias({"PING"}) PING,                                  // player pings the server to check alive
-    @Alias({"@", "CONFIG", "SETUP"}) CONFIG,                // sets up a name for example
+    @Alias({"@"}) CONFIG,                                   // sets up a name for example
     @Alias(("DC")) DISCONNECT,                              // player peaceful disconnect request
 
     // content commands
@@ -34,14 +36,17 @@ public enum ServerCommand implements Command {
     TIMEOUT,                                                  // executed if a player timeouted
     ;
 
-    private static final ServerCommand[] _cachedValues = ServerCommand.values();
+    // -----------------------------------------------------
+    // COPY PASTE TEMPLATE
+    // -----------------------------------------------------
+    public static final ServerCommand[] cachedValues = ServerCommand.values();
 
     public class Compiled extends Command.Compiled<ServerCommand> {
-        private Player player;
+        private User player;
 
         public Compiled(ServerCommand cmd, String... args) { super(cmd, args); }
 
-        public Player getPlayer() { return player; }
+        public User getPlayer() { return player; }
 
         /**
          * Adds info about player issuing the command to the compiled command
@@ -49,9 +54,13 @@ public enum ServerCommand implements Command {
          * @param player player issuing the command
          * @return Returns this compiled command but with setup player. Modifies original value.
          */
-        public Compiled withPlayer(Player player) {
+        public Compiled withPlayer(User player) {
             this.player = player;
             return this;
         }
+    }
+
+    public static Compiled parse(@NotNull String input) throws CommandException {
+        return (Compiled) Command._parse(ServerCommand.class, input);
     }
 }

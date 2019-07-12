@@ -12,11 +12,22 @@ import java.util.logging.Logger;
 public class Server implements Runnable {
     private static final Logger LOGGER;
     int port;
+    Hub hub;
 
     static {
         System.setProperty("java.util.logging.config.file",
                 Server.class.getClassLoader().getResource("logging.properties").getFile());
         LOGGER = Logger.getLogger(Server.class.getName());
+    }
+
+    private Server(){}
+
+    private static class SingletonHelper{
+        private static final Server INSTANCE = new Server();
+    }
+
+    public static Server getInstance(){
+        return SingletonHelper.INSTANCE;
     }
 
     // main thread listening for connections and creating connection-per-client threads
@@ -42,13 +53,14 @@ public class Server implements Runnable {
         try (ServerSocket server = new ServerSocket(port)) {
             LOGGER.info("Server started at " + port + ". Waiting for clients to connect...");
             ResourceManager.getInstance(); // prefetch decks
+            hub = new Hub();
             // listen for clients
             int tag = 0;
             while (true) {
                 Socket serverClient = server.accept();
-                LOGGER.info( "Client " + ++tag + " connected.");
-                ClientThread ct = new ClientThread(serverClient, new Hub(), tag);
-                new Thread(ct).start();
+                LOGGER.info("Client " + ++tag + " connected.");
+                User p = new User();
+                new Thread(p).start();
             }
         } catch (Exception e) {
             LOGGER.severe(e.getMessage());
@@ -63,12 +75,12 @@ public class Server implements Runnable {
     private static class ClientThread implements Runnable {
 
         Socket socket;
-        Hub hub;
-        int tag;
-        Player player;
+        Hub    hub;
+        int    tag;
+        User   player;
 
         /**
-         * Creates new thread for Player
+         * Creates new thread for User
          *
          * @param inSocket socket on which server will listen for player's input
          * @param hub      hub to which the player connects
@@ -87,7 +99,8 @@ public class Server implements Runnable {
             ResourceManager.getInstance();
             // create new playable player with given tag and socket for transmission
             // player implements auto close-able so in case of socket failure, it is properly closed
-            try (Player player = new Player(socket, tag)) {
+            try (User player = new User(Server.this, ocket, tag)) {
+                player.
 
 
                 if (hub.addPlayer(player)) {
@@ -97,9 +110,9 @@ public class Server implements Runnable {
                     player.transmit(MessageFormatter.error("Game is already in progress, cannot join the hub"));
 
             } catch (SocketTimeoutException | SocketException e) {
-                LOGGER.info("Player timeouted or connection reset.");
+                LOGGER.info("User timeouted or connection reset.");
             } catch (IOException e) {
-                LOGGER.severe( "Socket error.");
+                LOGGER.severe("Socket error.");
                 e.printStackTrace();
             } catch (Exception e) {
                 LOGGER.severe("WTF happened.");

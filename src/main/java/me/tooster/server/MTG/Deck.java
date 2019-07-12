@@ -1,6 +1,6 @@
 package me.tooster.server.MTG;
 
-import me.tooster.server.Player;
+import me.tooster.server.User;
 import me.tooster.server.ResourceManager;
 import me.tooster.server.exceptions.CardException;
 import me.tooster.server.exceptions.DeckException;
@@ -10,8 +10,8 @@ import java.util.*;
 
 public class Deck {
 
-    private Player owner;
-    private final Map<String, Object> properties; // properties from YAML file
+    private       User                           owner;
+    private final Map<String, Object>            properties; // properties from YAML file
     private final EnumMap<Pile, ArrayList<Card>> piles = new EnumMap<>(Pile.class);
 
 
@@ -23,15 +23,15 @@ public class Deck {
     }
 
 
-    private Deck(@NotNull Player owner, @NotNull Map<String, Object> properties) throws CardException {
+    private Deck(@NotNull User owner, @NotNull Map<String, Object> properties) throws CardException {
         this.properties = properties;
         this.owner = owner;
         for (Pile pile : Pile.cachedValues()) piles.put(pile, new ArrayList<>());
     }
 
-    public void setOwner(Player owner) { this.owner = owner; }
+    public void setOwner(User owner) { this.owner = owner; }
 
-    public Player getOwner() { return owner; }
+    public User getOwner() { return owner; }
 
     public Map<String, Object> getProperties() { return properties; }
 
@@ -111,7 +111,7 @@ public class Deck {
      *                 optional sideboard field
      * @return new Deck object if deck was successfully created
      */
-    public static Deck build(Player owner, String deckname) throws DeckException, CardException {
+    public static Deck build(User owner, String deckname) throws DeckException, CardException {
         Deck deck = new Deck(owner, ResourceManager.getInstance().getDeck(deckname));
         owner.setDeck(deck);
         for (Pile pile : Pile.cachedValues()) { // for all piles saved in deck.yml file

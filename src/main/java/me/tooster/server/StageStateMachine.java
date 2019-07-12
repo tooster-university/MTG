@@ -52,9 +52,9 @@ class StageStateMachine extends FiniteStateMachine<ServerCommand.Compiled, Hub> 
                             cc.getPlayer().transmit(MessageFormatter.error("You must select deck first."));
                             return this;
                         } else {
-                            cc.getPlayer().getFlags().add(Player.Flag.READY);
+                            cc.getPlayer().getFlags().add(User.Flag.READY);
                             // hub.players cannot be empty here
-                            if (!hub.getPlayers().stream().allMatch(p -> p.getFlags().contains(Player.Flag.READY))) {
+                            if (!hub.getPlayers().stream().allMatch(p -> p.getFlags().contains(User.Flag.READY))) {
                                 hub.broadcast(MessageFormatter.broadcast("Waiting for all players to be ready."));
                                 return this;
                             }

@@ -3,18 +3,18 @@ package me.tooster.server.MTG;
 import me.tooster.common.FiniteStateMachine;
 import me.tooster.server.Hub;
 import me.tooster.common.Parser;
-import me.tooster.server.Player;
+import me.tooster.server.User;
 
 public class GameStateMachine extends FiniteStateMachine<Hub, > {
 
     private boolean autoNext = false;
-    private Player winner = null;
+    private User    winner   = null;
 
     public GameStateMachine() {
         super(Phase.DECK_SETUP);
     }
 
-    public Player getWinner() { return winner; }
+    public User getWinner() { return winner; }
 
     enum Phase implements State<Parser.CompiledCommand, Hub> {
         // game prepare gamePhase

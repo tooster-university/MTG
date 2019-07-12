@@ -3,7 +3,6 @@ package me.tooster.server;
 
 import me.tooster.common.CommandException;
 import me.tooster.common.MessageFormatter;
-import me.tooster.common.Parser;
 import me.tooster.server.MTG.GameStateMachine;
 
 import java.util.*;
@@ -18,8 +17,8 @@ public class Hub {
     private final StageStateMachine stageFSM = new StageStateMachine();
     private GameStateMachine gameFSM;
 
-    private final List<Player> players = new ArrayList<>(); // players connected to session
-    private int ID = 0;                                             // ID for objects. Collective for players and cards
+    private final List<User>           players  = new ArrayList<>(); // players connected to session
+    private int                        ID       = 0;                                             // ID for objects. Collective for players and cards
     private final Map<Integer, Object> mappings = new HashMap<>();
 
     //------------------------------------------------------------------------------------------------------------------
@@ -50,10 +49,10 @@ public class Hub {
      * @return true if player got connected, false otherwise
      * @throws IllegalArgumentException if somehow player with given name and tag already exists
      */
-    boolean addPlayer(Player player) {
+    boolean addPlayer(User player) {
 
         if (players.stream().anyMatch(p -> p.getNick().equals(player.getNick())))
-            throw new IllegalArgumentException("Player with given nick and tag was already added. WTF.");
+            throw new IllegalArgumentException("User with given nick and tag was already added. WTF.");
         if (stageFSM.getCurrentState() != StageStateMachine.Stage.PREPARE) // players cannot connect
             return false;
 
@@ -64,7 +63,7 @@ public class Hub {
                 SELECT_DECK,
                 SHOW_DECK,
                 READY);
-        broadcast(" Player " + player.getNick() + " joined the hub. " + "Current players: " + players.size());
+        broadcast(" User " + player.getNick() + " joined the hub. " + "Current players: " + players.size());
         player.transmit("Use HELP anytime to see available commands.");
 
         return true;
@@ -73,7 +72,7 @@ public class Hub {
     /**
      * @return List of players connected to this hub.
      */
-    List<Player> getPlayers() { return players; }
+    List<User> getPlayers() { return players; }
 
     /**
      * Sends message to all players
@@ -81,7 +80,7 @@ public class Hub {
      * @param msg message to send
      */
     void broadcast(String msg) {
-        for (Player p : players)
+        for (User p : players)
             p.transmit(MessageFormatter.broadcast(msg));
     }
 
@@ -91,10 +90,10 @@ public class Hub {
      * @param player input author
      * @param input input to process.
      */
-    void process(Player player, String input){
-        System.err.println(input);
+    void process(User player, String input){
+        System.err.println(player + input);
         try {
-            ServerCommand.Compiled scc = (ServerCommand.Compiled) player.scParser.parse(input);
+            ServerCommand.Compiled scc = ServerCommand.parse(input);
         } catch (CommandException e) {
             e.printStackTrace();
         }

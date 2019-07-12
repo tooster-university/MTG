@@ -1,18 +1,20 @@
 package me.tooster.server;
 
-import me.tooster.common.Parser;
+import me.tooster.common.CommandException;
+import me.tooster.common.CommandManager;
 import me.tooster.server.MTG.Deck;
-import me.tooster.server.MTG.MTGCommand;
 import me.tooster.server.MTG.Mana;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.EnumSet;
 
-import static me.tooster.server.ServerCommand.*;
+public class User implements AutoCloseable, Runnable {
 
-public class Player implements AutoCloseable {
+    private Hub hub;                // connected Hub
+    private Deck deck;
 
     private BufferedReader in;
     private PrintWriter out;
@@ -22,11 +24,9 @@ public class Player implements AutoCloseable {
     private final int tag;                // unique tag per server
     private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
 
-    public final Parser<ServerCommand> scParser = new Parser<>(ServerCommand.class);
-    public final Parser<MTGCommand>mtgParser = new Parser<>(MTGCommand.class);
+    public final CommandManager<ServerCommand> scParser  = new CommandManager<>(ServerCommand.class);
+//    public final Parser<MTGCommand>            mtgParser = new Parser<>(MTGCommand.class);
 
-    private Hub hub;                // connected Hub
-    private Deck deck;
 
 
     // MTG specific things
@@ -52,27 +52,51 @@ public class Player implements AutoCloseable {
      * @param tag    tag assigned by the server
      * @throws IOException for socket errors
      */
-    public Player(Socket socket, int tag) throws IOException {
-        socket.setSoTimeout(5000); // 5 second timeout for config sending
+    public User(Hub hub, Socket socket, int tag) throws IOException {
+        this.hub = hub;
+
         this.socket = socket;
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out = new PrintWriter(socket.getOutputStream(), true);
 
         this.tag = tag;
 
-        scParser.enableCommands(HELP, PING, CONFIG, DISCONNECT);
-        scParser.commandMask.remove(HELP);
+        scParser.enableCommands(ServerCommand.HELP, ServerCommand.PING, ServerCommand.CONFIG, ServerCommand.DISCONNECT);
+        scParser.commandMask.remove(ServerCommand.HELP);
 
-        String[] config;
-        try {
-            config = in.readLine().split("\\s+"); // read config with nick
-        } catch (SocketTimeoutException e) {
-            throw new IOException("Player didn't send config data in the first 5 seconds. Assuming he is dead.");
-        }
-
-        this.nick = config[0];
+        this.nick = "thelegend27";
         HP = 20;
         manaPool = new Mana(null);
+    }
+
+    @Override
+    public void run() {
+
+        // pull-in the config
+        try {
+            socket.setSoTimeout(5000); // 5 second timeout to receive config data from client
+            ServerCommand.Compiled scc = ServerCommand.parse(in.readLine());
+        } catch (SocketTimeoutException e) {
+            throw new IOException("Player didn't send config data in the first 5 seconds. Assuming he is dead.");
+        } catch (CommandException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        while (!flags.contains(Flag.AFK)) { // FIXME: dafuq is this shit ???
+            try {
+                String cmd = in.readLine();
+                if (cmd == null || cmd.isEmpty()) continue;
+                hub.process(this, cmd);
+            } catch (SocketTimeoutException e){ // FIXME: Timeout
+                throw e;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -116,22 +140,6 @@ public class Player implements AutoCloseable {
     public EnumSet<Flag> getFlags() { return flags; }
 
     /**
-     * Fetches and runs process command from player
-     */
-    public void listen() throws IOException {
-            while (!flags.contains(Flag.AFK)) {
-
-                try {
-                    String cmd = in.readLine();
-                    if (cmd == null || cmd.isEmpty()) continue;
-                    hub.process(this, cmd);
-                } catch (SocketTimeoutException e){ // FIXME: Timeout
-                    throw e;
-                }
-            }
-    }
-
-    /**
      * Send data to player
      *
      * @param data data to be sent
@@ -163,6 +171,11 @@ public class Player implements AutoCloseable {
         out.close();
         socket.close();
         flags.add(Flag.AFK);
+    }
+
+    @Override
+    public String toString() {
+        return getNick();
     }
 }
 

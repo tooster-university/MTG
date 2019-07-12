@@ -31,8 +31,8 @@ public interface Command {
 
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Cmd{
-        boolean enabled() default false;
+    @interface Enable {
+        boolean value() default false;
     }
 
     /**
@@ -70,10 +70,19 @@ public interface Command {
 
     /**
      * @return returns list of all defined commands.
+     * FIXME #1: check if this successfully hides enum values() if overridden
      */
-    static Command[] values(){return new Command[0];}
+    Command[] values();
 
-    static Compiled parse(@NotNull String input) throws CommandException {
+
+    /**
+     * Parses the input and returns compiled command
+     * @param clazz exact class of enum to parse
+     * @param input input string to parse
+     * @return compiled command with command and string argument list
+     * @throws CommandException if command cannot parse aka doesn't match any or error occurs
+     */
+    static <CMD extends Command> Compiled _parse(Class<CMD> clazz, @NotNull String input) throws CommandException {
         List<String> matchList    = new ArrayList<>();
         Pattern      regex        = Pattern.compile("[^\\s\"]+|\"([^\"]*)\""); // matches: (abcd) "(xy zv)" (x)
         Matcher      regexMatcher = regex.matcher(input);
@@ -81,7 +90,7 @@ public interface Command {
             matchList.add(regexMatcher.group(1) != null ? regexMatcher.group(1) : regexMatcher.group());
 
         String cname = matchList.remove(0); // command name
-        for (Command c : values()) {
+        for (Command c : clazz.getEnumConstants()) {
             if (c.getClass().getAnnotation(Command.Alias.class) != null) // check for alias annotation
                 for (String alias : c.getClass().getAnnotation(Command.Alias.class).value()) // check all aliases
                     // matching alias
@@ -90,5 +99,4 @@ public interface Command {
         }
         throw new CommandException("No such command.");
     }
-
 }

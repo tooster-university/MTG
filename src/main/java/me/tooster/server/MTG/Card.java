@@ -1,6 +1,6 @@
 package me.tooster.server.MTG;
 
-import me.tooster.server.Player;
+import me.tooster.server.User;
 import me.tooster.server.ResourceManager;
 import me.tooster.server.exceptions.CardException;
 import me.tooster.server.exceptions.ManaFormatException;
@@ -11,15 +11,15 @@ import java.util.*;
  * @brief represents card-object, be it in the hand, graveyard or on the board
  */
 public class Card {
-    private Integer ID;                                 // integer id that will be displayed on the board. Set by engine
-    private final Deck deck;                            // deck containing the card
-    private Deck.Pile pile;                             // pile in which the card currently is
-    private Player owner;                               // owner of the card i.e. player, whose deck contained this card
-    private Player controller;                          // pile containing current card
-    private Mana cost;                                  // mana cost of the card
+    private       Integer             ID;                                 // integer id that will be displayed on the board. Set by engine
+    private final Deck                deck;                            // deck containing the card
+    private       Deck.Pile           pile;                             // pile in which the card currently is
+    private       User                owner;                               // owner of the card i.e. player, whose deck contained this card
+    private       User                controller;                          // pile containing current card
+    private       Mana                cost;                                  // mana cost of the card
     private final Map<String, Object> properties;       // reference to yaml map loaded by ResourceManager
     private final Map<String, Object> selfProperties;   // selfProperties for properties with read only
-    private final EnumSet<Flag> flags;                  // card specific flags to represent the status and selfProperties
+    private final EnumSet<Flag>       flags;                  // card specific flags to represent the status and selfProperties
 
     private Card(Deck deck, Map<String, Object> cardYaml) {
         this.deck = deck;
@@ -72,7 +72,7 @@ public class Card {
 
     public int getID() {return ID;}
 
-    public void setController(Player controller) { this.controller = controller; }
+    public void setController(User controller) { this.controller = controller; }
 
     public Set<Flag> getFlags() {return Collections.unmodifiableSet(flags);}
 

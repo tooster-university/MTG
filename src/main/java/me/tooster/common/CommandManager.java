@@ -2,17 +2,18 @@ package me.tooster.common;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 /**
- * Class managing the parsing of a command. It has a list of enabled commands
+ * class to enable and disable commands
  *
  * @param <CMD> command type extending Enum implementing {@link me.tooster.common.Command.Compiled}
  */
-public class Parser<CMD extends Enum<CMD> & Command> {
+public class CommandManager<CMD extends Enum<CMD> & Command> {
 
     private final Class<CMD>   enumClass;
     private final EnumSet<CMD> enabledCommands;
@@ -21,10 +22,16 @@ public class Parser<CMD extends Enum<CMD> & Command> {
      */
     public final  EnumSet<CMD> commandMask;
 
-    public Parser(Class<CMD> enumClass) {
-        this.enumClass = enumClass;
+    /**
+     * Creates new command manger that manages the states of given commands
+     * @param enumClass enum class
+     */
+    public CommandManager(Class<CMD> enumClass) {
+        enumClass = (Class<CMD>) ((CMD) new Object()).getClass();
+        this.enumClass = enumClass; // FIXME: WTF hackto get enum class
         enabledCommands = EnumSet.noneOf(enumClass);
         commandMask = EnumSet.allOf(enumClass);
+
     }
 
     /**
@@ -68,5 +75,9 @@ public class Parser<CMD extends Enum<CMD> & Command> {
      * @return true iff command is enabled
      */
     public boolean isEnabled(CMD command) { return enabledCommands.contains(command); }
+
+    public EnumSet<CMD> getEnabled() {return EnumSet.copyOf(enabledCommands); }
+
+    public EnumSet<CMD> getDisabed() {return EnumSet.complementOf(enabledCommands); }
 
 }
