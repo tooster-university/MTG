@@ -1,5 +1,10 @@
 package me.tooster.common;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Abstract finite state machine that holds current state and has auto-go feature.
  *
@@ -7,16 +12,15 @@ package me.tooster.common;
  * @param <C> Context type for machine states
  */
 public abstract class FiniteStateMachine<I, C> {
-    private State<I, C> currentState;
-    private boolean     autoNext = false;
-
+    private   State<I, C> currentState;
     /**
-     * Create new FSM with initial state.
-     *
-     * @param initialState Initial state for machine. Machine won't execute initial state's <code>onEnter()</code>
-     *                     first time.
+     * Enables auto-advance mode of FSM, so that it won't wait for input from user - external call to
+     * <code>process()</code>. Instead it supplies itself with input and context objects passed to the function at
+     * the beginning of auto phase. To alter parameters, simply modify the content of input or context
      */
-    protected FiniteStateMachine(State<I, C> initialState) {currentState = initialState;}
+    protected boolean     autoNext = false;
+
+    public FiniteStateMachine(State<I, C> initialState) { currentState = initialState; }
 
     /**
      * Advances the state of FSM. It will keep processing with Hub and CompiledCommand until <code>disableAuto()</code>
@@ -40,21 +44,14 @@ public abstract class FiniteStateMachine<I, C> {
         } while (autoNext);
     }
 
+    public void process(I input) { process(input, null); }
+
+    public void restart() {}
+
     /**
      * @return returns current state
      */
     public State<I, C> getCurrentState() { return currentState; }
-
-    /**
-     * Enables auto-advance mode of FSM, so that it won't wait for input command (external call to <code>process()
-     * </code>.
-     */
-    void enableAuto() {autoNext = true;}
-
-    /**
-     * Disables auto-advance mode of FSM, so next state update will be triggered only with some input command.
-     */
-    void disableAuto() {autoNext = false;}
 
     /**
      * Interface for States.
@@ -62,7 +59,7 @@ public abstract class FiniteStateMachine<I, C> {
      * @param <I> Input that State accepts
      * @param <C> context that State accepts
      */
-    public interface State<I, C>{
+    public interface State<I, C> {
         /**
          * Processes the CompiledCommand inside State. Returns next state to go to, or this if state doesn't change
          *

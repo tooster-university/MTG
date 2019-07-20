@@ -5,7 +5,8 @@ version: 0.1
 
 # USER CONFIG HERE. TODO: make it count XD LUL.
 # -------------------------------------------
-
+default_server_ip: 127.0.0.1
+default_server_port: 62442
 # initial player's HP
 initial_HP: 20
 # maximum hand size

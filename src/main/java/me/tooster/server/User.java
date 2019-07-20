@@ -1,7 +1,7 @@
 package me.tooster.server;
 
 import me.tooster.common.CommandException;
-import me.tooster.common.CommandManager;
+import me.tooster.common.CommandController;
 import me.tooster.server.MTG.Deck;
 import me.tooster.server.MTG.Mana;
 
@@ -24,7 +24,7 @@ public class User implements AutoCloseable, Runnable {
     private final int tag;                // unique tag per server
     private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
 
-    public final CommandManager<ServerCommand> scParser  = new CommandManager<>(ServerCommand.class);
+    private final CommandController<ServerCommand> scParser = new CommandController<>(ServerCommand.class);
 //    public final Parser<MTGCommand>            mtgParser = new Parser<>(MTGCommand.class);
 
 
@@ -62,7 +62,7 @@ public class User implements AutoCloseable, Runnable {
         this.tag = tag;
 
         scParser.enableCommands(ServerCommand.HELP, ServerCommand.PING, ServerCommand.CONFIG, ServerCommand.DISCONNECT);
-        scParser.commandMask.remove(ServerCommand.HELP);
+        scParser.mask.remove(ServerCommand.HELP);
 
         this.nick = "thelegend27";
         HP = 20;
@@ -75,7 +75,7 @@ public class User implements AutoCloseable, Runnable {
         // pull-in the config
         try {
             socket.setSoTimeout(5000); // 5 second timeout to receive config data from client
-            ServerCommand.Compiled scc = ServerCommand.parse(in.readLine());
+            ServerCommand.Parsed scc = ServerCommand.parse(in.readLine());
         } catch (SocketTimeoutException e) {
             throw new IOException("Player didn't send config data in the first 5 seconds. Assuming he is dead.");
         } catch (CommandException e) {

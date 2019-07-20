@@ -11,15 +11,15 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-class StageStateMachine extends FiniteStateMachine<ServerCommand.Compiled, Hub> {
+class StageStateMachine extends FiniteStateMachine<ServerCommand.Parsed, Hub> {
 
     StageStateMachine() { super(Stage.PREPARE); }
-    enum Stage implements FiniteStateMachine.State<ServerCommand.Compiled, Hub> {
+    enum Stage implements FiniteStateMachine.State<ServerCommand.Parsed, Hub> {
         PREPARE { // players can import decks and select a deck.
 
 
             @Override
-            public Stage process(ServerCommand.Compiled cc, Hub hub) {
+            public Stage process(ServerCommand.Parsed cc, Hub hub) {
                 switch (cc.command) {
                     case LIST_DECKS: {
                         String[] decks = ResourceManager.getInstance().getDecks().toArray(new String[]{});
@@ -73,7 +73,7 @@ class StageStateMachine extends FiniteStateMachine<ServerCommand.Compiled, Hub> 
         // game phase with it's own state machine.
         GAME {
             @Override
-            public Stage process(ServerCommand.Compiled cc, Hub hub) {
+            public Stage process(ServerCommand.Parsed cc, Hub hub) {
                 if (cc.command == ServerCommand.END_GAME) {
                     return PREPARE;
                 }

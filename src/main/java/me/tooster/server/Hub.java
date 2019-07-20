@@ -93,7 +93,7 @@ public class Hub {
     void process(User player, String input){
         System.err.println(player + input);
         try {
-            ServerCommand.Compiled scc = ServerCommand.parse(input);
+            ServerCommand.Parsed scc = ServerCommand.parse(input);
         } catch (CommandException e) {
             e.printStackTrace();
         }

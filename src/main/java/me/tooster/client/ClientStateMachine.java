@@ -7,18 +7,16 @@ import me.tooster.common.FiniteStateMachine;
  */
 public class ClientStateMachine extends FiniteStateMachine<ClientCommand.Compiled, Client> {
 
-    protected ClientStateMachine() {
-        super(ClientStage.NOT_CONNECTED);
-    }
+    protected ClientStateMachine() { super(ClientStage.NOT_CONNECTED); }
 
-    enum ClientStage implements State<ClientCommand.Compiled, Client>{
-        NOT_CONNECTED{
+    enum ClientStage implements State<ClientCommand.Compiled, Client> {
+        NOT_CONNECTED {
             @Override
             public ClientStage process(ClientCommand.Compiled input, Client context) {
-                return null;
+                return this;
             }
         },
-        CONNECTED{
+        CONNECTED {
             @Override
             public ClientStage process(ClientCommand.Compiled input, Client context) {
                 return null;
