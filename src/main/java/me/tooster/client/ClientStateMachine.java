@@ -1,24 +1,31 @@
 package me.tooster.client;
 
+import me.tooster.common.Command;
 import me.tooster.common.FiniteStateMachine;
 
 /**
  * See the {@link me.tooster.common.FiniteStateMachine me.tooster.common.FiniteStateMachine&lt;I, C&gt;}
  */
-public class ClientStateMachine extends FiniteStateMachine<ClientCommand.Compiled, Client> {
+class ClientStateMachine extends FiniteStateMachine<Command.Compiled<ClientCommand>, Client> {
 
-    protected ClientStateMachine() { super(ClientStage.NOT_CONNECTED); }
+    ClientStateMachine() { super(ClientStage.NOT_CONNECTED); }
 
-    enum ClientStage implements State<ClientCommand.Compiled, Client> {
+    enum ClientStage implements State<Command.Compiled<ClientCommand>, Client> {
         NOT_CONNECTED {
             @Override
-            public ClientStage process(ClientCommand.Compiled input, Client context) {
+            public ClientStage process(Command.Compiled<ClientCommand> input, Client context) {
+                switch (input.cmd){
+                    case HELP: break;
+                    case CONNECT: break;
+                    case CHANGE_NAME: break;
+                    case SHUTDOWN: break;
+                }
                 return this;
             }
         },
         CONNECTED {
             @Override
-            public ClientStage process(ClientCommand.Compiled input, Client context) {
+            public ClientStage process(Command.Compiled<ClientCommand> input, Client context) {
                 return null;
             }
         }

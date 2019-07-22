@@ -1,15 +1,17 @@
 package me.tooster.client;
 
 import me.tooster.common.Command;
-import me.tooster.common.CommandController;
+import me.tooster.common.Formatter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static me.tooster.client.ClientCommand.*;
 
@@ -35,7 +37,7 @@ public class Client implements Runnable {
         this.IP = IP;
         this.port = port;
         cFSM = new ClientStateMachine();
-        cmdController = new Command.Controller<ClientCommand>();
+        cmdController = new Command.Controller<>();
         System.out.println("\33[36m]--==: MTG Client started :==--[$\33[0m");
     }
 
@@ -47,34 +49,37 @@ public class Client implements Runnable {
         if (IP != null)
             cFSM.process(cmdController.compile(CONNECT, IP, String.valueOf(port)));
 
-        Scanner                         scanner = new Scanner(System.in);
-        String                          input;
-        Command.Compiled<ClientCommand> parsed;
+        Scanner scanner = new Scanner(System.in);
+        String  input;
 
         parseLoop:
         do {
             input = scanner.nextLine();
-            parsed = cmdController.parse(input);
+            Command.Compiled<ClientCommand> compiled = cmdController.parse(input);
 
-            switch (parsed.cmd) {
-                case SHUTDOWN: break parseLoop;
+            switch (compiled.cmd) {
                 case HELP:
-                    String[] help = cmdController.getEnabled()
+                    if (compiled.args.length == 1 &&
+                            Arrays.stream(cachedValues).anyMatch(c -> c.matches(compiled.args[0])))
+                        System.out.println(ClientCommand.valueOf(compiled.args[0].toUpperCase()).help());
+                    else {
+
+                        String s = Formatter.YELLOW +
+                                cmdController.enabledCommands
+                                        .stream()
+                                        .map(Enum::toString)
+                                        .collect(Collectors.joining("\n")) + Formatter.RESET;
+                        System.out.println(Formatter.UNDERLINE + "Client commands:\n" + Formatter.RESET + s);
+                        cFSM.process(compiled);
+                    }
+                    break;
+                case SHUTDOWN:
+                    break parseLoop;
+                default:
+                    cFSM.process(compiled, this);
             }
+        } while (true);
 
-        } while (parsed)
-        String input;
-        if (!(input = scanner.nextLine()).isEmpty()) {
-
-        }
-
-        Socket socket = connect(args[1], Integer.parseInt(args[2]));
-        if (socket != null)
-            new Thread(new Receiver(socket)).start(); // create reader from server
-
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        out.println(args[2]); // send nick to server as config data
-        out.flush();
     }
 
     /**
@@ -126,6 +131,7 @@ public class Client implements Runnable {
                 System.exit(1);
             }
         }
+
     }
 
     //------------------------------------------------------------------------------------------------------------------

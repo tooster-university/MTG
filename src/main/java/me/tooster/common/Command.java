@@ -1,7 +1,6 @@
 package me.tooster.common;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +12,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * Interface for commands with alias. Each command can be compiled with code in format
@@ -23,7 +21,7 @@ import java.util.stream.Stream;
 public interface Command {
 
     /**
-     * Used to alias the commands. Command without alias won't be matched.
+     * Used to alias the commands. Command without alias won't be matched. Main alias is the first one
      */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -31,72 +29,66 @@ public interface Command {
         String[] value() default {};
     }
 
+    /**
+     * Returns help for the command
+     */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Help {
+        String value() default "";
+    }
+
     default boolean matches(String input) {
         return (this.getClass().isAnnotationPresent(Alias.class)) &&
                 Arrays.stream(this.getClass().getAnnotation(Alias.class).value()).anyMatch(s -> s.equalsIgnoreCase(input));
     }
 
+    /**
+     * @return list of aliases for the command
+     */
     default String[] aliases() {
         return this.getClass().isAnnotationPresent(Alias.class)
                ? this.getClass().getAnnotation(Alias.class).value()
                : new String[0];
     }
 
+    /**
+     * @return main (first) alias of command or empty string if it doesn't exist
+     */
+    default String mainAlias() {
+        String[] aliases = aliases();
+        return aliases.length > 0 ? aliases[0] : "";
+    }
+
+    /**
+     * @return the acronym of command (second alias) if exists, otherwise returns empty string
+     */
+    default String acronym() {
+        String[] aliases = aliases();
+        return aliases.length > 1 ? aliases[1] : "";
+    }
+
+    /**
+     * @return Returns help message for this command.
+     */
+    default String help() {
+        return this.getClass().isAnnotationPresent(Help.class)
+               ? this.getClass().getAnnotation(Help.class).value()
+               : "";
+    }
+
     class Controller<CMD extends Enum<CMD> & Command> {
         private final Class<CMD>   enumClass;
-        private final EnumSet<CMD> enabledCommands;
-        public final  EnumSet<CMD> mask; // mask for enable/disable etc
-
-        enum Status {ENABLED, DISABLED, MASKED, UNMASKED}
+        public final  EnumSet<CMD> enabledCommands;
+        public final  EnumSet<CMD> commandMask; // commandMask for enable/disable etc
 
         public Controller() { //(Class<CMD> enumClass) {
-            enumClass = (Class<CMD>) ((CMD) new Object()).getClass();// FIXME: WTF hack to get enum class
+            enumClass = (Class<CMD>) ((CMD) new Object()).getClass();// FIXME: WTF may work hack to get enum class???
 //        this.enumClass = enumClass;
             enabledCommands = EnumSet.noneOf(enumClass);
-            mask = EnumSet.allOf(enumClass);
+            commandMask = EnumSet.allOf(enumClass);
 
         }
-
-
-        /**
-         * Sets specified commands as enabled and rest as disabled. Affected by mask.
-         *
-         * @see #set(Status, Enum[])
-         */
-        public void set(CMD... commands) { set(null, commands);}
-
-        /**
-         * Controls the enabled/disabled status of commands for this controller.
-         *
-         * @param status   If status is specified, change the state of specified commands to
-         *                 'status' leaving others intact. If null - disable unspecified and enable specified.
-         *                 Affected by mask
-         * @param commands Commands to set.
-         */
-        public void set(Status status, CMD... commands) {
-            EnumSet<CMD> switchMask = commands.length == 0 ? EnumSet.allOf(enumClass)
-                                                           : EnumSet.copyOf(Arrays.asList(commands));
-            if (status == null) { // for null status, set enabled to 'commands' and disable the rest (intersect mask)
-                enabledCommands.removeAll(mask);
-                status = Status.ENABLED;
-            }
-
-            switchMask.retainAll(mask); // affect only masked types
-            switch (status) {
-                case ENABLED: enabledCommands.addAll(switchMask);
-                    break;
-                case DISABLED: enabledCommands.removeAll(switchMask);
-                    break;
-            }
-        }
-
-        public EnumSet<CMD> get(@NotNull Status status) {
-            return status == Status.ENABLED
-                   ? EnumSet.copyOf(enabledCommands)
-                   : EnumSet.complementOf(enabledCommands);
-        }
-
-        public EnumSet<CMD> getDisabed() {return EnumSet.complementOf(enabledCommands); }
 
         /**
          * Parses the input and returns compiled command
@@ -130,16 +122,6 @@ public interface Command {
             return new Compiled<>(this, command, args);
         }
 
-        /**
-         * @return return
-         */
-        public Stream<String> help(Status status) {
-            return getEnabled()
-                    .stream()
-                    .filter(c -> c.aliases().length > 0)
-                    .map(c -> "[" + c.aliases()[1] + "]\t" + c.aliases()[0]);
-        }
-
     }
 
     class Compiled<CMD> {
@@ -160,9 +142,15 @@ public interface Command {
             this.args = args == null ? new String[0] : args;
         }
 
+        /**
+         * @return true iff command is enabled in it's controller
+         */
         public boolean isEnabled() { return controller.enabledCommands.contains(this.cmd); }
 
-        public boolean isMasked() {return controller.mask.contains(this.cmd);}
+        /**
+         * @return true iff command is in mask in it's controller
+         */
+        public boolean isMasked() {return controller.commandMask.contains(this.cmd);}
 
         /**
          * Converts command to readable format as <br>

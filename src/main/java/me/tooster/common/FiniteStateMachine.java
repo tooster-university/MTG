@@ -1,10 +1,5 @@
 package me.tooster.common;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
  * Abstract finite state machine that holds current state and has auto-go feature.
  *
@@ -12,15 +7,16 @@ import java.lang.annotation.Target;
  * @param <C> Context type for machine states
  */
 public abstract class FiniteStateMachine<I, C> {
-    private   State<I, C> currentState;
+    private State<I, C> initialState;
+    private State<I, C> currentState;
     /**
      * Enables auto-advance mode of FSM, so that it won't wait for input from user - external call to
      * <code>process()</code>. Instead it supplies itself with input and context objects passed to the function at
      * the beginning of auto phase. To alter parameters, simply modify the content of input or context
      */
-    protected boolean     autoNext = false;
+    private boolean     autoNext = false;
 
-    public FiniteStateMachine(State<I, C> initialState) { currentState = initialState; }
+    public FiniteStateMachine(State<I, C> initialState) { this.initialState = currentState = initialState; }
 
     /**
      * Advances the state of FSM. It will keep processing with Hub and CompiledCommand until <code>disableAuto()</code>
@@ -46,7 +42,25 @@ public abstract class FiniteStateMachine<I, C> {
 
     public void process(I input) { process(input, null); }
 
-    public void restart() {}
+    /**
+     * Sets the auto mode. Without auto mode, the FSM loop is as follows:
+     * <pre>
+     *     1. wait for user to invoke `process(i, c)`
+     *     2. |update FSM with i, c|
+     *     3. if auto is enabled goto 2. otherwise goto 1.
+     * </pre>
+     *
+     * @param enabled sets the auto mode
+     */
+    public void setAuto(boolean enabled) {autoNext = enabled;}
+
+    /**
+     * Resets the state machine to initial state and turn's off the auto mode;
+     */
+    public synchronized void reset() {
+        currentState = initialState;
+        autoNext = false;
+    }
 
     /**
      * @return returns current state
@@ -85,7 +99,6 @@ public abstract class FiniteStateMachine<I, C> {
          * @param context context for machine
          */
         default void onExit(State<I, C> nextState, C context) {}
-
     }
 
 }

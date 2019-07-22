@@ -1,6 +1,6 @@
 package me.tooster.server;
 
-import me.tooster.common.MessageFormatter;
+import me.tooster.common.Formatter;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -107,7 +107,7 @@ public class Server implements Runnable {
                     socket.setSoTimeout(0); // 3 minute timeout
                     player.listen();
                 } else
-                    player.transmit(MessageFormatter.error("Game is already in progress, cannot join the hub"));
+                    player.transmit(Formatter.error("Game is already in progress, cannot join the hub"));
 
             } catch (SocketTimeoutException | SocketException e) {
                 LOGGER.info("User timeouted or connection reset.");

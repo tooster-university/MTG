@@ -6,17 +6,24 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Utility functions for generic purpose
  */
-public class MessageFormatter {
-    private static final String reset = "\033[0m";
-    private static final String invert = "\33[7m";
-    private static final String underline = "\33[4m";
+public enum Formatter {
+    RESET("\033[0m"),
+    INVERT("\33[7m"),
+    UNDERLINE("\33[4m"),
 
-    private static final String red = "\033[31m";
-    private static final String green = "\33[32m";
-    private static final String yellow = "\33[33m";
-    private static final String blue = "\33[34m";
-    private static final String purple = "\33[35m";
-    private static final String cyan = "\33[36m";
+    RED("\033[31m"),
+    GREEN("\33[32m"),
+    YELLOW("\33[33m"),
+    BLUE("\33[34m"),
+    PURPLE("\33[35m"),
+    CYAN("\33[36m");
+
+    private final String value;
+
+    Formatter(String value) { this.value = value;}
+
+    @Override
+    public String toString() {return this.value;}
 
     /**
      * Formats announcement as:
@@ -29,7 +36,7 @@ public class MessageFormatter {
      * @return formatted message
      */
     public static String broadcast(@NotNull String msg) {
-        return formatAllLines(cyan + invert + "[~] %-100s [~]" + reset, msg);
+        return formatAllLines(CYAN + "" + INVERT + "[~] %-100s [~]" + RESET, msg);
     }
 
     /**
@@ -46,11 +53,11 @@ public class MessageFormatter {
      * @return formatted message
      */
     public static String response(@NotNull String msg) {
-        return blue +
+        return BLUE +
                 "#==============================================================================#\n" +
                 formatAllLines("#= %-74s =#", msg) + "\n" +
                 "#==============================================================================#" +
-                reset;
+                RESET;
     }
 
     /**
@@ -65,7 +72,7 @@ public class MessageFormatter {
      * @return formatted message
      */
     public static String error(@NotNull String msg) {
-        return formatAllLines(red + invert + "[ERR]\t%s" + reset, msg);
+        return formatAllLines(RED + "" + INVERT + "[ERR]\t%s" + INVERT, msg);
     }
 
     /**
@@ -79,7 +86,7 @@ public class MessageFormatter {
      * @return formatted message
      */
     public static String tip(@NotNull String msg) {
-        return formatAllLines(green + "(*) %s" + reset, msg);
+        return formatAllLines(GREEN + "(*) %s" + INVERT, msg);
     }
 
     /**
@@ -92,7 +99,7 @@ public class MessageFormatter {
      * @return formatted message
      */
     public static String prompt(@NotNull String msg) {
-        return formatAllLines(purple + invert + "[$]> %s" + reset, msg);
+        return formatAllLines(PURPLE + "" + INVERT + "[$]> %s" + INVERT, msg);
     }
 
     /**
@@ -100,12 +107,14 @@ public class MessageFormatter {
      * <pre>
      * [somePlayer]-> yeah this is the message
      * </pre>
+     *
      * @param nick nick of a sender
-     * @param msg message
+     * @param msg  message
      * @return formatted message
      */
     public static String say(@NotNull String nick, @NotNull String msg) {
-        return formatAllLines(yellow + invert + "[%2$s]" + reset + invert + "-> %1$s" + reset, msg, nick);
+        return formatAllLines(YELLOW + "" + INVERT + "[%2$s]" + INVERT + INVERT + "-> " +
+                "%1$s" + INVERT, msg, nick);
     }
 
     /**
@@ -113,12 +122,13 @@ public class MessageFormatter {
      * <pre>
      * [!] [somePlayer]: yeah this is the message
      * </pre>
+     *
      * @param nick nick of a sender
-     * @param msg message
+     * @param msg  message
      * @return formatted message
      */
-    public static String shout(@NotNull String nick,@NotNull String msg) {
-        return formatAllLines(yellow + "[!] [%2$s]" + reset  + ": %1$s", msg, nick);
+    public static String shout(@NotNull String nick, @NotNull String msg) {
+        return formatAllLines(YELLOW + "[!] [%2$s]" + INVERT + ": %1$s", msg, nick);
     }
 
     /**
@@ -146,10 +156,10 @@ public class MessageFormatter {
      * Formats all lines of multiline message to give them some format
      *
      * @param format format of the line where %1$s is from msg line
-     * @param args   arguments
+     * @param args   arguments for formatter, referenced from %2$s
      * @return formatted message
      */
-    private static String formatAllLines(String format, String msg, String... args) {
+    public static String formatAllLines(String format, String msg, String... args) {
         String[] lines = msg.split("\\r?\\n");
 
         StringBuilder sb = new StringBuilder();

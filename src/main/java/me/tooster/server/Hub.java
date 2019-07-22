@@ -2,7 +2,7 @@ package me.tooster.server;
 
 
 import me.tooster.common.CommandException;
-import me.tooster.common.MessageFormatter;
+import me.tooster.common.Formatter;
 import me.tooster.server.MTG.GameStateMachine;
 
 import java.util.*;
@@ -14,8 +14,8 @@ import static me.tooster.server.ServerCommand.*;
  */
 public class Hub {
 
-    private final StageStateMachine stageFSM = new StageStateMachine();
-    private GameStateMachine gameFSM;
+    private final HubStateMachine  stageFSM = new HubStateMachine();
+    private       GameStateMachine gameFSM;
 
     private final List<User>           players  = new ArrayList<>(); // players connected to session
     private int                        ID       = 0;                                             // ID for objects. Collective for players and cards
@@ -30,7 +30,7 @@ public class Hub {
     /**
      * @return stage finite state machine for the hub
      */
-    StageStateMachine getStageFSM() { return stageFSM; }
+    HubStateMachine getStageFSM() { return stageFSM; }
 
     /**
      * @return game state machine or null if there is no game right now.
@@ -53,7 +53,7 @@ public class Hub {
 
         if (players.stream().anyMatch(p -> p.getNick().equals(player.getNick())))
             throw new IllegalArgumentException("User with given nick and tag was already added. WTF.");
-        if (stageFSM.getCurrentState() != StageStateMachine.Stage.PREPARE) // players cannot connect
+        if (stageFSM.getCurrentState() != HubStateMachine.Stage.PREPARE) // players cannot connect
             return false;
 
         players.add(player);
@@ -81,11 +81,11 @@ public class Hub {
      */
     void broadcast(String msg) {
         for (User p : players)
-            p.transmit(MessageFormatter.broadcast(msg));
+            p.transmit(Formatter.broadcast(msg));
     }
 
     /**
-     * issues a command on this hub. Right now acts as a proxy to the StageStateMachine
+     * issues a command on this hub. Right now acts as a proxy to the HubStateMachine
      *
      * @param player input author
      * @param input input to process.
@@ -102,9 +102,9 @@ public class Hub {
 //        // player cry for help always enabled
 //        if (cc.getCommand() == Parser.Command.HELP && !cc.isInternal()) {
 //            cc.getPlayer().transmit(
-//                    MessageFormatter.response(MessageFormatter.list(cc.getPlayer().getEnabledCommands().stream()
-//                            .filter(c -> c.getAliases().length > 0)
-//                            .map(c -> "[" + c.getAliases()[1] + "]\t" + c.getAliases()[0])
+//                    Formatter.response(Formatter.list(cc.getPlayer().getEnabledCommands().stream()
+//                            .filter(c -> c.aliases().length > 0)
+//                            .map(c -> "[" + c.aliases()[1] + "]\t" + c.aliases()[0])
 //                            .toArray()))
 //            );
 //        } else
