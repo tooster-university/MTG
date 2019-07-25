@@ -4,10 +4,7 @@ import me.tooster.common.Command;
 import me.tooster.common.Formatter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -17,7 +14,7 @@ import static me.tooster.client.ClientCommand.*;
 
 public class Client implements Runnable {
 
-    private static final Logger LOGGER;
+    protected static final Logger LOGGER;
 
     static {
         System.setProperty("java.util.logging.config.file",
@@ -28,9 +25,10 @@ public class Client implements Runnable {
     private final ClientStateMachine                cFSM;
     private final Command.Controller<ClientCommand> cmdController;
 
-    private String nick;
-    private String IP;
-    private int    port;
+    protected String nick;
+    protected Socket socket;
+    protected String IP;
+    protected int    port;
 
     Client(@NotNull String nick, @NotNull String IP, int port) {
         this.nick = nick;
@@ -79,58 +77,6 @@ public class Client implements Runnable {
                     cFSM.process(compiled, this);
             }
         } while (true);
-
-    }
-
-    /**
-     * Tries to connect to the server at given address and port with a timeout of 10 seconds
-     *
-     * @param host host of the server
-     * @param port port of the server
-     * @return Socket of the server if connection succeeded or null if it didn't
-     */
-    private static Socket connect(String host, int port) {
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(host, port), 10 * 1000);
-            return socket;
-        } catch (UnknownHostException e) {
-            System.err.println("Unknown server host.");
-        } catch (IOException e) {
-            System.err.println("Error connecting to the server.");
-        }
-        return null;
-    }
-
-    /**
-     * Displays output to the screen on separate thread
-     */
-    private static class Receiver implements Runnable {
-
-        Socket         socket;
-        BufferedReader in;
-
-        Receiver(Socket sockin) throws IOException {
-
-            socket = sockin;
-            in = new BufferedReader(new InputStreamReader(sockin.getInputStream()));
-        }
-
-        @Override
-        public void run() {
-            try {
-                String s;
-                while ((s = in.readLine()) != null)
-                    System.out.println(String.format(s)); // display server reply
-
-                socket.close();
-
-                LOGGER.info("Client disconnected.");
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
 
     }
 
