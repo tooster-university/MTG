@@ -63,6 +63,13 @@ public abstract class FiniteStateMachine<I, C> {
     }
 
     /**
+     * Forcibly changes the state of FSM.
+     *
+     * @param newState new state to set
+     */
+    public synchronized void forceState(State<I, C> newState) { currentState = newState; }
+
+    /**
      * @return returns current state
      */
     public State<I, C> getCurrentState() { return currentState; }
@@ -100,5 +107,4 @@ public abstract class FiniteStateMachine<I, C> {
          */
         default void onExit(State<I, C> nextState, C context) {}
     }
-
 }

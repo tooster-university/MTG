@@ -4,6 +4,8 @@ import me.tooster.common.Command;
 import me.tooster.common.Formatter;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -22,11 +24,13 @@ public class Client implements Runnable {
         LOGGER = Logger.getLogger(Client.class.getName());
     }
 
-    private final ClientStateMachine                cFSM;
-    private final Command.Controller<ClientCommand> cmdController;
+    protected final ClientStateMachine                cFSM;
+    protected final Command.Controller<ClientCommand> cmdController;
 
     protected String nick;
     protected Socket socket;
+    protected PrintWriter    out;
+    protected BufferedReader in;
     protected String IP;
     protected int    port;
 
@@ -57,9 +61,11 @@ public class Client implements Runnable {
 
             switch (compiled.cmd) {
                 case HELP:
+                    // specific command help
                     if (compiled.args.length == 1 &&
                             Arrays.stream(cachedValues).anyMatch(c -> c.matches(compiled.args[0])))
                         System.out.println(ClientCommand.valueOf(compiled.args[0].toUpperCase()).help());
+                        // general help
                     else {
 
                         String s = Formatter.YELLOW +
@@ -73,11 +79,12 @@ public class Client implements Runnable {
                     break;
                 case SHUTDOWN:
                     break parseLoop;
-                default:
+                default: // unparsed passed to server
                     cFSM.process(compiled, this);
             }
         } while (true);
 
+        System.out.println("\33[36m]--==: MTG Client stopped :==--[$\33[0m");
     }
 
     //------------------------------------------------------------------------------------------------------------------

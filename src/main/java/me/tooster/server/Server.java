@@ -99,13 +99,13 @@ public class Server implements Runnable {
             ResourceManager.getInstance();
             // create new playable player with given tag and socket for transmission
             // player implements auto close-able so in case of socket failure, it is properly closed
-            try (User player = new User(Server.this, ocket, tag)) {
-                player.
+            try (User player = new User(Server.getInstance().hub, socket, tag)) {
+
 
 
                 if (hub.addPlayer(player)) {
                     socket.setSoTimeout(0); // 3 minute timeout
-                    player.listen();
+//                    player.listen();
                 } else
                     player.transmit(Formatter.error("Game is already in progress, cannot join the hub"));
 

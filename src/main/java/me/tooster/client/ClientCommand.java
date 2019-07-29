@@ -4,10 +4,11 @@ import me.tooster.common.Command;
 
 public enum ClientCommand implements Command {
 
-    @Alias("help") HELP, // displays help for client program
-    @Alias("connect") CONNECT, // connects to server - with no arguments, connects do previous server
-    @Alias({"nick", "name"}) CHANGE_NAME, // changes nick
-    @Alias("shutdown") SHUTDOWN; // shuts down the client gracefully
+    @Alias("help") @Help("It, like, displays help... What did you think...") HELP,
+    @Alias("connect") @Help("'connect IP Port' to connect to given server and 'connect' to connect to the last.") CONNECT,
+    @Alias("disconnect") @Help("Disconnects from the server. Both internal and external.") DISCONNECT,
+    @Alias({"nick", "name"}) @Help("'nick newnick' to change nick.") CHANGE_NAME,
+    @Alias("shutdown") @Help("Shuts down the client...") SHUTDOWN;
 
 
     public static final ClientCommand[] cachedValues = ClientCommand.values();
