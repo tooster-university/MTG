@@ -15,7 +15,7 @@ public class Mana {
     public enum Color {
         // those represent both cost and mana pool
         WHITE, BLUE, BLACK, RED, GREEN, COLORLESS, // "diamond" symbol mana
-        // those two below can only be used in mana cost, not stored mana pool:
+        // those two below can only be used serverIn mana cost, not stored mana pool:
         GENERIC_X,  // variable generic mana
         GENERIC; // numeric mana, # is just a placeholder for number
 
@@ -71,7 +71,7 @@ public class Mana {
         Matcher manaMatcher = manaRegex.matcher(mana);
         if (!manaMatcher.matches()) throw new ManaFormatException(mana);
 
-        // find numbers in mana format
+        // find numbers serverIn mana format
         Pattern genericRegex = Pattern.compile("\\d+");
         Matcher numberMatcher = genericRegex.matcher(mana);
         int genericCost = 0;
@@ -129,7 +129,7 @@ public class Mana {
     }
 
     /**
-     * Sets current X value in mana pool. Should be only used in pool, not in cost.
+     * Sets current X value serverIn mana pool. Should be only used serverIn pool, not serverIn cost.
      *
      * @param X new X value
      */
@@ -164,10 +164,10 @@ public class Mana {
     }
 
     /**
-     * Removes <b>choosenMana</b> from mana pool. GENERIC_X mustn't be in the <b>choosenMana</b>.
+     * Removes <b>choosenMana</b> from mana pool. GENERIC_X mustn't be serverIn the <b>choosenMana</b>.
      *
      * @param choosenMana choosenMana
-     * @throws InsufficientManaException if trying to remove more mana than in storage
+     * @throws InsufficientManaException if trying to remove more mana than serverIn storage
      */
     public void removeMana(Mana choosenMana) throws InsufficientManaException {
         if (!this.satisfies(choosenMana))
@@ -188,7 +188,7 @@ public class Mana {
     /**
      * Converts this objects collectible mana to generic mana. Use only with pool types, not cost types
      *
-     * @param choosenMana mana in current pool to be converted to generic.
+     * @param choosenMana mana serverIn current pool to be converted to generic.
      * @return this object with converted generic mana
      * @throws InsufficientManaException if there is not enough mana
      */
@@ -213,7 +213,7 @@ public class Mana {
      * generic and variable(X) total cost.
      *
      * @param requiredMana amount of mana that must be paid.
-     *                     GENERIC_X should equal the number of X counters in card cost
+     *                     GENERIC_X should equal the number of X counters serverIn card cost
      * @throws InsufficientManaException when current pool has too few mana to pay for <b>requiredMana/b>.
      */
     public void payFor(Mana requiredMana) throws InsufficientManaException {
@@ -258,7 +258,7 @@ public class Mana {
 
         }
 
-        // counts generic and variable mana; variable mana also must be converted to generic in pool beforehand
+        // counts generic and variable mana; variable mana also must be converted to generic serverIn pool beforehand
         return (pool.getOrDefault(Color.GENERIC, 0) >=
                 requiredMana.getPool().getOrDefault(Color.GENERIC, 0)
                         + requiredMana.getPool().getOrDefault(Color.GENERIC_X, 0)

@@ -142,7 +142,7 @@ public enum Formatter {
      * </pre>
      *
      * @param elements array of string elements
-     * @return single formatted string representing array of elements as in the order as in <b>elements</b>
+     * @return single formatted string representing array of elements as serverIn the order as serverIn <b>elements</b>
      */
     public static String list(@NotNull Object[] elements) {
         String[] t = new String[elements.length];

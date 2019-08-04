@@ -3,44 +3,44 @@ package me.tooster.common;
 /**
  * Abstract finite state machine that holds current state and has auto-go feature.
  *
- * @param <I> Input type for machine states
- * @param <C> Context type for machine states
+ * @param <InputT> Input type for machine states
+ * @param <ContextT> Context type for machine states
  */
-public abstract class FiniteStateMachine<I, C> {
-    private State<I, C> initialState;
-    private State<I, C> currentState;
+public abstract class FiniteStateMachine<InputT, ContextT> {
+    private State<InputT, ContextT> initialState;
+    private State<InputT, ContextT> currentState;
     /**
      * Enables auto-advance mode of FSM, so that it won't wait for input from user - external call to
      * <code>process()</code>. Instead it supplies itself with input and context objects passed to the function at
      * the beginning of auto phase. To alter parameters, simply modify the content of input or context
      */
-    private boolean     autoNext = false;
+    private boolean                 autoNext = false;
 
-    public FiniteStateMachine(State<I, C> initialState) { this.initialState = currentState = initialState; }
+    public FiniteStateMachine(State<InputT, ContextT> initialState) { this.initialState = currentState = initialState; }
 
     /**
      * Advances the state of FSM. It will keep processing with Hub and CompiledCommand until <code>disableAuto()</code>
-     * is called. To change the parameters passed to next state in auto mode, use setters for Hub and CompiledCommand.
+     * is called. To change the parameters passed to next state serverIn auto mode, use setters for Hub and CompiledCommand.
      *
      * @param input   input for the FSM
-     * @param context represents the context in which the state machine is updated. All data for state update should
-     *                be included in context. Used to contain data for FSM to use
+     * @param context represents the context serverIn which the state machine is updated. All data for state update should
+     *                be included serverIn context. Used to contain data for FSM to use
      */
     // FIXME: Add lock() to lock the process() of FSM and executeIf(State, <lambda>) to execute actions atomically
-    //  and lock if FSM is in given state
-    public synchronized void process(I input, C context) {
+    //  and lock if FSM is serverIn given state
+    public synchronized void process(InputT input, ContextT context) {
         do {
-            State<I, C> nextState = currentState.process(input, context);
+            State<InputT, ContextT> nextState = currentState.process(input, context);
             if (currentState != nextState) {
                 currentState.onExit(nextState, context);
-                State<I, C> previousState = currentState;
+                State<InputT, ContextT> previousState = currentState;
                 currentState = nextState;
                 nextState.onEnter(previousState, context);
             }
         } while (autoNext);
     }
 
-    public void process(I input) { process(input, null); }
+    public void process(InputT input) { process(input, null); }
 
     /**
      * Sets the auto mode. Without auto mode, the FSM loop is as follows:
@@ -67,12 +67,12 @@ public abstract class FiniteStateMachine<I, C> {
      *
      * @param newState new state to set
      */
-    public synchronized void forceState(State<I, C> newState) { currentState = newState; }
+    public synchronized void forceState(State<InputT, ContextT> newState) { currentState = newState; }
 
     /**
      * @return returns current state
      */
-    public State<I, C> getCurrentState() { return currentState; }
+    public State<InputT, ContextT> getCurrentState() { return currentState; }
 
     /**
      * Interface for States.
@@ -93,7 +93,7 @@ public abstract class FiniteStateMachine<I, C> {
         /**
          * Method invoked when new state is entered.
          * Always invoked after previous <code>onExit()</code>
-         * It is not invoked in machine's initial state
+         * It is not invoked serverIn machine's initial state
          *
          * @param context context for machine
          */

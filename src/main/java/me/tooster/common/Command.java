@@ -1,6 +1,7 @@
 package me.tooster.common;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Interface for commands with alias. Each command can be compiled with code in format
+ * Interface for commands with alias. Each command can be compiled with code serverIn format
  * <pre>new ServerCommand.Compiled(ServerCommand.ECHO, data)</pre>
  * Command interface works best when used with enums enums. Compiled command
  */
@@ -79,8 +80,8 @@ public interface Command {
 
     class Controller<CMD extends Enum<CMD> & Command> {
         private final Class<CMD>   enumClass;
-        public final  EnumSet<CMD> enabledCommands;
-        public final  EnumSet<CMD> commandMask; // commandMask for enable/disable etc
+        public final  EnumSet<CMD> enabledCommands; // by default all  disabled
+        public final  EnumSet<CMD> commandMask; // commandMask for enable/disable etc. by default all enabled
 
         public Controller() { //(Class<CMD> enumClass) {
             enumClass = (Class<CMD>) ((CMD) new Object()).getClass();// FIXME: WTF may work hack to get enum class???
@@ -91,12 +92,93 @@ public interface Command {
         }
 
         /**
+         * Sets the enabled commands anew with respect to the mask.
+         *
+         * @param commands commands to set as enabled, rest will be disabled
+         */
+        public void setEnabled(CMD... commands) {
+            enabledCommands.removeAll(commandMask);
+            EnumSet<CMD> cmdSwitch = EnumSet.allOf(enumClass);
+            cmdSwitch.retainAll(Arrays.asList(commands));
+            cmdSwitch.retainAll(commandMask);
+            enabledCommands.addAll(cmdSwitch);
+        }
+
+        /**
+         * Enables commands with respect to the mask.
+         *
+         * @param commands commands to enable
+         */
+        public void enable(CMD... commands) {
+            EnumSet<CMD> cmdSwitch = EnumSet.allOf(enumClass);
+            cmdSwitch.retainAll(Arrays.asList(commands));
+            cmdSwitch.retainAll(commandMask);
+            enabledCommands.addAll(cmdSwitch);
+        }
+
+        /**
+         * Disables commands with respect to the mask.
+         *
+         * @param commands commands to disable
+         */
+        public void disable(CMD... commands) {
+            EnumSet<CMD> cmdSwitch = EnumSet.allOf(enumClass);
+            cmdSwitch.retainAll(Arrays.asList(commands));
+            cmdSwitch.retainAll(commandMask);
+            enabledCommands.removeAll(cmdSwitch);
+        }
+
+        /**
+         * @param command command to check
+         * @return returns true if command is enabled
+         */
+        public boolean isEnabled(CMD command) { return enabledCommands.contains(command); }
+
+        /**
+         * Sets the mask anew.
+         *
+         * @param commands commands to set serverIn the mask, rest will be unset
+         */
+        public void setMasked(CMD... commands) {
+            commandMask.clear();
+            commandMask.addAll(Arrays.asList(commands));
+        }
+
+        /**
+         * Adds command to mask
+         *
+         * @param commands command to add to the mask
+         */
+        public void mask(CMD... commands) {
+            EnumSet<CMD> cmdSwitch = EnumSet.allOf(enumClass);
+            cmdSwitch.retainAll(Arrays.asList(commands));
+            commandMask.addAll(cmdSwitch);
+        }
+
+        /**
+         * Removes command from the mask
+         *
+         * @param commands command to remove from the mask
+         */
+        public void unmask(CMD... commands) {
+            EnumSet<CMD> cmdSwitch = EnumSet.allOf(enumClass);
+            cmdSwitch.retainAll(Arrays.asList(commands));
+            commandMask.removeAll(cmdSwitch);
+        }
+
+        /**
+         * @param command command to check
+         * @return true iff command is set serverIn mask
+         */
+        public boolean isMasked(CMD command) { return commandMask.contains(command);}
+
+        /**
          * Parses the input and returns compiled command
          *
          * @param input input string to parse
          * @return compiled command with command and string argument list if parse was a success, null otherwise
          */
-        public Compiled<CMD> parse(@NotNull String input) {
+        public @NotNull Compiled<CMD> parse(@NotNull String input) {
             List<String> matchList    = new ArrayList<>();
             Pattern      regex        = Pattern.compile("[^\\s\"]+|\"([^\"]*)\""); // matches: (abcd) "(xy zv)" (x)
             Matcher      regexMatcher = regex.matcher(input);
@@ -108,7 +190,7 @@ public interface Command {
                 if (c.matches(cname))
                     return compile((CMD) c, (String[]) matchList.toArray()); // rest is argument's list
             }
-            return null;
+            return compile(null);
         }
 
         /**
@@ -118,16 +200,28 @@ public interface Command {
          * @param args    command arguments
          * @return compiled command
          */
-        public Compiled<CMD> compile(@NotNull CMD command, String... args) {
+        public Compiled<CMD> compile(CMD command, String... args) {
             return new Compiled<>(this, command, args);
         }
 
+        /**
+         * Returns help for given command, or help for all commands if argument is null
+         *
+         * @param command command to check help or null to check all commands
+         * @return list of help elements
+         */
+        public String[] help(@Nullable CMD command) {
+            // specific command help
+            if (command != null) return new String[]{command.help()};
+                // general help
+            else return Arrays.stream(enumClass.getEnumConstants()).toArray(String[]::new);
+        }
     }
 
-    class Compiled<CMD> {
-        @NotNull public final  CMD        cmd;
-        @NotNull public final  String[]   args; // arguments as array of strings
-        @NotNull private final Controller controller;
+    class Compiled<CMD extends Enum<CMD> & Command> {
+        @NotNull private final Controller<CMD> controller;  // controller that parsed this command
+        @NotNull public final  CMD             cmd;         // command for parse success, null otherwise
+        @NotNull public final  String[]        args;        // arguments as array of strings
 
         /**
          * Creates new compiled command with final fields <code>command</code> and <code>args</code>. Those fields
@@ -136,21 +230,21 @@ public interface Command {
          * @param command command enum representing the command
          * @param args    arguments for command
          */
-        Compiled(@NotNull Controller controller, @NotNull CMD command, String... args) {
+        protected Compiled(@NotNull Controller<CMD> controller, @NotNull CMD command, String... args) {
             this.controller = controller;
             this.cmd = command;
             this.args = args == null ? new String[0] : args;
         }
 
         /**
-         * @return true iff command is enabled in it's controller
+         * @return true iff command is enabled serverIn it's controller
          */
-        public boolean isEnabled() { return controller.enabledCommands.contains(this.cmd); }
+        public boolean isEnabled() { return controller.isEnabled(this.cmd); }
 
         /**
-         * @return true iff command is in mask in it's controller
+         * @return true iff command is serverIn mask serverIn it's controller
          */
-        public boolean isMasked() {return controller.commandMask.contains(this.cmd);}
+        public boolean isMasked() {return controller.isMasked(this.cmd);}
 
         /**
          * Converts command to readable format as <br>

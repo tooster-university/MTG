@@ -10,27 +10,26 @@ import java.util.*;
 import static me.tooster.server.ServerCommand.*;
 
 /**
- * Hub manages connected players and
+ * Hub manages connected users and
  */
 public class Hub {
 
-    private final HubStateMachine  stageFSM = new HubStateMachine();
-    private       GameStateMachine gameFSM;
+    public final HubStateMachine   hubFSM = new HubStateMachine();
 
-    private final List<User>           players  = new ArrayList<>(); // players connected to session
-    private int                        ID       = 0;                                             // ID for objects. Collective for players and cards
+    private final List<User>           users    = new ArrayList<>(); // users connected to session
+    private       int                  ID       = 0;   // ID for objects. Collective for users and cards
     private final Map<Integer, Object> mappings = new HashMap<>();
 
     //------------------------------------------------------------------------------------------------------------------
 
-     Hub() {}
+    Hub() {}
     /// Represents the stages of game aka preparation for duel etc.
 
 
     /**
      * @return stage finite state machine for the hub
      */
-    HubStateMachine getStageFSM() { return stageFSM; }
+    HubStateMachine getHubFSM() { return hubFSM; }
 
     /**
      * @return game state machine or null if there is no game right now.
@@ -42,45 +41,45 @@ public class Hub {
     /**
      * Adds player to Hub.
      * Sets up player's hub reference and his enabled commands.
-     * Broadcasts players info about joining players.
+     * Broadcasts users info about joining users.
      * Sends welcome message to player
      *
      * @param player player to add
      * @return true if player got connected, false otherwise
      * @throws IllegalArgumentException if somehow player with given name and tag already exists
      */
-    boolean addPlayer(User player) {
+    void addPlayer(User player) {
 
-        if (players.stream().anyMatch(p -> p.getNick().equals(player.getNick())))
+        if (users.stream().anyMatch(p -> p.getNick().equals(player.getNick())))
             throw new IllegalArgumentException("User with given nick and tag was already added. WTF.");
-        if (stageFSM.getCurrentState() != HubStateMachine.Stage.PREPARE) // players cannot connect
+        if (hubFSM.getCurrentState() != HubStateMachine.Stage.NOT_IN_GAME) // users cannot connect
             return false;
 
-        players.add(player);
+        users.add(player);
         player.setHub(this);
         player.scParser.setCommands(
                 LIST_DECKS,
                 SELECT_DECK,
                 SHOW_DECK,
                 READY);
-        broadcast(" User " + player.getNick() + " joined the hub. " + "Current players: " + players.size());
+        broadcast(" User " + player.getNick() + " joined the hub. " + "Current users: " + users.size());
         player.transmit("Use HELP anytime to see available commands.");
 
         return true;
     }
 
     /**
-     * @return List of players connected to this hub.
+     * @return List of users connected to this hub.
      */
-    List<User> getPlayers() { return players; }
+    List<User> getUsers() { return users; }
 
     /**
-     * Sends message to all players
+     * Sends message to all users
      *
      * @param msg message to send
      */
     void broadcast(String msg) {
-        for (User p : players)
+        for (User p : users)
             p.transmit(Formatter.broadcast(msg));
     }
 
@@ -88,9 +87,9 @@ public class Hub {
      * issues a command on this hub. Right now acts as a proxy to the HubStateMachine
      *
      * @param player input author
-     * @param input input to process.
+     * @param input  input to process.
      */
-    void process(User player, String input){
+    void process(User player, String input) {
         System.err.println(player + input);
         try {
             ServerCommand.Parsed scc = ServerCommand.parse(input);
@@ -108,11 +107,11 @@ public class Hub {
 //                            .toArray()))
 //            );
 //        } else
-//            stageFSM.process(cc, this);
+//            hubFSM.process(cc, this);
     }
 
     /**
-     * Returns object in HUB that maps to it's unique ID
+     * Returns object serverIn HUB that maps to it's unique ID
      *
      * @param ID ID of the queried object
      * @return querried object or null if not found

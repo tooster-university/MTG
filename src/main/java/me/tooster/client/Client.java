@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -27,12 +28,12 @@ public class Client implements Runnable {
     protected final ClientStateMachine                cFSM;
     protected final Command.Controller<ClientCommand> cmdController;
 
-    protected String nick;
-    protected Socket socket;
-    protected PrintWriter    out;
-    protected BufferedReader in;
-    protected String IP;
-    protected int    port;
+    protected String         nick;
+    protected Socket         socket;
+    protected PrintWriter    serverOut;
+    protected BufferedReader serverIn;
+    protected String         IP;
+    protected int            port;
 
     Client(@NotNull String nick, @NotNull String IP, int port) {
         this.nick = nick;
@@ -61,20 +62,17 @@ public class Client implements Runnable {
 
             switch (compiled.cmd) {
                 case HELP:
-                    // specific command help
-                    if (compiled.args.length == 1 &&
-                            Arrays.stream(cachedValues).anyMatch(c -> c.matches(compiled.args[0])))
-                        System.out.println(ClientCommand.valueOf(compiled.args[0].toUpperCase()).help());
-                        // general help
-                    else {
-
-                        String s = Formatter.YELLOW +
-                                cmdController.enabledCommands
-                                        .stream()
-                                        .map(Enum::toString)
-                                        .collect(Collectors.joining("\n")) + Formatter.RESET;
-                        System.out.println(Formatter.UNDERLINE + "Client commands:\n" + Formatter.RESET + s);
-                        cFSM.process(compiled);
+                    // if args == 0 -> return this whole help and servers
+                    // if args > 0 -> check if arg[0] parses, print message if yes, if no send help request to server
+                    ClientCommand c = null;
+                    if (compiled.args.length > 0) {
+                        try {
+                            c = ClientCommand.valueOf(compiled.args[0].toUpperCase());
+                            System.out.println(Formatter.UNDERLINE + "Client commands:\n" + Formatter.RESET
+                                    + Formatter.YELLOW + String.join("\n", cmdController.help(c)) + Formatter.RESET);
+                        } catch (IllegalArgumentException ignored) { // no such client command
+                            cFSM.process(compiled);
+                        }
                     }
                     break;
                 case SHUTDOWN:

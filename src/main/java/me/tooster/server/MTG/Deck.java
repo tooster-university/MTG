@@ -36,7 +36,7 @@ public class Deck {
     public Map<String, Object> getProperties() { return properties; }
 
     /**
-     * Returns unmodifiable list of cards in the given pile
+     * Returns unmodifiable list of cards serverIn the given pile
      * @param pile
      * @return
      */
@@ -62,7 +62,7 @@ public class Deck {
     }
 
     /**
-     * Resets deck - puts all cards in library, shuffles, changes mulligan counter to 0
+     * Resets deck - puts all cards serverIn library, shuffles, changes mulligan counter to 0
      */
     public void reset() {
         piles.get(Pile.LIBRARY).addAll(piles.get(Pile.HAND));
@@ -82,10 +82,10 @@ public class Deck {
      * Moves card at index <b>srcIdx</b> from <b>srcPile</b> to <b>dstPile</b> at <b>dstIdx</b>
      *
      * @param srcPile source pile
-     * @param srcIdx  index in source pile.
+     * @param srcIdx  index serverIn source pile.
      *                Indexing starts at 0 from the top of the pile.
      * @param dstPile destination pile
-     * @param dstIdx  index in destination pile.
+     * @param dstIdx  index serverIn destination pile.
      *                inserting at index <i>i</i> means, that card will be at the index <i>i</i>
      *                counting from top as 0
      * @throws DeckException Thrown if index or
@@ -106,7 +106,7 @@ public class Deck {
      * Deck factory. Builds and assigns deck to the player.
      *
      * @param deckname name of the deck imported into program
-     *                 - should be in the list returned by <code>ResourceManager.getInstance().getDecks()</code>
+     *                 - should be serverIn the list returned by <code>ResourceManager.getInstance().getDecks()</code>
      *                 If it was imported, it meets the composition of a deck: compulsory name, library fields and
      *                 optional sideboard field
      * @return new Deck object if deck was successfully created
@@ -114,7 +114,7 @@ public class Deck {
     public static Deck build(User owner, String deckname) throws DeckException, CardException {
         Deck deck = new Deck(owner, ResourceManager.getInstance().getDeck(deckname));
         owner.setDeck(deck);
-        for (Pile pile : Pile.cachedValues()) { // for all piles saved in deck.yml file
+        for (Pile pile : Pile.cachedValues()) { // for all piles saved serverIn deck.yml file
             Map<String, Integer> cardsYAML = (Map<String, Integer>) deck.properties.get(pile.toString().toLowerCase());
             ArrayList<Card> cardsPile = deck.piles.get(pile);
             for (Map.Entry<String, Integer> cardYAML : cardsYAML.entrySet()) // iterate over every card

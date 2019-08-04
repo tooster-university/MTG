@@ -114,13 +114,13 @@ public class ResourceManager {
                     if (!cardsYAML.containsKey(cardEntry.getKey())) // if the card wasn't loaded - shit happens
                         throw new YAMLException("card '" + cardEntry.getKey() + "' wasn't imported");
                     List<String> types = (List<String>) cardsYAML.get(cardEntry.getKey()).get("types");
-                    if (cardEntry.getValue() > 4 && // more than 4 in deck that are not basic land
+                    if (cardEntry.getValue() > 4 && // more than 4 serverIn deck that are not basic land
                             types.stream().anyMatch(t -> !t.equals(Card.Type.LAND.toString().toLowerCase())))
                         throw new YAMLException(("deck can have maximum of 4 non-land cards with the same name"));
                 }
             }
 
-            decksYAML.put(name, deckYAML); // save to decks map in library
+            decksYAML.put(name, deckYAML); // save to decks map serverIn library
             LOGGER.config("Imported deck '" + name + "'");
         } catch (YAMLException | FileNotFoundException e) {
             LOGGER.warning("Couldn't import deck '" + deckPath.getFileName() + "': \n" + e.toString());

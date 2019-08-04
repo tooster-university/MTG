@@ -1,10 +1,11 @@
 package me.tooster.server.MTG;
 
+import me.tooster.common.Command;
 import me.tooster.common.FiniteStateMachine;
 import me.tooster.server.Hub;
 import me.tooster.server.User;
 
-public class GameStateMachine extends FiniteStateMachine<MTGCommand.Parsed, Hub> {
+public class GameStateMachine extends FiniteStateMachine<Command.Compiled<MTGCommand>, Hub> {
 
     private User    winner   = null;
 

@@ -20,20 +20,18 @@ public class Server implements Runnable {
         LOGGER = Logger.getLogger(Server.class.getName());
     }
 
-    private Server(){}
+    private Server() {}
 
-    private static class SingletonHelper{
+    private static class SingletonHelper {
         private static final Server INSTANCE = new Server();
     }
 
-    public static Server getInstance(){
-        return SingletonHelper.INSTANCE;
-    }
+    public static Server getInstance() { return SingletonHelper.INSTANCE; }
 
     // main thread listening for connections and creating connection-per-client threads
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Pass port as first argument.");
+            System.err.println("Port for the server incoming connections must be specified");
             System.exit(1);
         }
 
@@ -51,73 +49,28 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try (ServerSocket server = new ServerSocket(port)) {
-            LOGGER.info("Server started at " + port + ". Waiting for clients to connect...");
+            LOGGER.info("Server started at " + port + ".");
+
+            LOGGER.info("Fetching data from resources...");
             ResourceManager.getInstance(); // prefetch decks
+
+            LOGGER.info("Initializing the hub");
             hub = new Hub();
             // listen for clients
+            LOGGER.info("Waiting for incoming client connections...");
             int tag = 0;
             while (true) {
-                Socket serverClient = server.accept();
+                Socket userSocket = server.accept();
                 LOGGER.info("Client " + ++tag + " connected.");
-                User p = new User();
+
+                User p = new User(userSocket, tag);
                 new Thread(p).start();
+                hub.addPlayer(p);
             }
         } catch (Exception e) {
             LOGGER.severe(e.getMessage());
             System.exit(1);
         }
         LOGGER.info("Server stopped.");
-    }
-
-    /**
-     * Client listening and replying to user input
-     */
-    private static class ClientThread implements Runnable {
-
-        Socket socket;
-        Hub    hub;
-        int    tag;
-        User   player;
-
-        /**
-         * Creates new thread for User
-         *
-         * @param inSocket socket on which server will listen for player's input
-         * @param hub      hub to which the player connects
-         * @param tag      server tag for player
-         */
-        ClientThread(Socket inSocket, Hub hub, int tag) {
-            socket = inSocket;
-            this.hub = hub;
-            this.tag = tag;
-        }
-
-        // thread for listening to client
-        @Override
-        public void run() {
-
-            ResourceManager.getInstance();
-            // create new playable player with given tag and socket for transmission
-            // player implements auto close-able so in case of socket failure, it is properly closed
-            try (User player = new User(Server.getInstance().hub, socket, tag)) {
-
-
-
-                if (hub.addPlayer(player)) {
-                    socket.setSoTimeout(0); // 3 minute timeout
-//                    player.listen();
-                } else
-                    player.transmit(Formatter.error("Game is already in progress, cannot join the hub"));
-
-            } catch (SocketTimeoutException | SocketException e) {
-                LOGGER.info("User timeouted or connection reset.");
-            } catch (IOException e) {
-                LOGGER.severe("Socket error.");
-                e.printStackTrace();
-            } catch (Exception e) {
-                LOGGER.severe("WTF happened.");
-                e.printStackTrace();
-            }
-        }
     }
 }
