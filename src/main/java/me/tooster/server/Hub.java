@@ -7,14 +7,12 @@ import me.tooster.server.MTG.GameStateMachine;
 
 import java.util.*;
 
-import static me.tooster.server.ServerCommand.*;
-
 /**
  * Hub manages connected users and
  */
 public class Hub {
 
-    public final HubStateMachine   hubFSM = new HubStateMachine();
+    public final HubStateMachine   hubFSM = new HubStateMachine(this);
 
     private final List<User>           users    = new ArrayList<>(); // users connected to session
     private       int                  ID       = 0;   // ID for objects. Collective for users and cards
@@ -52,7 +50,7 @@ public class Hub {
 
         if (users.stream().anyMatch(p -> p.getNick().equals(player.getNick())))
             throw new IllegalArgumentException("User with given nick and tag was already added. WTF.");
-        if (hubFSM.getCurrentState() != HubStateMachine.Stage.NOT_IN_GAME) // users cannot connect
+        if (hubFSM.getCurrentState() != HubStateMachine.State.NOT_IN_GAME) // users cannot connect
             return false;
 
         users.add(player);
@@ -66,6 +64,10 @@ public class Hub {
         player.transmit("Use HELP anytime to see available commands.");
 
         return true;
+    }
+
+    void removePlayer(User player) {
+
     }
 
     /**

@@ -77,10 +77,10 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
     /**
      * Interface for States.
      *
-     * @param <I> Input that State accepts
-     * @param <C> context that State accepts
+     * @param <InputT> Input that State accepts
+     * @param <ContextT> context that State accepts
      */
-    public interface State<I, C> {
+    public interface State<InputT, ContextT> {
         /**
          * Processes the CompiledCommand inside State. Returns next state to go to, or this if state doesn't change
          *
@@ -88,7 +88,7 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
          * @param context context for machine
          * @return next state or this if state stays the same
          */
-        State<I, C> process(I input, C context);
+        State<InputT, ContextT> process(InputT input, ContextT context);
 
         /**
          * Method invoked when new state is entered.
@@ -97,7 +97,7 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
          *
          * @param context context for machine
          */
-        default void onEnter(State<I, C> prevState, C context) {}
+        default void onEnter(State<InputT, ContextT> prevState, ContextT context) {}
 
         /**
          * Method invoked when exiting a state to enter other state.
@@ -105,6 +105,6 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
          *
          * @param context context for machine
          */
-        default void onExit(State<I, C> nextState, C context) {}
+        default void onExit(State<InputT, ContextT> nextState, ContextT context) {}
     }
 }

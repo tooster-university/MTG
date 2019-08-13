@@ -20,11 +20,16 @@ public enum MTGCommand implements Command {
     ,
     @Alias({"DR", "DRAW"}) DRAW,
     @Alias({"M", "MULLIGAN"}) MULLIGAN,
-    @Alias({"!", "C", "CAST"}) CAST;
+    @Alias({"!", "C", "CAST"}) CAST,
+
+    // fixme: "select" without parameters returns "null not imported"
+    @Alias({"S", "select"}) SELECT_DECK
+    //((player, args) -> args.size() >= 1 && ResourceManager.getInstance().getDecks().contains(args.get(0)))
+    ,
+    @Alias({"L", "decks"}) LIST_DECKS,
+    @Alias({"D", "show"}) SHOW_DECK,
+    @Alias({"K", "ok", "ready"}) READY;                    // marks player as ready serverIn deck select gamePhase
 
 
     public static final MTGCommand[] cachedValues = MTGCommand.values();
-
-    @Override
-    public Command[] list() {return cachedValues;}
 }
