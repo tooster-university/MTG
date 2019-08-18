@@ -2,6 +2,11 @@ package me.tooster.common;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * Utility functions for generic purpose
@@ -28,15 +33,35 @@ public enum Formatter {
     /**
      * Formats announcement as:
      * <pre>
-     * [~] something     [~]
-     * [~] something2    [~]
+     * [HUB] hub announcement in purple underline
+     * [SERVER] server announcement in cyan underline
+     * DM from server in purple
+     * DM from HUB in cyan
+     * [!] [Player#725] server chat in yellow underlined
+     * [Player$725] hub chat
+     * -->[Boss] outgoing message in yellow inverted prefix
+     * <--[Boss] incoming message in yellow inverted prefix
      * </pre>
      *
-     * @param msg string to format
-     * @return formatted message
+     * @param from     identity sending message
+     * @param to       identity to send message to
+     * @param incoming if message is incoming or outgoing
+     * @param msg      string to format
+     * @return formatted message as described above
      */
-    public static String broadcast(@NotNull String msg) {
-        return formatAllLines(CYAN + "" + INVERT + "[~] %-100s [~]" + RESET, msg);
+    public static String chat(@NotNull String from, @NotNull String to, boolean incoming, @NotNull String msg) {
+        String prefix;
+        // from server or hub
+        if (from.equals("SERVER")) prefix = to.equals("SERVER") ? String.format("%s[SERVER] %s", PURPLE, UNDERLINE) : PURPLE.value;
+        else if (from.equals("HUB")) prefix = to.equals("HUB") ? String.format("%s[HUB] %s", CYAN, UNDERLINE) : CYAN.value;
+        // from user
+        else if (to.equals("SERVER")) prefix = String.format("%s[!] [%s] %s", YELLOW, from, UNDERLINE); // server shout
+        else if (to.equals("HUB")) prefix = String.format("[%s] ",from); // hub shout
+        // dm
+        else prefix = String.format("%s%s%s[%s]%s ", YELLOW, INVERT, incoming ? "<--" : "-->", incoming ? from : to, INVERT);
+
+        return String.format("%s%s%s", prefix, msg, RESET);
+        //        return formatAllLines(CYAN + "" + INVERT + "[~] %-100s [~]" + RESET, msg);
     }
 
     /**
@@ -52,7 +77,7 @@ public enum Formatter {
      * @param msg string to format
      * @return formatted message
      */
-    public static String response(@NotNull String msg) {
+    public static String response(@NotNull String msg) { // FIXME
         return BLUE +
                 "#==============================================================================#\n" +
                 formatAllLines("#= %-74s =#", msg) + "\n" +
@@ -72,7 +97,7 @@ public enum Formatter {
      * @return formatted message
      */
     public static String error(@NotNull String msg) {
-        return formatAllLines(RED + "" + INVERT + "[ERR]\t%s" + INVERT, msg);
+        return String.format("%s%s[ERROR] %s%s", RED, INVERT, msg, RESET);
     }
 
     /**
@@ -86,7 +111,7 @@ public enum Formatter {
      * @return formatted message
      */
     public static String tip(@NotNull String msg) {
-        return formatAllLines(GREEN + "(*) %s" + INVERT, msg);
+        return String.format("%s(*) %s%s", GREEN, msg, RESET);
     }
 
     /**
@@ -99,46 +124,16 @@ public enum Formatter {
      * @return formatted message
      */
     public static String prompt(@NotNull String msg) {
-        return formatAllLines(PURPLE + "" + INVERT + "[$]> %s" + INVERT, msg);
-    }
-
-    /**
-     * Formats the say message as:
-     * <pre>
-     * [somePlayer]-> yeah this is the message
-     * </pre>
-     *
-     * @param nick nick of a sender
-     * @param msg  message
-     * @return formatted message
-     */
-    public static String say(@NotNull String nick, @NotNull String msg) {
-        return formatAllLines(YELLOW + "" + INVERT + "[%2$s]" + INVERT + INVERT + "-> " +
-                "%1$s" + INVERT, msg, nick);
-    }
-
-    /**
-     * Formats the shout message as:
-     * <pre>
-     * [!] [somePlayer]: yeah this is the message
-     * </pre>
-     *
-     * @param nick nick of a sender
-     * @param msg  message
-     * @return formatted message
-     */
-    public static String shout(@NotNull String nick, @NotNull String msg) {
-        return formatAllLines(YELLOW + "[!] [%2$s]" + INVERT + ": %1$s", msg, nick);
+        return String.format("%s%s[$]> %s%s", PURPLE, INVERT, msg, RESET);
     }
 
     /**
      * Formats the list of elements as:
-     *
      * <pre>
-     * > element 1
-     * > element 2
+     * - element 1
+     * - element 2
      * ...
-     * > element n
+     * - element n
      * </pre>
      *
      * @param elements array of string elements
@@ -167,6 +162,36 @@ public enum Formatter {
             sb.append(String.format(format, line, args));
 
         return sb.toString();
+    }
+
+    /**
+     * Splits the single input line into parts separated by whitespace, where a part is any string that doesn't have whitespaces
+     * or a string inside normal quotes ("this for example") with whitespaces.
+     * For example:
+     * <pre>test this123 !@#.asd "and !@3 this" "tes't ~"</pre>
+     * will be split into
+     * <pre>(test) (this123) (!@#.asd) (and !@3 this) (tes't ~)</pre>
+     *
+     * @param input input to split into parts
+     * @return list of parts as described above.
+     */
+    public static List<String> splitParts(String input) {
+        List<String> matchList = new ArrayList<>();
+        Pattern regex = Pattern.compile("[^\\s\"]+|\"([^\"]*)\""); // matches: (abcd) "(xy zv)" (x)
+        Matcher regexMatcher = regex.matcher(input);
+        while (regexMatcher.find())
+            matchList.add(regexMatcher.group(1) != null ? regexMatcher.group(1) : regexMatcher.group());
+        return matchList;
+    }
+
+    /**
+     * Returns progress in form [a/b] for numeric values or '-' for nulls
+     * @param a first stat
+     * @param b second stat
+     * @return
+     */
+    public static String formatProgress(Integer a, Integer b){
+        return String.format("[%s/%s]", a == null ? "-" : a, b == null ? "-" : b);
     }
 }
 

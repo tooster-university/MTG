@@ -1,8 +1,8 @@
 package me.tooster.server;
 
-import me.tooster.server.MTG.Card;
-import me.tooster.server.MTG.Deck;
-import me.tooster.server.MTG.Mana;
+import me.tooster.MTG.Card;
+import me.tooster.MTG.Deck;
+import me.tooster.MTG.Mana;
 import me.tooster.server.exceptions.CardException;
 import me.tooster.server.exceptions.DeckException;
 import me.tooster.server.exceptions.ManaFormatException;

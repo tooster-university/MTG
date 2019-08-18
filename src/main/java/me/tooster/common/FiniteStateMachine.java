@@ -1,9 +1,13 @@
 package me.tooster.common;
 
+import org.jetbrains.annotations.NotNull;
+
+// TODO: change ContextT to Object varargs and InputT maybe also ???
+// TODO: right now doin the hubFSM to manage ready/not ready players
 /**
  * Abstract finite state machine that holds current state and has auto-go feature.
  *
- * @param <InputT> Input type for machine states
+ * @param <InputT>   Input type for machine states
  * @param <ContextT> Context type for machine states
  */
 public abstract class FiniteStateMachine<InputT, ContextT> {
@@ -16,7 +20,10 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
      */
     private boolean                 autoNext = false;
 
-    public FiniteStateMachine(State<InputT, ContextT> initialState) { this.initialState = currentState = initialState; }
+    public FiniteStateMachine(@NotNull State<InputT, ContextT> initialState) {
+        this.initialState = initialState;
+        reset();
+    }
 
     /**
      * Advances the state of FSM. It will keep processing with Hub and CompiledCommand until <code>disableAuto()</code>
@@ -30,6 +37,7 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
     //  and lock if FSM is serverIn given state
     public synchronized void process(InputT input, ContextT context) {
         do {
+            if(currentState == null) throw new RuntimeException("FSM halted.");
             State<InputT, ContextT> nextState = currentState.process(input, context);
             if (currentState != nextState) {
                 currentState.onExit(nextState, context);
@@ -55,19 +63,27 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
     public void setAuto(boolean enabled) {autoNext = enabled;}
 
     /**
-     * Resets the state machine to initial state and turn's off the auto mode;
+     * Resets the state machine to initial state and turn's off the auto mode.
+     * At first triggers the onExit event of current state
+     * Triggers the onEnter event of initial state with prevState and context set to null
      */
     public synchronized void reset() {
-        currentState = initialState;
         autoNext = false;
+        forceState(initialState, null);
     }
 
     /**
      * Forcibly changes the state of FSM.
+     * Triggers exit/enter events with all null prev/next state which can be used
+     * to determine initial entry/finishing exit transition of state machine.
      *
      * @param newState new state to set
      */
-    public synchronized void forceState(State<InputT, ContextT> newState) { currentState = newState; }
+    public synchronized void forceState(State<InputT, ContextT> newState, ContextT context) {
+        if(currentState != null) currentState.onExit(null, context);
+        currentState = newState;
+        if(currentState != null) currentState.onEnter(null, context);
+    }
 
     /**
      * @return returns current state
@@ -77,10 +93,20 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
     /**
      * Interface for States.
      *
-     * @param <InputT> Input that State accepts
+     * @param <InputT>   Input that State accepts
      * @param <ContextT> context that State accepts
      */
     public interface State<InputT, ContextT> {
+        /**
+         * Method invoked when new state is entered.
+         * Happens after <code>onExit()</code> on previous state.
+         * Machine current state is set to state that's being entered.
+         * <code>prevState</code> is null if machine enters the initial state.
+         *
+         * @param context context for machine
+         */
+        default void onEnter(State<InputT, ContextT> prevState, ContextT context) {}
+
         /**
          * Processes the CompiledCommand inside State. Returns next state to go to, or this if state doesn't change
          *
@@ -91,17 +117,10 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
         State<InputT, ContextT> process(InputT input, ContextT context);
 
         /**
-         * Method invoked when new state is entered.
-         * Always invoked after previous <code>onExit()</code>
-         * It is not invoked serverIn machine's initial state
-         *
-         * @param context context for machine
-         */
-        default void onEnter(State<InputT, ContextT> prevState, ContextT context) {}
-
-        /**
          * Method invoked when exiting a state to enter other state.
-         * Always invoked before process state's <code>onEnter()</code>
+         * Happens before <code>onEnter()</code> on next state.
+         * Machine current state is set to state that's being exited.
+         * <code>nextState</code> is null to distinguish machine finish.
          *
          * @param context context for machine
          */

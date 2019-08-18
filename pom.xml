@@ -15,9 +15,30 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>1.9</source>
-                    <target>1.9</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.os72</groupId>
+                <artifactId>protoc-jar-maven-plugin</artifactId>
+                <version>3.8.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <addSources>none</addSources>
+                            <outputDirectory>src/main/java</outputDirectory>
+                            <inputDirectories>
+                                <include>src/main/java/me/tooster/common/proto</include>
+                            </inputDirectories>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -36,6 +57,13 @@
             <artifactId>snakeyaml</artifactId>
             <version>1.24</version>
         </dependency>
+        <!-- protobuf. (de)serialize proto buffers using java api. -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.9.1</version>
+        </dependency>
+
     </dependencies>
 
 

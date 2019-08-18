@@ -1,4 +1,4 @@
-package me.tooster.server.MTG;
+package me.tooster.MTG;
 
 import me.tooster.server.exceptions.InsufficientManaException;
 import me.tooster.server.exceptions.ManaFormatException;

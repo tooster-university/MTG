@@ -1,4 +1,4 @@
-package me.tooster.server.MTG;
+package me.tooster.MTG;
 
 import me.tooster.common.Command;
 public enum MTGCommand implements Command {

@@ -1,0 +1,47 @@
+syntax = "proto3";
+package me.tooster.common.proto;
+
+message Message {
+    int64 ID = 1; // can be used in request-response system
+    oneof msgType {
+        ConfigMsg configMsg = 3;
+        ChatMsg chatMsg = 4;
+        CommandMsg commandMsg = 5;
+        ControlMsg controlMsg = 6;
+    }
+}
+
+message ConfigMsg {
+    map<string, string> configuration = 1;
+}
+
+// chat message:
+//   `from': always set to either SERVER HUB or server player's ID
+//   `to': SERVER HUB or playerID
+//   let `S` `H` `-` `P` `bc` mean `SERVER` `HUB` `none` `playerId` `broadcast`
+//   ............................................
+//   from : S    : S    : H    : H    : P     : P     : P
+//   to   : S    : -    : H    : -    : H     : S     : P
+//   what : S bc : S dm : H bc : H dm : local : shout : dm
+message ChatMsg {
+    string from = 1; // player tag, 'SERVER' or 'HUB'
+    string to = 2; // player tag, 'SERVER' or 'HUB'
+    string msg = 3;
+}
+
+// command sent as raw input. must be raw to keep chat formatting
+message CommandMsg {
+    string command = 1;
+}
+
+// handshake/PingPong/disconnect
+message ControlMsg {
+    enum Code {
+        PING = 0; // received only on server
+        PONG = 1; // received on both ends
+        SERVER_HELLO = 2; // received on client
+        SERVER_DENY = 3; // received on client
+        CLIENT_DISCONNECT = 4; // received on server
+    }
+    Code code = 1;
+}

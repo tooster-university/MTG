@@ -1,63 +1,69 @@
 package me.tooster.server;
 
+import me.tooster.MTG.MTGStateMachine;
 import me.tooster.common.Command;
 import me.tooster.common.FiniteStateMachine;
 import me.tooster.common.Formatter;
-import me.tooster.server.MTG.GameStateMachine;
+
+import me.tooster.MTG.GameStateMachine;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static me.tooster.server.ServerCommand.*;
+import static me.tooster.common.proto.Messages.*;
 
 
-class HubStateMachine extends FiniteStateMachine<Command.Compiled<ServerCommand>, User> {
+class HubStateMachine extends FiniteStateMachine<Command.Compiled<ServerCommand>, Hub> {
 
-    Hub hub;
-    HubStateMachine(Hub hub) { this.hub = hub; super(State.NOT_IN_GAME); }
 
-    enum State implements FiniteStateMachine.State<Command.Compiled<ServerCommand>, User> {
+    HubStateMachine() { super(State.NOT_IN_GAME); }
+
+    private MTGStateMachine mtgFSM;
+
+    enum State implements FiniteStateMachine.State<Command.Compiled<ServerCommand>, Hub> {
         NOT_IN_GAME { // players can import decks and select a deck.
 
             @Override
-            public State process(Command.Compiled<ServerCommand> cc, User user) {
-                switch (cc.cmd) {
-                    case HELP:
-                        ServerCommand c = null;
-                        try {
-                            if (cc.args.length > 0)
-                                c = ServerCommand.valueOf(cc.args[0].toUpperCase());
-                        } catch (IllegalArgumentException ignored) { }
-                        user.transmit(String.join("\n", user.cmdController.help(c)));
+            public State process(Command.Compiled<ServerCommand> command, Hub hub) {
+                User user = (User) command.controller.owner;
+                switch (command.cmd) {
+                    case HUB_ADD_USER:
+                        user.transmit(ChatMsg.newBuilder().setFrom("HUB").setMsg("When you are ready, use '/ready'."));
                         return this;
-                    case PING:
-                        user.transmit("PONG");
-                        return this;
-                    case DISCONNECT:
-                        hub.
-                        break;
-                    case SHOUT: break;
-                    case WHISPER: break;
+                    case READY:
+                        if (user.setReady(!user.isReady())) {
+                            synchronized (hub.users) {
+                                if (hub.users.values().stream().filter(User::isReady).count() == hub.userSlots) {
+                                    User[] players = (User[]) hub.users.values().toArray();
+                                    Collections.shuffle(Arrays.asList(players));
+                                    hub.hubFSM.mtgFSM = new MTGStateMachine(players);
+                                    return IN_GAME;
+                                }
+                            }
+                        }
                 }
-                hub.broadcast("Starting a game. " + hub.getUsers().get(0) + " goes first.");
-                hub.setGameFSM(new GameStateMachine());
-                return IN_GAME;
+                return this;
             }
 
             @Override
             public void onEnter(FiniteStateMachine.State prevState, Hub hub) {
-                hub.broadcast(Formatter.broadcast("Waiting for players."));
+                hub.broadcast("Ready for next game.");
             }
         },
         // game phase with it's own state machine.
         IN_GAME {
             @Override
-            public State process(ServerCommand.Compiled, User user) {
-                if (cc.command == ServerCommand.END_GAME) {
-                    return NOT_IN_GAME;
-                }
-                return this; // same state
+            public void onEnter(FiniteStateMachine.State<Compiled<ServerCommand>, Hub> prevState, Hub hub) {
+                hub.broadcast("Game started.");
             }
 
             @Override
-            public void onExit(FiniteStateMachine.State nextState, Hub hub) {
-                hub.broadcast(Formatter.broadcast("Winner: " + hub.getGameFSM().getWinner()));
+            public FiniteStateMachine.State<Compiled<ServerCommand>, Hub> process(Compiled<ServerCommand> input, Hub context) {
+                return this;
             }
+
         };
     }
 }

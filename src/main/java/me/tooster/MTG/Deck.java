@@ -1,4 +1,4 @@
-package me.tooster.server.MTG;
+package me.tooster.MTG;
 
 import me.tooster.server.User;
 import me.tooster.server.ResourceManager;
@@ -113,15 +113,15 @@ public class Deck {
      */
     public static Deck build(User owner, String deckname) throws DeckException, CardException {
         Deck deck = new Deck(owner, ResourceManager.getInstance().getDeck(deckname));
-        owner.setDeck(deck);
+        owner.deck = deck;
         for (Pile pile : Pile.cachedValues()) { // for all piles saved serverIn deck.yml file
             Map<String, Integer> cardsYAML = (Map<String, Integer>) deck.properties.get(pile.toString().toLowerCase());
             ArrayList<Card> cardsPile = deck.piles.get(pile);
             for (Map.Entry<String, Integer> cardYAML : cardsYAML.entrySet()) // iterate over every card
                 for (int i = 0; i < cardYAML.getValue(); i++) { // add <count> cards to deck
                     Card c = Card.build(deck, cardYAML.getKey());
-                    c.setID(owner.getHub().nextID());
-                    owner.getHub().registerObject(c.getID(), c);
+//                    c.setID(owner.hub.nextID());
+//                    owner.hub.registerObject(c.getID(), c);
                     cardsPile.add(c);
                 }
 

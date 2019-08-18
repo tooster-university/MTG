@@ -2,19 +2,23 @@ package me.tooster.server;
 
 import me.tooster.common.Command;
 
-public enum ServerCommand implements Command {
+import java.util.EnumSet;
+
+enum ServerCommand implements Command {
 
     // generic - always enabled
     // -----------------------------------------------------
 
-    @Alias({"?", "help"}) @Help("Displays server's help") HELP,                             // returns list of enabled commands
-    @Alias({"ping"}) PING, PONG,                            // player pings the server to check alive, server replies PONG
-    @Alias({"@"}) CONFIG,                                   // sets up a name for example
-    @Alias(("dc")) DISCONNECT,                              // player peaceful disconnect request
-    @Alias({"!", "shout"}) SHOUT,                           // hub chat
-    @Alias({".", "say", "whisper", "w"}) WHISPER,           // personal chat
+    @Alias({"/help", "/?"}) @Help("/help [cmd] displays help [for command].") HELP,
+    @Alias({"/whisper", "/w", "/m"}) @Help("/m <player> <msg> sends private message to player.") WHISPER,
+    @Alias("/say") @Help("/say <msg> sends message to local hub chat.") SAY,
+    @Alias({"/shout", "!"}) @Help("/shout <msg> sends message to server chat.") SHOUT,
+
+    HUB_ADD_USER, HUB_REMOVE_USER,
+
+    @Alias("/ready") @Help("switches the ready/not ready state.") READY,
 
     ;
 
-    public static final ServerCommand[] cachedValues = ServerCommand.values();
+    public static final EnumSet<ServerCommand> commands = EnumSet.allOf(ServerCommand.class);
 }

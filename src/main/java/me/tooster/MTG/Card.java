@@ -1,4 +1,4 @@
-package me.tooster.server.MTG;
+package me.tooster.MTG;
 
 import me.tooster.server.User;
 import me.tooster.server.ResourceManager;
@@ -65,9 +65,9 @@ public class Card {
      */
     public void setID(int ID) {
         if (this.ID != null) // remove old mapping
-            deck.getOwner().getHub().unregisterObject(ID);
+//            deck.getOwner().hub.unregisterObject(ID);
         this.ID = ID; // assign new mapping
-        deck.getOwner().getHub().registerObject(ID, this);
+//        deck.getOwner().hub.registerObject(ID, this);
     }
 
     public int getID() {return ID;}

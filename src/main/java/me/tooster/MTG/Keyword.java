@@ -1,4 +1,4 @@
-package me.tooster.server.MTG;
+package me.tooster.MTG;
 
 /**
  * Contains standard MTG keywords ,which can be later used serverIn configuration files.
