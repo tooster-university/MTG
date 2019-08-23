@@ -13,7 +13,7 @@ enum ClientCommand implements Command {
     @Alias("/config") @Help("Changes player config. Use as `/config key value'.") CONFIG,
     @Alias("/shutdown") @Help("Shuts down the client...") SHUTDOWN,
 
-    SERVER_HELLO, SERVER_DENY,
+    SERVER_HELLO, CONNECTION_CLOSE,
 
     ;
 

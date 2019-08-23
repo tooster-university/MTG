@@ -12,25 +12,30 @@ import static me.tooster.client.ClientCommand.*;
 /**
  * See the {@link me.tooster.common.FiniteStateMachine me.tooster.common.FiniteStateMachine&lt;I, C&gt;}
  */
-class ClientStateMachine extends FiniteStateMachine<Command.Compiled<ClientCommand>, Client> {
+class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, ClientStateMachine, Command.Compiled<ClientCommand>> {
 
-    ClientStateMachine() { super(State.NOT_CONNECTED); }
+    Client client;
 
-    enum State implements FiniteStateMachine.State<Command.Compiled<ClientCommand>, Client> {
+    ClientStateMachine(Client client) {
+        super(State.NOT_CONNECTED);
+        this.client = client;
+    }
+
+    enum State implements FiniteStateMachine.State<State, ClientStateMachine, Command.Compiled<ClientCommand>> {
         NOT_CONNECTED {
             @Override
-            public void onEnter(FiniteStateMachine.State<Command.Compiled<ClientCommand>, Client> prevState, Client client) {
-                client.commandController.setEnabled(CONNECT);
+            public void onEnter(ClientStateMachine fsm, State prevState) {
+                fsm.client.commandController.setEnabled(CONNECT);
             }
 
             @Override
-            public State process(Command.Compiled<ClientCommand> input, Client client) {
-
-                if (input.cmd == null) {
+            public State process(ClientStateMachine fsm, Command.Compiled<ClientCommand>... input) {
+                var compiled = input[0];
+                if (compiled.cmd == null) {
                     Client.LOGGER.warning("Unrecognized input.");
                     return this;
                 }
-                if (input.cmd == CONNECT)
+                else if (compiled.cmd == CONNECT)
                     return CONNECTING;
 
                 return this;
@@ -39,63 +44,64 @@ class ClientStateMachine extends FiniteStateMachine<Command.Compiled<ClientComma
 
         CONNECTING {
             @Override
-            public void onEnter(FiniteStateMachine.State<Command.Compiled<ClientCommand>, Client> prevState, Client client) {
+            public void onEnter(ClientStateMachine fsm, State prevState) {
                 Client.LOGGER.info(String.format("Connecting to the server at %s:%s...",
-                        client.config.get("serverIP"), client.config.get("serverPort")));
-                client.commandController.setEnabled(DISCONNECT);
-                new Thread(client::listenRemote).start();
+                        fsm.client.config.get("serverIP"), fsm.client.config.get("serverPort")));
+                fsm.client.commandController.setEnabled(DISCONNECT);
+                new Thread(fsm.client::listenRemote).start();
             }
 
             @Override
-            public State process(Command.Compiled<ClientCommand> input, Client client) {
-                if (input.cmd == null) {
+            public State process(ClientStateMachine fsm, Compiled<ClientCommand>... input) {
+                var compiled = input[0];
+                if (compiled.cmd == null) {
                     Client.LOGGER.warning("Unrecognized input.");
                     return this;
                 }
-                switch (input.cmd) {
+                switch (compiled.cmd) {
                     case DISCONNECT:
-                        client.disconnect();
+                    case CONNECTION_CLOSE:
+                        fsm.client.disconnect();
                         return NOT_CONNECTED;
                     case SERVER_HELLO:
                         return CONNECTED;
-                    case SERVER_DENY:
-                        Client.LOGGER.warning("Server denied connection.");
-                        client.disconnect();
-                        return NOT_CONNECTED;
                     default:
                         return this;
                 }
             }
+
         },
 
         CONNECTED {
             @Override
-            public void onEnter(FiniteStateMachine.State<Compiled<ClientCommand>, Client> prevState, Client client) {
+            public void onEnter(ClientStateMachine fsm, State prevState) {
+
                 Client.LOGGER.info("Connected to server.");
-                client.commandController.setEnabled(DISCONNECT);
-                client.transmit(ConfigMsg.newBuilder().putAllConfiguration(client.config)); // send initial configuration
+                fsm.client.commandController.setEnabled(DISCONNECT);
+                fsm.client.transmit(ConfigMsg.newBuilder().putAllConfiguration(fsm.client.config)); // send initial configuration
             }
 
             @Override
-            public State process(Command.Compiled<ClientCommand> input, Client client) {
-                if (input.cmd == null) {
-                    client.transmit(Messages.CommandMsg.newBuilder().setCommand(input.arg(0))); // send raw input
+            public State process(ClientStateMachine fsm, Compiled<ClientCommand>... input) {
+                var compiled = input[0];
+                if (compiled.cmd == null) {
+                    fsm.client.transmit(Messages.CommandMsg.newBuilder().setCommand(compiled.arg(0))); // send raw input
                     return this;
                 }
-                switch (input.cmd) {
+                switch (compiled.cmd) {
                     case CONFIG:
-                        client.transmit(ConfigMsg.newBuilder().putConfiguration(input.arg(1), input.arg(2)));
-                        System.out.println(input.toString());
+                        fsm.client.transmit(ConfigMsg.newBuilder().putConfiguration(compiled.arg(1), compiled.arg(2)));
+                        System.out.println(compiled.toString());
                         return this;
                     case DISCONNECT:
-                        client.disconnect();
+                    case CONNECTION_CLOSE:
+                        fsm.client.disconnect();
                         return NOT_CONNECTED;
                     default:
                         return this;
                 }
             }
         },
-
 
     }
 }

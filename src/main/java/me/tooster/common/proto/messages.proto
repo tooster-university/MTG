@@ -30,8 +30,15 @@ message ChatMsg {
 }
 
 // command sent as raw input. must be raw to keep chat formatting
+// from client to server is a command, from server to client is a command response. If command was
 message CommandMsg {
     string command = 1;
+    enum FormatHint{
+        ERROR = 0;
+        INFO = 1;
+        TIP = 2;
+    }
+    FormatHint formatHint = 2;
 }
 
 // handshake/PingPong/disconnect

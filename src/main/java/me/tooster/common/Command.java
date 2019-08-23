@@ -3,19 +3,23 @@ package me.tooster.common;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Objects;
 
 /**
  * Interface for commands with alias. Each command can be compiled with code serverIn format
  * <pre>new ServerCommand.Compiled(ServerCommand.ECHO, data)</pre>
- * Command interface works best when used with enums enums. Compiled command
+ * Command interface works best when used with enums.
+ * All non-internal commands(without alias) should have help annotation
  */
 public interface Command {
+
+    // TODO: automatically generate fields from annotations using annotation processor
+
+    // non internal commands should always have help
 
     /**
      * Used to alias the commands. Command without alias won't be matched. Main alias is the first one
@@ -32,49 +36,70 @@ public interface Command {
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Help {
-        String value() default "";
+        String value();
     }
 
-    default boolean matches(String input) {
-        return (this.getClass().isAnnotationPresent(Alias.class)) &&
-                Arrays.stream(this.getClass().getAnnotation(Alias.class).value()).anyMatch(s -> s.equalsIgnoreCase(input.strip()));
+    /**
+     * Returns given annotation for enum or fails with null and prints stack trace
+     *
+     * @param annotationClass class of annotation to get
+     * @return annotation or null if it doesn't exist
+     */
+    @SuppressWarnings("unchecked")
+    private @Nullable Annotation getAnnotation(Class annotationClass) {
+        try {
+            return this.getClass().getDeclaredField(((Enum) this).name()).getAnnotation(annotationClass); // null alias
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        } // this should never trigger
     }
+
+    /**
+     * Internal command is one that cannot be generated/accessed by user and via parse/help etc.
+     * It is defined as one without alias.
+     *
+     * @return true if command is internal i.e has no alias, false otherwise
+     */
+    default boolean isInternal() { return this.getAnnotation(Alias.class) == null; }
 
     /**
      * @return list of aliases for the command
      */
     default String[] aliases() {
-        return this.getClass().isAnnotationPresent(Alias.class)
-                ? this.getClass().getAnnotation(Alias.class).value()
-                : new String[0];
+        var aliasAnnotation = (Alias) this.getAnnotation(Alias.class);
+        return aliasAnnotation != null ? aliasAnnotation.value() : new String[0];
     }
 
     /**
      * @return main (first) alias of command or empty string if it doesn't exist
      */
-    default String mainAlias() {
+    default @NotNull String mainAlias() {
         String[] aliases = aliases();
         return aliases.length > 0 ? aliases[0] : "";
     }
 
     /**
-     * @return the acronym of command (second alias) if exists, otherwise returns empty string
+     * Checks if input matches exactly (ignoring case) any alias of this command
+     *
+     * @param input input string to match against
+     * @return true if input equals (ignoring case) to any of the aliases
      */
-    default String acronym() {
-        String[] aliases = aliases();
-        return aliases.length > 1 ? aliases[1] : "";
+    default boolean matches(String input) {
+        return (Arrays.stream(aliases()).anyMatch(s -> s.equalsIgnoreCase(input)));
     }
 
     /**
      * @return Returns help message for this command.
      */
-    default String help() {
-        String alias = mainAlias(), acronym = acronym();
-        return this.getClass().isAnnotationPresent(Help.class)
-                ?
-                (acronym.isEmpty() ? alias.isEmpty() ? "" : alias + " : " : acronym + " " + alias + " : ")
-                        + this.getClass().getAnnotation(Help.class).value()
-                : "No help for command " + this + " available.";
+    default @NotNull String help() {
+        var helpAnnotation = (Help) this.getAnnotation(Help.class);
+        if (helpAnnotation != null) {
+            var aliases = Arrays.asList(aliases());
+            return aliases.size() > 0 ? String.format("%-30s\t-> %s", String.join(", ", aliases), helpAnnotation.value())
+                                      : String.format("%-30s\t-> %s", ((Enum) this).name() + "*", helpAnnotation.value());
+
+        } else return "No help for " + ((Enum) this).name();
     }
 
     class Controller<CMD extends Enum<CMD> & Command> {
@@ -89,7 +114,8 @@ public interface Command {
          * @param commandClass class of command that controller controls
          */
         public Controller(Class<CMD> commandClass, Object owner) { //(Class<CMD> enumClass) {
-            commandEnumClass = commandClass; //(Class<CMD>) ((CMD) new Object()).getClass();// FIXME: WTF may work hack to get enum
+            commandEnumClass = commandClass; //(Class<CMD>) ((CMD) new Object()).getClass();// FIXME: WTF may work hack to get
+            // enum
             this.owner = owner;
             enabledCommands = EnumSet.noneOf(commandEnumClass);
             commandMask = EnumSet.noneOf(commandEnumClass);
@@ -101,9 +127,8 @@ public interface Command {
          * @param commands commands to set as enabled, rest will be disabled
          */
         public void setEnabled(CMD... commands) {
-            enabledCommands.removeAll(commandMask);
-            EnumSet<CMD> cmdSwitch = EnumSet.allOf(commandEnumClass);
-            cmdSwitch.retainAll(Arrays.asList(commands));
+            enabledCommands.retainAll(commandMask);
+            EnumSet<CMD> cmdSwitch = EnumSet.copyOf(Arrays.asList(commands));
             cmdSwitch.removeAll(commandMask);
             enabledCommands.addAll(cmdSwitch);
         }
@@ -114,8 +139,7 @@ public interface Command {
          * @param commands commands to enable
          */
         public void enable(CMD... commands) {
-            EnumSet<CMD> cmdSwitch = EnumSet.allOf(commandEnumClass);
-            cmdSwitch.retainAll(Arrays.asList(commands));
+            EnumSet<CMD> cmdSwitch = EnumSet.copyOf(Arrays.asList(commands));
             cmdSwitch.removeAll(commandMask);
             enabledCommands.addAll(cmdSwitch);
         }
@@ -126,8 +150,7 @@ public interface Command {
          * @param commands commands to disable
          */
         public void disable(CMD... commands) {
-            EnumSet<CMD> cmdSwitch = EnumSet.allOf(commandEnumClass);
-            cmdSwitch.retainAll(Arrays.asList(commands));
+            EnumSet<CMD> cmdSwitch = EnumSet.copyOf(Arrays.asList(commands));
             cmdSwitch.removeAll(commandMask);
             enabledCommands.removeAll(cmdSwitch);
         }
@@ -153,22 +176,14 @@ public interface Command {
          *
          * @param commands command to add to the mask
          */
-        public void mask(CMD... commands) {
-            EnumSet<CMD> cmdSwitch = EnumSet.allOf(commandEnumClass);
-            cmdSwitch.retainAll(Arrays.asList(commands));
-            commandMask.addAll(cmdSwitch);
-        }
+        public void mask(CMD... commands) { commandMask.addAll(Arrays.asList(commands)); }
 
         /**
          * Removes command from the mask. Masked command is not affected by enable/disable/setEnabled commands.
          *
          * @param commands command to remove from the mask
          */
-        public void unmask(CMD... commands) {
-            EnumSet<CMD> cmdSwitch = EnumSet.allOf(commandEnumClass);
-            cmdSwitch.retainAll(Arrays.asList(commands));
-            commandMask.removeAll(cmdSwitch);
-        }
+        public void unmask(CMD... commands) { commandMask.removeAll(Arrays.asList(commands)); }
 
         /**
          * Checks if command is in mask. Masked command is not affected by enable/disable/setEnabled commands.
@@ -188,11 +203,12 @@ public interface Command {
          */
         public @NotNull Compiled<CMD> parse(@NotNull String input) {
             var parts = Formatter.splitParts(input);
-            String cname = parts.get(0); // command name
-            for (CMD c : commandEnumClass.getEnumConstants())
-                if (c.matches(cname))
-                    return compile(c, parts.toArray(new String[0])); // rest is argument's list
-
+            if (parts.size() > 0) {
+                String cname = parts.get(0); // command name
+                for (CMD c : commandEnumClass.getEnumConstants())
+                    if (c.matches(cname))
+                        return compile(c, parts.toArray(new String[0])); // rest is argument's list
+            }
             return compile(null, input); // returns default command with input
         }
 
@@ -210,22 +226,15 @@ public interface Command {
         /**
          * Returns help for given command, or help for all commands if argument is null
          *
-         * @param command command to check help or null to check all commands
+         * @param command command to check help or empty to check all commands
          * @return list of help elements
          */
-        public String[] help(@NotNull String command) {
+        public @NotNull String help(@NotNull String command) {
             var parsed = parse(command);
-            if (command.isBlank())
-                return Arrays.stream(commandEnumClass.getEnumConstants()).toArray(String[]::new);
             if (parsed.cmd != null) // command successfully parsed
-                return new String[]{parsed.cmd.help()};
-            return new String[0];
+                return parsed.cmd.help();
+            return "No help for '" + command + "'.";
         }
-
-        /**
-         * @return help for all commands
-         */
-        public String[] help() { return help(""); }
     }
 
     /**
@@ -252,10 +261,10 @@ public interface Command {
             this.controller = controller;
             this.cmd = command;
             this.args = args == null ?
-                    command == null || command.mainAlias().isBlank() ?
-                            new String[0] :
-                            new String[]{command.mainAlias()} :
-                    args.clone();
+                        command == null || command.mainAlias().isBlank() ?
+                        new String[0] :
+                        new String[]{command.mainAlias()} :
+                        args.clone();
         }
 
         /**

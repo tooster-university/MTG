@@ -4,14 +4,18 @@ import me.tooster.common.Command;
 import me.tooster.common.FiniteStateMachine;
 import me.tooster.server.User;
 
-public class MTGStateMachine extends FiniteStateMachine<Command.Compiled<MTGCommand>, MTGStateMachine> {
+import static me.tooster.MTG.MTGCommand.*;
+import static me.tooster.common.Command.*;
+
+
+public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, MTGStateMachine, Command.Compiled<MTGCommand>> {
 
     private User[] usersInOrder;
     private int    userTurn;
     private int    userPriority;
 
     public MTGStateMachine(User[] usersInOrder) {
-        super(State.MULLIGANS);
+        super(State.DRAW_HAND);
         this.usersInOrder = usersInOrder;
         userTurn = userPriority = 0;
     }
@@ -34,12 +38,43 @@ public class MTGStateMachine extends FiniteStateMachine<Command.Compiled<MTGComm
         return usersInOrder[userTurn];
     }
 
-    enum State implements FiniteStateMachine.State<Command.Compiled<MTGCommand>, MTGStateMachine> {
-        MULLIGANS {
-            @Override
-            public FiniteStateMachine.State<Command.Compiled<MTGCommand>, MTGStateMachine> process(Command.Compiled<MTGCommand> input, MTGStateMachine context) {
-                return null;
-            }
-        },
+    enum State implements FiniteStateMachine.State<MTGStateMachine.State, MTGStateMachine, Compiled<MTGCommand>>{
+        DRAW_HAND, // mulligans phase
+
+        // game gamePhase
+        UNTAP ,
+        UPKEEP ,
+        DRAW ,
+
+        MAIN_1 ,
+
+        COMBAT_BEGIN ,
+        COMBAT_ATTACKERS ,
+
+        COMBAT_BLOCKERS ,
+
+        COMBAT_FIRST_STRIKE_DAMAGE ,
+        COMBAT_DAMAGE ,
+        COMBAT_END ,
+
+        MAIN_2 ,
+
+        END_STEP ,
+        CLEANUP_STEP ;
+
+        @Override @Deprecated
+        public State process(MTGStateMachine fsm, Command.Compiled<MTGCommand>... input) {
+            return null;
+        }
+
+        @Override @Deprecated
+        public void onEnter(MTGStateMachine fsm, State prevState) {
+
+        }
+
+        @Override @Deprecated
+        public void onExit(MTGStateMachine fsm, State nextState) {
+
+        }
     }
 }

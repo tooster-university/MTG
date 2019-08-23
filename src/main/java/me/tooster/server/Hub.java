@@ -5,7 +5,7 @@ import me.tooster.common.Formatter;
 import me.tooster.common.proto.Messages;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import static me.tooster.server.ServerCommand.*;
 
@@ -15,11 +15,24 @@ import static me.tooster.server.ServerCommand.*;
  */
 public class Hub {
 
-    public final HubStateMachine hubFSM = new HubStateMachine();
+    public static final Logger LOGGER;
 
-    public final Map<Long, User> users     = Collections.synchronizedMap(new HashMap<>(2)); // users connected to session
-    public       Integer         userSlots = 2;
+    static {
+        System.setProperty("java.util.logging.config.file",
+                Hub.class.getClassLoader().getResource("logging.properties").getFile());
+        LOGGER = Logger.getLogger(Hub.class.getName());
+    }
 
+    public final HubStateMachine hubFSM;
+
+    public final Map<Long, User> users;// users connected to session
+    public       Integer         userSlots;
+
+    public Hub() {
+        hubFSM = new HubStateMachine(this);
+        users = Collections.synchronizedMap(new HashMap<>(2));
+        userSlots = 2;
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +50,7 @@ public class Hub {
         user.hub = this;
         broadcast(String.format("User %s joined the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
 
-        hubFSM.process(user.serverCommandController.compile(HUB_ADD_USER), this);
+        hubFSM.process(user.serverCommandController.compile(HUB_ADD_USER));
     }
 
     void removeUser(User user) {
@@ -47,7 +60,7 @@ public class Hub {
         user.setReady(false);
         broadcast(String.format("User %s left the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
 
-        hubFSM.process(user.serverCommandController.compile(HUB_REMOVE_USER), this);
+        hubFSM.process(user.serverCommandController.compile(HUB_REMOVE_USER));
     }
 
     /**

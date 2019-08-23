@@ -47,7 +47,7 @@ public class Server {
      */
     private void awaitClients() {
         try (ServerSocket server = new ServerSocket(port)) {
-            LOGGER.info("Server started at " + port + ".");
+            LOGGER.info("Server started at port" + port + ".");
 
             LOGGER.info("Fetching data from resources...");
             ResourceManager.getInstance(); // prefetch decks
@@ -69,6 +69,7 @@ public class Server {
             }
         } catch (Exception e) {
             LOGGER.severe(e.getMessage());
+            e.printStackTrace();
             System.exit(1);
         }
         LOGGER.info("Server stopped.");

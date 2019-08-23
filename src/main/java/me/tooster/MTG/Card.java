@@ -11,10 +11,12 @@ import java.util.*;
  * @brief represents card-object, be it serverIn the hand, graveyard or on the board
  */
 public class Card {
-    private       Integer             ID;                                 // integer id that will be displayed on the board. Set by engine
+    private       Integer             ID;                                 // integer id that will be displayed on the board.
+    // Set by engine
     private final Deck                deck;                            // deck containing the card
     private       Deck.Pile           pile;                             // pile serverIn which the card currently is
-    private       User                owner;                               // owner of the card i.e. player, whose deck contained this card
+    private       User                owner;                               // owner of the card i.e. player, whose deck
+    // contained this card
     private       User                controller;                          // pile containing current card
     private       Mana                cost;                                  // mana cost of the card
     private final Map<String, Object> properties;       // reference to yaml map loaded by ResourceManager
@@ -64,7 +66,7 @@ public class Card {
      * @param ID new ID for this object
      */
     public void setID(int ID) {
-        if (this.ID != null) // remove old mapping
+//        if (this.ID != null) // remove old mapping
 //            deck.getOwner().hub.unregisterObject(ID);
         this.ID = ID; // assign new mapping
 //        deck.getOwner().hub.registerObject(ID, this);

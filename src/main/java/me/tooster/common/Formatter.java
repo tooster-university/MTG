@@ -15,6 +15,7 @@ public enum Formatter {
     RESET("\033[0m"),
     INVERT("\33[7m"),
     UNDERLINE("\33[4m"),
+    STRIKETHROUGH("\33[9m"),
 
     RED("\033[31m"),
     GREEN("\33[32m"),

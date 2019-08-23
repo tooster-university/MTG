@@ -2234,6 +2234,11 @@ public final class Messages {
    * chat message:
    *   `from': always set to either SERVER HUB or server player's ID
    *   `to': SERVER HUB or playerID
+   *   let `S` `H` `-` `P` `bc` mean `SERVER` `HUB` `none` `playerId` `broadcast`
+   *   ............................................
+   *   from : S    : S    : H    : H    : P     : P     : P
+   *   to   : S    : -    : H    : -    : H     : S     : P
+   *   what : S bc : S dm : H bc : H dm : local : shout : dm
    * </pre>
    *
    * Protobuf type {@code me.tooster.common.proto.ChatMsg}
@@ -2630,6 +2635,11 @@ public final class Messages {
      * chat message:
      *   `from': always set to either SERVER HUB or server player's ID
      *   `to': SERVER HUB or playerID
+     *   let `S` `H` `-` `P` `bc` mean `SERVER` `HUB` `none` `playerId` `broadcast`
+     *   ............................................
+     *   from : S    : S    : H    : H    : P     : P     : P
+     *   to   : S    : -    : H    : -    : H     : S     : P
+     *   what : S bc : S dm : H bc : H dm : local : shout : dm
      * </pre>
      *
      * Protobuf type {@code me.tooster.common.proto.ChatMsg}
@@ -3105,10 +3115,20 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getCommandBytes();
+
+    /**
+     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+     */
+    int getFormatHintValue();
+    /**
+     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+     */
+    me.tooster.common.proto.Messages.CommandMsg.FormatHint getFormatHint();
   }
   /**
    * <pre>
    * command sent as raw input. must be raw to keep chat formatting
+   * from client to server is a command, from server to client is a command response. If command was
    * </pre>
    *
    * Protobuf type {@code me.tooster.common.proto.CommandMsg}
@@ -3124,6 +3144,7 @@ public final class Messages {
     }
     private CommandMsg() {
       command_ = "";
+      formatHint_ = 0;
     }
 
     @java.lang.Override
@@ -3162,6 +3183,12 @@ public final class Messages {
               command_ = s;
               break;
             }
+            case 16: {
+              int rawValue = input.readEnum();
+
+              formatHint_ = rawValue;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3192,6 +3219,113 @@ public final class Messages {
       return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_CommandMsg_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               me.tooster.common.proto.Messages.CommandMsg.class, me.tooster.common.proto.Messages.CommandMsg.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code me.tooster.common.proto.CommandMsg.FormatHint}
+     */
+    public enum FormatHint
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>ERROR = 0;</code>
+       */
+      ERROR(0),
+      /**
+       * <code>INFO = 1;</code>
+       */
+      INFO(1),
+      /**
+       * <code>TIP = 2;</code>
+       */
+      TIP(2),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <code>ERROR = 0;</code>
+       */
+      public static final int ERROR_VALUE = 0;
+      /**
+       * <code>INFO = 1;</code>
+       */
+      public static final int INFO_VALUE = 1;
+      /**
+       * <code>TIP = 2;</code>
+       */
+      public static final int TIP_VALUE = 2;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static FormatHint valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static FormatHint forNumber(int value) {
+        switch (value) {
+          case 0: return ERROR;
+          case 1: return INFO;
+          case 2: return TIP;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<FormatHint>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          FormatHint> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<FormatHint>() {
+              public FormatHint findValueByNumber(int number) {
+                return FormatHint.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return me.tooster.common.proto.Messages.CommandMsg.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final FormatHint[] VALUES = values();
+
+      public static FormatHint valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private FormatHint(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:me.tooster.common.proto.CommandMsg.FormatHint)
     }
 
     public static final int COMMAND_FIELD_NUMBER = 1;
@@ -3228,6 +3362,23 @@ public final class Messages {
       }
     }
 
+    public static final int FORMATHINT_FIELD_NUMBER = 2;
+    private int formatHint_;
+    /**
+     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+     */
+    public int getFormatHintValue() {
+      return formatHint_;
+    }
+    /**
+     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+     */
+    public me.tooster.common.proto.Messages.CommandMsg.FormatHint getFormatHint() {
+      @SuppressWarnings("deprecation")
+      me.tooster.common.proto.Messages.CommandMsg.FormatHint result = me.tooster.common.proto.Messages.CommandMsg.FormatHint.valueOf(formatHint_);
+      return result == null ? me.tooster.common.proto.Messages.CommandMsg.FormatHint.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3245,6 +3396,9 @@ public final class Messages {
       if (!getCommandBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, command_);
       }
+      if (formatHint_ != me.tooster.common.proto.Messages.CommandMsg.FormatHint.ERROR.getNumber()) {
+        output.writeEnum(2, formatHint_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3256,6 +3410,10 @@ public final class Messages {
       size = 0;
       if (!getCommandBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, command_);
+      }
+      if (formatHint_ != me.tooster.common.proto.Messages.CommandMsg.FormatHint.ERROR.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(2, formatHint_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3274,6 +3432,7 @@ public final class Messages {
 
       if (!getCommand()
           .equals(other.getCommand())) return false;
+      if (formatHint_ != other.formatHint_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3287,6 +3446,8 @@ public final class Messages {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + COMMAND_FIELD_NUMBER;
       hash = (53 * hash) + getCommand().hashCode();
+      hash = (37 * hash) + FORMATHINT_FIELD_NUMBER;
+      hash = (53 * hash) + formatHint_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3385,6 +3546,7 @@ public final class Messages {
     /**
      * <pre>
      * command sent as raw input. must be raw to keep chat formatting
+     * from client to server is a command, from server to client is a command response. If command was
      * </pre>
      *
      * Protobuf type {@code me.tooster.common.proto.CommandMsg}
@@ -3426,6 +3588,8 @@ public final class Messages {
         super.clear();
         command_ = "";
 
+        formatHint_ = 0;
+
         return this;
       }
 
@@ -3453,6 +3617,7 @@ public final class Messages {
       public me.tooster.common.proto.Messages.CommandMsg buildPartial() {
         me.tooster.common.proto.Messages.CommandMsg result = new me.tooster.common.proto.Messages.CommandMsg(this);
         result.command_ = command_;
+        result.formatHint_ = formatHint_;
         onBuilt();
         return result;
       }
@@ -3504,6 +3669,9 @@ public final class Messages {
         if (!other.getCommand().isEmpty()) {
           command_ = other.command_;
           onChanged();
+        }
+        if (other.formatHint_ != 0) {
+          setFormatHintValue(other.getFormatHintValue());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3599,6 +3767,51 @@ public final class Messages {
   checkByteStringIsUtf8(value);
         
         command_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int formatHint_ = 0;
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+       */
+      public int getFormatHintValue() {
+        return formatHint_;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+       */
+      public Builder setFormatHintValue(int value) {
+        formatHint_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+       */
+      public me.tooster.common.proto.Messages.CommandMsg.FormatHint getFormatHint() {
+        @SuppressWarnings("deprecation")
+        me.tooster.common.proto.Messages.CommandMsg.FormatHint result = me.tooster.common.proto.Messages.CommandMsg.FormatHint.valueOf(formatHint_);
+        return result == null ? me.tooster.common.proto.Messages.CommandMsg.FormatHint.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+       */
+      public Builder setFormatHint(me.tooster.common.proto.Messages.CommandMsg.FormatHint value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        formatHint_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
+       */
+      public Builder clearFormatHint() {
+        
+        formatHint_ = 0;
         onChanged();
         return this;
       }
@@ -4391,12 +4604,15 @@ public final class Messages {
       "n.proto.ConfigMsg.ConfigurationEntry\0324\n\022" +
       "ConfigurationEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value" +
       "\030\002 \001(\t:\0028\001\"0\n\007ChatMsg\022\014\n\004from\030\001 \001(\t\022\n\n\002t" +
-      "o\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\"\035\n\nCommandMsg\022\017\n\007co" +
-      "mmand\030\001 \001(\t\"\232\001\n\nControlMsg\0226\n\004code\030\001 \001(\016" +
-      "2(.me.tooster.common.proto.ControlMsg.Co" +
-      "de\"T\n\004Code\022\010\n\004PING\020\000\022\010\n\004PONG\020\001\022\020\n\014SERVER" +
-      "_HELLO\020\002\022\017\n\013SERVER_DENY\020\003\022\025\n\021CLIENT_DISC" +
-      "ONNECT\020\004b\006proto3"
+      "o\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\"\215\001\n\nCommandMsg\022\017\n\007c" +
+      "ommand\030\001 \001(\t\022B\n\nformatHint\030\002 \001(\0162..me.to" +
+      "oster.common.proto.CommandMsg.FormatHint" +
+      "\"*\n\nFormatHint\022\t\n\005ERROR\020\000\022\010\n\004INFO\020\001\022\007\n\003T" +
+      "IP\020\002\"\232\001\n\nControlMsg\0226\n\004code\030\001 \001(\0162(.me.t" +
+      "ooster.common.proto.ControlMsg.Code\"T\n\004C" +
+      "ode\022\010\n\004PING\020\000\022\010\n\004PONG\020\001\022\020\n\014SERVER_HELLO\020" +
+      "\002\022\017\n\013SERVER_DENY\020\003\022\025\n\021CLIENT_DISCONNECT\020" +
+      "\004b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4431,7 +4647,7 @@ public final class Messages {
     internal_static_me_tooster_common_proto_CommandMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_me_tooster_common_proto_CommandMsg_descriptor,
-        new java.lang.String[] { "Command", });
+        new java.lang.String[] { "Command", "FormatHint", });
     internal_static_me_tooster_common_proto_ControlMsg_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_me_tooster_common_proto_ControlMsg_fieldAccessorTable = new

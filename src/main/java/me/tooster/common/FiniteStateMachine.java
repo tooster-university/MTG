@@ -2,53 +2,49 @@ package me.tooster.common;
 
 import org.jetbrains.annotations.NotNull;
 
-// TODO: change ContextT to Object varargs and InputT maybe also ???
 // TODO: right now doin the hubFSM to manage ready/not ready players
+
 /**
- * Abstract finite state machine that holds current state and has auto-go feature.
+ * Abstract class of finite state machine that holds current state and has auto-go feature and enter/exit state events
  *
- * @param <InputT>   Input type for machine states
- * @param <ContextT> Context type for machine states
+ * @param <InputT> Input type for machine states
+ * @param <FsmT>   Type of generic state machine
+ * @param <StateT> state type subclass
  */
-public abstract class FiniteStateMachine<InputT, ContextT> {
-    private State<InputT, ContextT> initialState;
-    private State<InputT, ContextT> currentState;
+public abstract class FiniteStateMachine<StateT extends FiniteStateMachine.State<StateT, FsmT, InputT>,
+        FsmT extends FiniteStateMachine, InputT> {
+    private StateT  initialState;
+    private StateT  currentState;
+
     /**
      * Enables auto-advance mode of FSM, so that it won't wait for input from user - external call to
      * <code>process()</code>. Instead it supplies itself with input and context objects passed to the function at
      * the beginning of auto phase. To alter parameters, simply modify the content of input or context
      */
-    private boolean                 autoNext = false;
+    private boolean autoNext = false;
 
-    public FiniteStateMachine(@NotNull State<InputT, ContextT> initialState) {
+    /**
+     * Private constructor for factory
+     * @param initialState initial state of the machine
+     */
+    public FiniteStateMachine(@NotNull StateT initialState) {
         this.initialState = initialState;
-        reset();
     }
 
     /**
-     * Advances the state of FSM. It will keep processing with Hub and CompiledCommand until <code>disableAuto()</code>
-     * is called. To change the parameters passed to next state serverIn auto mode, use setters for Hub and CompiledCommand.
-     *
-     * @param input   input for the FSM
-     * @param context represents the context serverIn which the state machine is updated. All data for state update should
-     *                be included serverIn context. Used to contain data for FSM to use
+     * Starts the state machine from initial state triggering onEnter with prevState=null on initial state
      */
-    // FIXME: Add lock() to lock the process() of FSM and executeIf(State, <lambda>) to execute actions atomically
-    //  and lock if FSM is serverIn given state
-    public synchronized void process(InputT input, ContextT context) {
-        do {
-            if(currentState == null) throw new RuntimeException("FSM halted.");
-            State<InputT, ContextT> nextState = currentState.process(input, context);
-            if (currentState != nextState) {
-                currentState.onExit(nextState, context);
-                State<InputT, ContextT> previousState = currentState;
-                currentState = nextState;
-                nextState.onEnter(previousState, context);
-            }
-        } while (autoNext);
+    public void start(){
+        currentState = null;
+        forceState(initialState);
     }
 
-    public void process(InputT input) { process(input, null); }
+    /**
+     * Stops the state machine from current state triggering onExit with nextState=null.
+     */
+    public void stop(){
+        forceState(null);
+    }
 
     /**
      * Sets the auto mode. Without auto mode, the FSM loop is as follows:
@@ -63,14 +59,32 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
     public void setAuto(boolean enabled) {autoNext = enabled;}
 
     /**
-     * Resets the state machine to initial state and turn's off the auto mode.
-     * At first triggers the onExit event of current state
-     * Triggers the onEnter event of initial state with prevState and context set to null
+     * Wrapper function for state's process() function. Check overloading state machine to check the actual process() functions.
+     * Advances the state of FSM. It will keep processing with the same input until <code>disableAuto()</code>
+     * is called. Shared state can be passed in finite state machine or input objects.
+     *
+     * @param input input for the FSM
      */
-    public synchronized void reset() {
-        autoNext = false;
-        forceState(initialState, null);
+    // FIXME: Add lock() to lock the process() of FSM and executeIf(State, <lambda>) to execute actions atomically
+    //  and lock if FSM is serverIn given state
+    @SuppressWarnings("unchecked")
+    public synchronized void process(InputT... input) {
+        do {
+            if (currentState == null) throw new RuntimeException("FSM halted. ");
+            StateT nextState = currentState.process((FsmT) this, input);
+            if (currentState != nextState) {
+                currentState.onExit((FsmT) this, nextState);
+                StateT previousState = currentState;
+                currentState = nextState;
+                nextState.onEnter((FsmT) this, previousState);
+            }
+        } while (autoNext);
     }
+
+    /**
+     * @return returns current state; null if machine is halted
+     */
+    public StateT getCurrentState() { return currentState; }
 
     /**
      * Forcibly changes the state of FSM.
@@ -79,42 +93,40 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
      *
      * @param newState new state to set
      */
-    public synchronized void forceState(State<InputT, ContextT> newState, ContextT context) {
-        if(currentState != null) currentState.onExit(null, context);
+    @SuppressWarnings("unchecked")
+    public synchronized void forceState(StateT newState) {
+        if (currentState != null) currentState.onExit((FsmT) this, null);
         currentState = newState;
-        if(currentState != null) currentState.onEnter(null, context);
+        if (currentState != null) currentState.onEnter((FsmT) this, null);
     }
-
-    /**
-     * @return returns current state
-     */
-    public State<InputT, ContextT> getCurrentState() { return currentState; }
 
     /**
      * Interface for States.
      *
-     * @param <InputT>   Input that State accepts
-     * @param <ContextT> context that State accepts
+     * @param <InputT> Input that State accepts
+     * @param <FsmT>   type of containing machine
+     * @param <StateT> state type subclass
      */
-    public interface State<InputT, ContextT> {
+    public interface State<StateT extends State<StateT, FsmT, InputT>, FsmT extends FiniteStateMachine, InputT> {
+        /**
+         * Processes the CompiledCommand inside State. Returns next state to go to, or this if state doesn't change
+         *
+         * @param input CompiledCommand to process
+         * @param fsm   containing machine
+         * @return next state or this if state stays the same
+         */
+        StateT process(FsmT fsm, InputT... input);
+
         /**
          * Method invoked when new state is entered.
          * Happens after <code>onExit()</code> on previous state.
          * Machine current state is set to state that's being entered.
          * <code>prevState</code> is null if machine enters the initial state.
          *
-         * @param context context for machine
+         * @param fsm       containing machine
+         * @param prevState previous state before transition
          */
-        default void onEnter(State<InputT, ContextT> prevState, ContextT context) {}
-
-        /**
-         * Processes the CompiledCommand inside State. Returns next state to go to, or this if state doesn't change
-         *
-         * @param input   CompiledCommand to process
-         * @param context context for machine
-         * @return next state or this if state stays the same
-         */
-        State<InputT, ContextT> process(InputT input, ContextT context);
+        default void onEnter(FsmT fsm, StateT prevState) {}
 
         /**
          * Method invoked when exiting a state to enter other state.
@@ -122,8 +134,9 @@ public abstract class FiniteStateMachine<InputT, ContextT> {
          * Machine current state is set to state that's being exited.
          * <code>nextState</code> is null to distinguish machine finish.
          *
-         * @param context context for machine
+         * @param fsm       containing machine
+         * @param nextState next state to transition into
          */
-        default void onExit(State<InputT, ContextT> nextState, ContextT context) {}
+        default void onExit(FsmT fsm, StateT nextState) {}
     }
 }

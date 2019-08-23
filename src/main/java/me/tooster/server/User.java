@@ -1,6 +1,7 @@
 package me.tooster.server;
 
 import me.tooster.MTG.Deck;
+import me.tooster.common.Command;
 import me.tooster.common.Formatter;
 import me.tooster.common.proto.Messages;
 import me.tooster.MTG.MTGCommand;
@@ -83,7 +84,7 @@ public class User {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        disconnect();
     }
 
     /**
@@ -142,9 +143,13 @@ public class User {
                     if (target == null) transmit(ChatMsg.newBuilder().setFrom("SERVER").setMsg("User offline or too generic."));
                     else transmit(ChatMsg.newBuilder().setFrom(this.toString()).setTo(target.toString()).setMsg(parsed.arg(3)));
                 } else if (parsed.cmd == HELP) {
-                    transmit(ChatMsg.newBuilder().setFrom("SERVER").setMsg(Formatter.list(serverCommandController.help(parsed.arg(1)))));
+                    if (parsed.args.length > 1) // help is on client/not connected // fixme reply with Command.newBuilder
+                        transmit(ChatMsg.newBuilder().setFrom("SERVER").setMsg(serverCommandController.help(parsed.arg(1))));
+                    else
+                        transmit(ChatMsg.newBuilder().setFrom("SERVER").setMsg(
+                                Formatter.list(serverCommandController.enabledCommands.stream().map(Command::help).toArray(String[]::new))));
                 }
-                hub.hubFSM.process(parsed, hub);
+                hub.hubFSM.process(parsed);
                 break;
 
             case MSGTYPE_NOT_SET:
@@ -178,10 +183,11 @@ public class User {
     public void disconnect() {
         try {
             // updates game, sends status to other player etc.
-            if(hub != null) hub.removeUser(this);
+            if (hub != null) hub.removeUser(this);
             Server.getInstance().users.remove(serverTag); // remove from players list
             listenRemoteThread.interrupt(); // close the streams and halt the thread
             socket.close();
+            Server.LOGGER.info("Client " + toString() + " disconnected.");
         } catch (IOException e) {
             e.printStackTrace();
         }
