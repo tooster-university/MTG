@@ -2,6 +2,9 @@ package me.tooster.common;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 // TODO: right now doin the hubFSM to manage ready/not ready players
 
 /**
@@ -13,18 +16,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class FiniteStateMachine<StateT extends FiniteStateMachine.State<StateT, FsmT, InputT>,
         FsmT extends FiniteStateMachine, InputT> {
-    private StateT  initialState;
-    private StateT  currentState;
+    private       StateT initialState;
+    private       StateT currentState;
 
-    /**
-     * Enables auto-advance mode of FSM, so that it won't wait for input from user - external call to
-     * <code>process()</code>. Instead it supplies itself with input and context objects passed to the function at
-     * the beginning of auto phase. To alter parameters, simply modify the content of input or context
-     */
     private boolean autoNext = false;
 
     /**
      * Private constructor for factory
+     *
      * @param initialState initial state of the machine
      */
     public FiniteStateMachine(@NotNull StateT initialState) {
@@ -32,43 +31,15 @@ public abstract class FiniteStateMachine<StateT extends FiniteStateMachine.State
     }
 
     /**
-     * Starts the state machine from initial state triggering onEnter with prevState=null on initial state
-     */
-    public void start(){
-        currentState = null;
-        forceState(initialState);
-    }
-
-    /**
-     * Stops the state machine from current state triggering onExit with nextState=null.
-     */
-    public void stop(){
-        forceState(null);
-    }
-
-    /**
-     * Sets the auto mode. Without auto mode, the FSM loop is as follows:
-     * <pre>
-     *     1. wait for user to invoke `process(i, c)`
-     *     2. |update FSM with i, c|
-     *     3. if auto is enabled goto 2. otherwise goto 1.
-     * </pre>
-     *
-     * @param enabled sets the auto mode
-     */
-    public void setAuto(boolean enabled) {autoNext = enabled;}
-
-    /**
-     * Wrapper function for state's process() function. Check overloading state machine to check the actual process() functions.
-     * Advances the state of FSM. It will keep processing with the same input until <code>disableAuto()</code>
-     * is called. Shared state can be passed in finite state machine or input objects.
+     * Wrapper function for state's process() function. Go see the overloading state machine to check the actual process() functions.
+     * Advances the state of FSM. It will keep processing with the same input until <code>disableAuto()</code> is called.
+     * Shared state can be passed in finite state machine or input objects.
      *
      * @param input input for the FSM
+     * @return returns the finite state machine object to enable linking the process(), lock() and unlock() calls
      */
-    // FIXME: Add lock() to lock the process() of FSM and executeIf(State, <lambda>) to execute actions atomically
-    //  and lock if FSM is serverIn given state
     @SuppressWarnings("unchecked")
-    public synchronized void process(InputT... input) {
+    public synchronized FiniteStateMachine<StateT, FsmT, InputT> process(InputT... input) {
         do {
             if (currentState == null) throw new RuntimeException("FSM halted. ");
             StateT nextState = currentState.process((FsmT) this, input);
@@ -79,7 +50,35 @@ public abstract class FiniteStateMachine<StateT extends FiniteStateMachine.State
                 nextState.onEnter((FsmT) this, previousState);
             }
         } while (autoNext);
+        return this;
     }
+
+    /**
+     * Starts the state machine from initial state triggering onEnter with prevState=null on initial state
+     */
+    public synchronized void start() {
+        currentState = null;
+        forceState(initialState);
+    }
+
+    /**
+     * Stops the state machine from current state triggering onExit with nextState=null.
+     */
+    public void stop() {
+        forceState(null);
+    }
+
+    /**
+     * Sets the auto mode. The FSM workflow looks like that:
+     * <pre>
+     *     1. |update FSM with `this` and input `i`|
+     *     2. if auto is enabled goto 1.
+     * </pre>
+     * in auto mode input and fsm is passed as is to the `process` function
+     *
+     * @param enabled sets the auto mode
+     */
+    public void setAuto(boolean enabled) {autoNext = enabled;}
 
     /**
      * @return returns current state; null if machine is halted
@@ -94,11 +93,14 @@ public abstract class FiniteStateMachine<StateT extends FiniteStateMachine.State
      * @param newState new state to set
      */
     @SuppressWarnings("unchecked")
-    public synchronized void forceState(StateT newState) {
+    public synchronized FiniteStateMachine<StateT, FsmT, InputT> forceState(StateT newState) {
         if (currentState != null) currentState.onExit((FsmT) this, null);
         currentState = newState;
         if (currentState != null) currentState.onEnter((FsmT) this, null);
+        return this;
     }
+
+    //--------------------------------------------------------------------------------------------------------------------------------------
 
     /**
      * Interface for States.

@@ -22,7 +22,8 @@ public enum Formatter {
     YELLOW("\33[33m"),
     BLUE("\33[34m"),
     PURPLE("\33[35m"),
-    CYAN("\33[36m");
+    CYAN("\33[36m"),
+    GRAY("\33[90m");
 
     private final String value;
 
@@ -53,13 +54,14 @@ public enum Formatter {
     public static String chat(@NotNull String from, @NotNull String to, boolean incoming, @NotNull String msg) {
         String prefix;
         // from server or hub
-        if (from.equals("SERVER")) prefix = to.equals("SERVER") ? String.format("%s[SERVER] %s", PURPLE, UNDERLINE) : PURPLE.value;
-        else if (from.equals("HUB")) prefix = to.equals("HUB") ? String.format("%s[HUB] %s", CYAN, UNDERLINE) : CYAN.value;
-        // from user
-        else if (to.equals("SERVER")) prefix = String.format("%s[!] [%s] %s", YELLOW, from, UNDERLINE); // server shout
-        else if (to.equals("HUB")) prefix = String.format("[%s] ",from); // hub shout
-        // dm
-        else prefix = String.format("%s%s%s[%s]%s ", YELLOW, INVERT, incoming ? "<--" : "-->", incoming ? from : to, INVERT);
+        if (from.equals("SERVER"))
+            prefix = to.equals("SERVER") ? String.format("%s[SERVER] %s%s", PURPLE, UNDERLINE, PURPLE) : PURPLE.value;
+        else if (from.equals("HUB")) prefix = to.equals("HUB") ? String.format("%s[HUB] %s%s", CYAN, UNDERLINE, CYAN) : CYAN.value;
+            // from user
+        else if (to.equals("SERVER")) prefix = String.format("%s[!] [%s] %s%s", YELLOW, from, UNDERLINE, YELLOW); // server shout
+        else if (to.equals("HUB")) prefix = String.format("[%s] ", from); // hub shout
+            // dm
+        else prefix = String.format("%s%s%s[%s]%s%s ", YELLOW, INVERT, incoming ? "<--" : "-->", incoming ? from : to, INVERT, YELLOW);
 
         return String.format("%s%s%s", prefix, msg, RESET);
         //        return formatAllLines(CYAN + "" + INVERT + "[~] %-100s [~]" + RESET, msg);
@@ -90,8 +92,7 @@ public enum Formatter {
      * Formats error as:
      *
      * <pre>
-     * [ERR] someerror.something
-     * [ERR] anotherlineeoferror
+     * [ERR] some error message in red inverted
      * </pre>
      *
      * @param msg string to format
@@ -99,6 +100,20 @@ public enum Formatter {
      */
     public static String error(@NotNull String msg) {
         return String.format("%s%s[ERROR] %s%s", RED, INVERT, msg, RESET);
+    }
+
+    /**
+     * Formats invalid as:
+     *
+     * <pre>
+     * some invalid message in red
+     * </pre>
+     *
+     * @param msg string to format
+     * @return formatted message
+     */
+    public static String invalid(@NotNull String msg) {
+        return String.format("%s%s%s", RED, msg, RESET);
     }
 
     /**
@@ -186,12 +201,34 @@ public enum Formatter {
     }
 
     /**
+     * Removes given part from the string
+     *
+     * @param idx   index of part to remove starting from 0
+     * @param input string consisting of words and doubly quoted phrases: this "for example consists" 'of 5' parts:
+     *              `this` `for example consists` `'of` `5'` `parts. Only double quotes make parts
+     * @return input without part and it's trailing whitespaces: `remove  the      idx=1  part` -> `remove  idx=1 part`
+     */
+    public static String removePart(Integer idx, String input) {
+        Pattern regex = Pattern.compile("[^\\s\"]+\\s*|\"[^\"]*\"\\s*"); // matches: (abcd) "(xy zv)" (x)
+        Matcher regexMatcher = regex.matcher(input);
+        int i = 0;
+        int start = 0, end = 0;
+        while (regexMatcher.find())
+            if (i++ == idx) {
+                start = regexMatcher.start();
+                end = regexMatcher.end();
+            }
+        return input.substring(0,start) + input.substring(end);
+    }
+
+    /**
      * Returns progress in form [a/b] for numeric values or '-' for nulls
+     *
      * @param a first stat
      * @param b second stat
      * @return
      */
-    public static String formatProgress(Integer a, Integer b){
+    public static String formatProgress(Integer a, Integer b) {
         return String.format("[%s/%s]", a == null ? "-" : a, b == null ? "-" : b);
     }
 }

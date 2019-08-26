@@ -2,8 +2,8 @@ package me.tooster.MTG;
 
 import me.tooster.server.User;
 import me.tooster.server.ResourceManager;
-import me.tooster.server.exceptions.CardException;
-import me.tooster.server.exceptions.ManaFormatException;
+import me.tooster.MTG.exceptions.CardException;
+import me.tooster.MTG.exceptions.ManaFormatException;
 
 import java.util.*;
 

@@ -1,6 +1,7 @@
 package me.tooster.server;
 
 
+import me.tooster.common.ChatRoom;
 import me.tooster.common.Formatter;
 import me.tooster.common.proto.Messages;
 
@@ -13,7 +14,7 @@ import static me.tooster.server.ServerCommand.*;
 /**
  * Hub manages connected users and
  */
-public class Hub {
+public class Hub implements ChatRoom<User> {
 
     public static final Logger LOGGER;
 
@@ -32,6 +33,7 @@ public class Hub {
         hubFSM = new HubStateMachine(this);
         users = Collections.synchronizedMap(new HashMap<>(2));
         userSlots = 2;
+        hubFSM.start();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -48,7 +50,7 @@ public class Hub {
         assert (!users.containsKey(user.serverTag));
         users.put(user.serverTag, user);
         user.hub = this;
-        broadcast(String.format("User %s joined the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
+        broadcast(String.format("%s joined the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
 
         hubFSM.process(user.serverCommandController.compile(HUB_ADD_USER));
     }
@@ -58,19 +60,23 @@ public class Hub {
         users.remove(user.serverTag);
         user.hub = null;
         user.setReady(false);
-        broadcast(String.format("User %s left the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
+        broadcast(String.format("%s left the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
 
         hubFSM.process(user.serverCommandController.compile(HUB_REMOVE_USER));
     }
 
-    /**
-     * Sends message to all users
-     *
-     * @param msg message to send
-     */
-    void broadcast(String msg) {
+    @Override
+    public void broadcast(String message) {
         synchronized (users) {
-            users.values().forEach(u -> u.transmit(Messages.ChatMsg.newBuilder().setFrom("HUB").setMsg(msg)));
+            users.values().forEach(u -> u.transmit(Messages.VisualMsg.newBuilder().setFrom("HUB").setTo("HUB").setMsg(message)));
         }
     }
+
+    @Override
+    public void shout(User user, String message){
+        synchronized (users){
+            users.values().forEach(u -> u.transmit(Messages.VisualMsg.newBuilder().setFrom(user.toString()).setTo("HUB").setMsg(message)));
+        }
+    }
+
 }

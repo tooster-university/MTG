@@ -56,12 +56,9 @@ public interface Command {
     }
 
     /**
-     * Internal command is one that cannot be generated/accessed by user and via parse/help etc.
-     * It is defined as one without alias.
-     *
-     * @return true if command is internal i.e has no alias, false otherwise
+     * @return Returns true if command has alias
      */
-    default boolean isInternal() { return this.getAnnotation(Alias.class) == null; }
+    default boolean hasAlias() { return this.getAnnotation(Alias.class) != null; }
 
     /**
      * @return list of aliases for the command
@@ -90,16 +87,33 @@ public interface Command {
     }
 
     /**
-     * @return Returns help message for this command.
+     * @return Returns help message for this command defined in @Help annotation or detais message if @Help not found on command
      */
     default @NotNull String help() {
         var helpAnnotation = (Help) this.getAnnotation(Help.class);
-        if (helpAnnotation != null) {
-            var aliases = Arrays.asList(aliases());
-            return aliases.size() > 0 ? String.format("%-30s\t-> %s", String.join(", ", aliases), helpAnnotation.value())
-                                      : String.format("%-30s\t-> %s", ((Enum) this).name() + "*", helpAnnotation.value());
+        var aliases = aliases();
+        return helpAnnotation == null ? this + "> has no help message."
+                                      : aliases.length > 0
+                                        ? String.format("%-30s\t-> %s", String.join(", ", aliases),
+                                              helpAnnotation.value())
+                                        : String.format("%-30s\t-> %s", ((Enum) this).name() + ">",
+                                                helpAnnotation.value());
+    }
 
-        } else return "No help for " + ((Enum) this).name();
+    /**
+     * @return Returns true if command has help message. Safe for null arguments
+     */
+    default boolean hasHelp() { return this.getAnnotation(Help.class) != null; }
+
+    /**
+     * Returns help for command.
+     *
+     * @param cmd command to get help
+     * @return Returns message containing help info about command or error message if command is invalid
+     */
+    static @NotNull String help(Command cmd) {
+        if (cmd == null) return "Invalid command - cannot find help.";
+        else return cmd.help();
     }
 
     class Controller<CMD extends Enum<CMD> & Command> {
@@ -222,19 +236,6 @@ public interface Command {
         public Compiled<CMD> compile(@Nullable CMD command, String... args) {
             return new Compiled<>(this, command, args);
         }
-
-        /**
-         * Returns help for given command, or help for all commands if argument is null
-         *
-         * @param command command to check help or empty to check all commands
-         * @return list of help elements
-         */
-        public @NotNull String help(@NotNull String command) {
-            var parsed = parse(command);
-            if (parsed.cmd != null) // command successfully parsed
-                return parsed.cmd.help();
-            return "No help for '" + command + "'.";
-        }
     }
 
     /**
@@ -252,10 +253,11 @@ public interface Command {
          * Creates new compiled command with final fields <code>command</code> and <code>args</code>. Those fields
          * provide easy access to the parsed command object,
          *
-         * @param command command enum representing the command, never null
-         * @param args    arguments for command, arg0 should be command itself. Always a not null array.
-         *                Always a fresh copy. If args are not specified, then arg0 is defaulted to main alias.
-         *                If main alias doesn't exist or command is null, a String[0] array is args
+         * @param controller controller that compiled this command
+         * @param command    command enum representing the command, never null
+         * @param args       arguments for command, arg0 should be command itself. Always a not null array.
+         *                   Always a fresh copy. If args are not specified, then arg0 is defaulted to main alias.
+         *                   If main alias doesn't exist or command is null, a String[0] array is args
          */
         Compiled(@NotNull Controller<CMD> controller, @Nullable CMD command, String... args) {
             this.controller = controller;
@@ -294,7 +296,7 @@ public interface Command {
          */
         @Override
         public String toString() {
-            return cmd + " " + String.join(" ", args);
+            return cmd + "> " + String.join(" ", args);
         }
     }
 

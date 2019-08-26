@@ -1,4 +1,4 @@
-package me.tooster.server.exceptions;
+package me.tooster.MTG.exceptions;
 
 import me.tooster.MTG.Mana;
 

@@ -1,6 +1,6 @@
 package me.tooster.server;
 
-import me.tooster.common.proto.Messages;
+import me.tooster.common.ChatRoom;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,10 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import static me.tooster.common.proto.Messages.*;
-import static me.tooster.server.ServerCommand.*;
 
 
-public class Server {
+public class Server implements ChatRoom<User> {
     public static final Logger LOGGER;
 
     static {
@@ -49,22 +48,18 @@ public class Server {
         try (ServerSocket server = new ServerSocket(port)) {
             LOGGER.info("Server started at port" + port + ".");
 
-            LOGGER.info("Fetching data from resources...");
+            LOGGER.fine("Fetching data from resources...");
             ResourceManager.getInstance(); // prefetch decks
 
-            LOGGER.info("Initializing the hub.");
+            LOGGER.fine("Initializing the hub.");
             hub = new Hub();
             // listen for clients
-            LOGGER.info("Waiting for incoming client connections...");
+            LOGGER.fine("Waiting for incoming client connections...");
             while (!Thread.interrupted()) {
                 Socket userSocket = server.accept();
-
                 User user = new User(userSocket, nextTag());
-                user.transmit(ControlMsg.newBuilder().setCode(ControlMsg.Code.SERVER_HELLO));
-                users.put(user.serverTag, user); // register in users map
-                LOGGER.info("Client " + user.serverTag + " connected.");
 
-                hub.addUser(user);
+                (user.listenRemoteThread = new Thread(user::listenRemote)).start();
 
             }
         } catch (Exception e) {
@@ -76,27 +71,42 @@ public class Server {
     }
 
     /**
-     * Broadcasts message to all users on the server
-     *
-     * @param msg message to broadcast
-     */
-    synchronized void broadcast(String msg) {
-        users.values().forEach(u -> u.transmit(ChatMsg.newBuilder().setFrom("SERVER").setMsg(msg)));
-    }
-
-    /**
      * Returns user based on some identity. can be a tag or starting letters of nick or full name
      *
      * @param identity any of tag, nick or starting identity of player
-     * @return user if exactly one user is found, null otherwise
+     * @return returns user if exactly one user is found, null otherwise
      */
     public User findUser(String identity) {
         User u = null;
+        //return by tag
         try { u = users.get(Long.parseLong(identity)); } catch (NumberFormatException ignored) {}
         if (u != null) return u;
-        var matching = users.values().stream().filter(id -> id.toString().startsWith(identity));
-        if (matching.count() == 1) return matching.findFirst().get();
-        return null;
+        // return by name
+        var matching = users.values().stream().filter(id -> id.toString().startsWith(identity)).toArray();
+        if (matching.length != 1) return null;
+        return (User) matching[0];
+    }
+
+    @Override
+    public void broadcast(String message) {
+        synchronized (users) {
+            users.values().forEach(u -> u.transmit(VisualMsg.newBuilder()
+                    .setVariant(VisualMsg.Variant.CHAT)
+                    .setFrom("SERVER")
+                    .setTo("SERVER")
+                    .setMsg(message)));
+        }
+    }
+
+    @Override
+    public void shout(User from, String message) {
+        synchronized (users) {
+            users.values().forEach(u -> u.transmit(VisualMsg.newBuilder()
+                    .setVariant(VisualMsg.Variant.CHAT)
+                    .setFrom(from.toString())
+                    .setTo("SERVER")
+                    .setMsg(message)));
+        }
     }
 
     //----------------------------------------------------------------------------------------------------------------------------

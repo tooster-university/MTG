@@ -9,10 +9,11 @@ enum ServerCommand implements Command {
     // generic - always enabled
     // -----------------------------------------------------
 
-    @Alias({"/help", "/?"}) @Help("/help [cmd] displays help [for command].") HELP,
-    @Alias({"/whisper", "/w", "/m"}) @Help("/m <player> <msg> sends private message to player.") WHISPER,
+    @Alias({"/?", "/help"}) @Help("/help [cmd] displays help [for command].") HELP,
+    @Alias({"/m", "/w", "/whisper"}) @Help("/m <player> <msg> sends private message to player.") WHISPER,
     @Alias("/say") @Help("/say <msg> sends message to local hub chat.") SAY,
     @Alias({"/shout", "!"}) @Help("/shout <msg> sends message to server chat.") SHOUT,
+    @Alias({"/who"}) @Help("displays all the users on the server.") WHO,
 
     HUB_ADD_USER, HUB_REMOVE_USER,
 

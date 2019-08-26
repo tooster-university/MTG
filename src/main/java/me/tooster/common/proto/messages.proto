@@ -4,15 +4,10 @@ package me.tooster.common.proto;
 message Message {
     int64 ID = 1; // can be used in request-response system
     oneof msgType {
-        ConfigMsg configMsg = 3;
-        ChatMsg chatMsg = 4;
-        CommandMsg commandMsg = 5;
-        ControlMsg controlMsg = 6;
+        ControlMsg controlMsg = 2;
+        VisualMsg visualMsg = 3;
+        CommandMsg commandMsg = 4;
     }
-}
-
-message ConfigMsg {
-    map<string, string> configuration = 1;
 }
 
 // chat message:
@@ -23,32 +18,49 @@ message ConfigMsg {
 //   from : S    : S    : H    : H    : P     : P     : P
 //   to   : S    : -    : H    : -    : H     : S     : P
 //   what : S bc : S dm : H bc : H dm : local : shout : dm
-message ChatMsg {
+message VisualMsg {
     string from = 1; // player tag, 'SERVER' or 'HUB'
     string to = 2; // player tag, 'SERVER' or 'HUB'
     string msg = 3;
+    Variant variant = 4; // optional hint for message formatting
+    enum Variant {
+        CHAT = 0;
+        INVALID = 1; // less than error
+        ERROR = 2;
+        TIP = 3;
+        PROMPT = 4;
+        INFO = 5;
+    }
 }
 
 // command sent as raw input. must be raw to keep chat formatting
 // from client to server is a command, from server to client is a command response. If command was
 message CommandMsg {
     string command = 1;
-    enum FormatHint{
-        ERROR = 0;
-        INFO = 1;
-        TIP = 2;
-    }
-    FormatHint formatHint = 2;
 }
 
-// handshake/PingPong/disconnect
+// handshake/PingPong/disconnect/config
 message ControlMsg {
+    Code code = 1;
+    map<string, string> configuration = 2; // optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
     enum Code {
         PING = 0; // received only on server
         PONG = 1; // received on both ends
-        SERVER_HELLO = 2; // received on client
-        SERVER_DENY = 3; // received on client
-        CLIENT_DISCONNECT = 4; // received on server
+        CLIENT_HELLO = 2;
+        SERVER_HELLO = 3; // received on client
+        SERVER_DENY = 4; // received on client
+        CLIENT_DISCONNECT = 5; // received on server
+        CONFIG = 6; // any config messages without initial handshake config
     }
-    Code code = 1;
 }
+
+// connection protocol:
+// 0. user connects on socket
+// 1. user sends CLIENT_HELLO with initial configuration within 5 seconds
+// 2. server replies SERVER_HELLO if CLIENT_HELLO received, otherwise sends SERVER_DENY and closes connection
+// 3. client waits 5 seconds max for SERVER_HELLO with remote configuration data
+// *. client can send any message except CONTROL.<PONG|CLIENT_HELLO|SERVER_HELLO|SERVER_DENY>
+// * client is expected to send any message in max 20sec time intervals.
+//   otherwise he is assumed dead and server closes connection
+// * server is expected to send anything in 20sec intervals, otherwise it's assumed dead
+// * fail messages always should have info about what caused them in configuration["details"]

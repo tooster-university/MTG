@@ -3,6 +3,7 @@ package me.tooster.client;
 import me.tooster.common.Command;
 import me.tooster.common.FiniteStateMachine;
 
+import me.tooster.common.Formatter;
 import me.tooster.common.proto.Messages;
 import me.tooster.common.proto.Messages.*;
 
@@ -32,7 +33,7 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
             public State process(ClientStateMachine fsm, Command.Compiled<ClientCommand>... input) {
                 var compiled = input[0];
                 if (compiled.cmd == null) {
-                    Client.LOGGER.warning("Unrecognized input.");
+                    System.out.println(Formatter.invalid("Unrecognized input."));
                     return this;
                 }
                 else if (compiled.cmd == CONNECT)
@@ -55,15 +56,15 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
             public State process(ClientStateMachine fsm, Compiled<ClientCommand>... input) {
                 var compiled = input[0];
                 if (compiled.cmd == null) {
-                    Client.LOGGER.warning("Unrecognized input.");
+                    System.out.println(Formatter.invalid("Unrecognized input."));
                     return this;
                 }
                 switch (compiled.cmd) {
                     case DISCONNECT:
-                    case CONNECTION_CLOSE:
+                    case CONNECTION_CLOSED:
                         fsm.client.disconnect();
                         return NOT_CONNECTED;
-                    case SERVER_HELLO:
+                    case CONNECTION_ESABLISHED:
                         return CONNECTED;
                     default:
                         return this;
@@ -76,9 +77,8 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
             @Override
             public void onEnter(ClientStateMachine fsm, State prevState) {
 
-                Client.LOGGER.info("Connected to server.");
+                System.out.println("Connected to the server as " + fsm.client.remoteConfig.get("identity"));
                 fsm.client.commandController.setEnabled(DISCONNECT);
-                fsm.client.transmit(ConfigMsg.newBuilder().putAllConfiguration(fsm.client.config)); // send initial configuration
             }
 
             @Override
@@ -89,12 +89,14 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
                     return this;
                 }
                 switch (compiled.cmd) {
-                    case CONFIG:
-                        fsm.client.transmit(ConfigMsg.newBuilder().putConfiguration(compiled.arg(1), compiled.arg(2)));
+                    case CONFIG: // send only changed option
+                        fsm.client.transmit(ControlMsg.newBuilder()
+                                .setCode(ControlMsg.Code.CONFIG)
+                                .putConfiguration(compiled.arg(1), compiled.arg(2)));
                         System.out.println(compiled.toString());
                         return this;
                     case DISCONNECT:
-                    case CONNECTION_CLOSE:
+                    case CONNECTION_CLOSED:
                         fsm.client.disconnect();
                         return NOT_CONNECTED;
                     default:

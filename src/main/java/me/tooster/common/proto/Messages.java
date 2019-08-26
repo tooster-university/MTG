@@ -28,56 +28,43 @@ public final class Messages {
     long getID();
 
     /**
-     * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-     */
-    boolean hasConfigMsg();
-    /**
-     * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-     */
-    me.tooster.common.proto.Messages.ConfigMsg getConfigMsg();
-    /**
-     * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-     */
-    me.tooster.common.proto.Messages.ConfigMsgOrBuilder getConfigMsgOrBuilder();
-
-    /**
-     * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-     */
-    boolean hasChatMsg();
-    /**
-     * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-     */
-    me.tooster.common.proto.Messages.ChatMsg getChatMsg();
-    /**
-     * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-     */
-    me.tooster.common.proto.Messages.ChatMsgOrBuilder getChatMsgOrBuilder();
-
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-     */
-    boolean hasCommandMsg();
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-     */
-    me.tooster.common.proto.Messages.CommandMsg getCommandMsg();
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-     */
-    me.tooster.common.proto.Messages.CommandMsgOrBuilder getCommandMsgOrBuilder();
-
-    /**
-     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
      */
     boolean hasControlMsg();
     /**
-     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
      */
     me.tooster.common.proto.Messages.ControlMsg getControlMsg();
     /**
-     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
      */
     me.tooster.common.proto.Messages.ControlMsgOrBuilder getControlMsgOrBuilder();
+
+    /**
+     * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+     */
+    boolean hasVisualMsg();
+    /**
+     * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+     */
+    me.tooster.common.proto.Messages.VisualMsg getVisualMsg();
+    /**
+     * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+     */
+    me.tooster.common.proto.Messages.VisualMsgOrBuilder getVisualMsgOrBuilder();
+
+    /**
+     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+     */
+    boolean hasCommandMsg();
+    /**
+     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+     */
+    me.tooster.common.proto.Messages.CommandMsg getCommandMsg();
+    /**
+     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+     */
+    me.tooster.common.proto.Messages.CommandMsgOrBuilder getCommandMsgOrBuilder();
 
     public me.tooster.common.proto.Messages.Message.MsgTypeCase getMsgTypeCase();
   }
@@ -131,51 +118,9 @@ public final class Messages {
               iD_ = input.readInt64();
               break;
             }
-            case 26: {
-              me.tooster.common.proto.Messages.ConfigMsg.Builder subBuilder = null;
-              if (msgTypeCase_ == 3) {
-                subBuilder = ((me.tooster.common.proto.Messages.ConfigMsg) msgType_).toBuilder();
-              }
-              msgType_ =
-                  input.readMessage(me.tooster.common.proto.Messages.ConfigMsg.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((me.tooster.common.proto.Messages.ConfigMsg) msgType_);
-                msgType_ = subBuilder.buildPartial();
-              }
-              msgTypeCase_ = 3;
-              break;
-            }
-            case 34: {
-              me.tooster.common.proto.Messages.ChatMsg.Builder subBuilder = null;
-              if (msgTypeCase_ == 4) {
-                subBuilder = ((me.tooster.common.proto.Messages.ChatMsg) msgType_).toBuilder();
-              }
-              msgType_ =
-                  input.readMessage(me.tooster.common.proto.Messages.ChatMsg.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((me.tooster.common.proto.Messages.ChatMsg) msgType_);
-                msgType_ = subBuilder.buildPartial();
-              }
-              msgTypeCase_ = 4;
-              break;
-            }
-            case 42: {
-              me.tooster.common.proto.Messages.CommandMsg.Builder subBuilder = null;
-              if (msgTypeCase_ == 5) {
-                subBuilder = ((me.tooster.common.proto.Messages.CommandMsg) msgType_).toBuilder();
-              }
-              msgType_ =
-                  input.readMessage(me.tooster.common.proto.Messages.CommandMsg.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((me.tooster.common.proto.Messages.CommandMsg) msgType_);
-                msgType_ = subBuilder.buildPartial();
-              }
-              msgTypeCase_ = 5;
-              break;
-            }
-            case 50: {
+            case 18: {
               me.tooster.common.proto.Messages.ControlMsg.Builder subBuilder = null;
-              if (msgTypeCase_ == 6) {
+              if (msgTypeCase_ == 2) {
                 subBuilder = ((me.tooster.common.proto.Messages.ControlMsg) msgType_).toBuilder();
               }
               msgType_ =
@@ -184,7 +129,35 @@ public final class Messages {
                 subBuilder.mergeFrom((me.tooster.common.proto.Messages.ControlMsg) msgType_);
                 msgType_ = subBuilder.buildPartial();
               }
-              msgTypeCase_ = 6;
+              msgTypeCase_ = 2;
+              break;
+            }
+            case 26: {
+              me.tooster.common.proto.Messages.VisualMsg.Builder subBuilder = null;
+              if (msgTypeCase_ == 3) {
+                subBuilder = ((me.tooster.common.proto.Messages.VisualMsg) msgType_).toBuilder();
+              }
+              msgType_ =
+                  input.readMessage(me.tooster.common.proto.Messages.VisualMsg.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((me.tooster.common.proto.Messages.VisualMsg) msgType_);
+                msgType_ = subBuilder.buildPartial();
+              }
+              msgTypeCase_ = 3;
+              break;
+            }
+            case 34: {
+              me.tooster.common.proto.Messages.CommandMsg.Builder subBuilder = null;
+              if (msgTypeCase_ == 4) {
+                subBuilder = ((me.tooster.common.proto.Messages.CommandMsg) msgType_).toBuilder();
+              }
+              msgType_ =
+                  input.readMessage(me.tooster.common.proto.Messages.CommandMsg.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((me.tooster.common.proto.Messages.CommandMsg) msgType_);
+                msgType_ = subBuilder.buildPartial();
+              }
+              msgTypeCase_ = 4;
               break;
             }
             default: {
@@ -223,10 +196,9 @@ public final class Messages {
     private java.lang.Object msgType_;
     public enum MsgTypeCase
         implements com.google.protobuf.Internal.EnumLite {
-      CONFIGMSG(3),
-      CHATMSG(4),
-      COMMANDMSG(5),
-      CONTROLMSG(6),
+      CONTROLMSG(2),
+      VISUALMSG(3),
+      COMMANDMSG(4),
       MSGTYPE_NOT_SET(0);
       private final int value;
       private MsgTypeCase(int value) {
@@ -242,10 +214,9 @@ public final class Messages {
 
       public static MsgTypeCase forNumber(int value) {
         switch (value) {
-          case 3: return CONFIGMSG;
-          case 4: return CHATMSG;
-          case 5: return COMMANDMSG;
-          case 6: return CONTROLMSG;
+          case 2: return CONTROLMSG;
+          case 3: return VISUALMSG;
+          case 4: return COMMANDMSG;
           case 0: return MSGTYPE_NOT_SET;
           default: return null;
         }
@@ -274,108 +245,82 @@ public final class Messages {
       return iD_;
     }
 
-    public static final int CONFIGMSG_FIELD_NUMBER = 3;
+    public static final int CONTROLMSG_FIELD_NUMBER = 2;
     /**
-     * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
+     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
      */
-    public boolean hasConfigMsg() {
+    public boolean hasControlMsg() {
+      return msgTypeCase_ == 2;
+    }
+    /**
+     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
+     */
+    public me.tooster.common.proto.Messages.ControlMsg getControlMsg() {
+      if (msgTypeCase_ == 2) {
+         return (me.tooster.common.proto.Messages.ControlMsg) msgType_;
+      }
+      return me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
+    }
+    /**
+     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
+     */
+    public me.tooster.common.proto.Messages.ControlMsgOrBuilder getControlMsgOrBuilder() {
+      if (msgTypeCase_ == 2) {
+         return (me.tooster.common.proto.Messages.ControlMsg) msgType_;
+      }
+      return me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
+    }
+
+    public static final int VISUALMSG_FIELD_NUMBER = 3;
+    /**
+     * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+     */
+    public boolean hasVisualMsg() {
       return msgTypeCase_ == 3;
     }
     /**
-     * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
+     * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
      */
-    public me.tooster.common.proto.Messages.ConfigMsg getConfigMsg() {
+    public me.tooster.common.proto.Messages.VisualMsg getVisualMsg() {
       if (msgTypeCase_ == 3) {
-         return (me.tooster.common.proto.Messages.ConfigMsg) msgType_;
+         return (me.tooster.common.proto.Messages.VisualMsg) msgType_;
       }
-      return me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance();
+      return me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance();
     }
     /**
-     * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
+     * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
      */
-    public me.tooster.common.proto.Messages.ConfigMsgOrBuilder getConfigMsgOrBuilder() {
+    public me.tooster.common.proto.Messages.VisualMsgOrBuilder getVisualMsgOrBuilder() {
       if (msgTypeCase_ == 3) {
-         return (me.tooster.common.proto.Messages.ConfigMsg) msgType_;
+         return (me.tooster.common.proto.Messages.VisualMsg) msgType_;
       }
-      return me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance();
+      return me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance();
     }
 
-    public static final int CHATMSG_FIELD_NUMBER = 4;
+    public static final int COMMANDMSG_FIELD_NUMBER = 4;
     /**
-     * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
+     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
      */
-    public boolean hasChatMsg() {
+    public boolean hasCommandMsg() {
       return msgTypeCase_ == 4;
     }
     /**
-     * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-     */
-    public me.tooster.common.proto.Messages.ChatMsg getChatMsg() {
-      if (msgTypeCase_ == 4) {
-         return (me.tooster.common.proto.Messages.ChatMsg) msgType_;
-      }
-      return me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance();
-    }
-    /**
-     * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-     */
-    public me.tooster.common.proto.Messages.ChatMsgOrBuilder getChatMsgOrBuilder() {
-      if (msgTypeCase_ == 4) {
-         return (me.tooster.common.proto.Messages.ChatMsg) msgType_;
-      }
-      return me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance();
-    }
-
-    public static final int COMMANDMSG_FIELD_NUMBER = 5;
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-     */
-    public boolean hasCommandMsg() {
-      return msgTypeCase_ == 5;
-    }
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
+     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
      */
     public me.tooster.common.proto.Messages.CommandMsg getCommandMsg() {
-      if (msgTypeCase_ == 5) {
+      if (msgTypeCase_ == 4) {
          return (me.tooster.common.proto.Messages.CommandMsg) msgType_;
       }
       return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
     }
     /**
-     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
+     * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
      */
     public me.tooster.common.proto.Messages.CommandMsgOrBuilder getCommandMsgOrBuilder() {
-      if (msgTypeCase_ == 5) {
+      if (msgTypeCase_ == 4) {
          return (me.tooster.common.proto.Messages.CommandMsg) msgType_;
       }
       return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
-    }
-
-    public static final int CONTROLMSG_FIELD_NUMBER = 6;
-    /**
-     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
-     */
-    public boolean hasControlMsg() {
-      return msgTypeCase_ == 6;
-    }
-    /**
-     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
-     */
-    public me.tooster.common.proto.Messages.ControlMsg getControlMsg() {
-      if (msgTypeCase_ == 6) {
-         return (me.tooster.common.proto.Messages.ControlMsg) msgType_;
-      }
-      return me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
-    }
-    /**
-     * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
-     */
-    public me.tooster.common.proto.Messages.ControlMsgOrBuilder getControlMsgOrBuilder() {
-      if (msgTypeCase_ == 6) {
-         return (me.tooster.common.proto.Messages.ControlMsg) msgType_;
-      }
-      return me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -395,17 +340,14 @@ public final class Messages {
       if (iD_ != 0L) {
         output.writeInt64(1, iD_);
       }
+      if (msgTypeCase_ == 2) {
+        output.writeMessage(2, (me.tooster.common.proto.Messages.ControlMsg) msgType_);
+      }
       if (msgTypeCase_ == 3) {
-        output.writeMessage(3, (me.tooster.common.proto.Messages.ConfigMsg) msgType_);
+        output.writeMessage(3, (me.tooster.common.proto.Messages.VisualMsg) msgType_);
       }
       if (msgTypeCase_ == 4) {
-        output.writeMessage(4, (me.tooster.common.proto.Messages.ChatMsg) msgType_);
-      }
-      if (msgTypeCase_ == 5) {
-        output.writeMessage(5, (me.tooster.common.proto.Messages.CommandMsg) msgType_);
-      }
-      if (msgTypeCase_ == 6) {
-        output.writeMessage(6, (me.tooster.common.proto.Messages.ControlMsg) msgType_);
+        output.writeMessage(4, (me.tooster.common.proto.Messages.CommandMsg) msgType_);
       }
       unknownFields.writeTo(output);
     }
@@ -420,21 +362,17 @@ public final class Messages {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(1, iD_);
       }
+      if (msgTypeCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, (me.tooster.common.proto.Messages.ControlMsg) msgType_);
+      }
       if (msgTypeCase_ == 3) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, (me.tooster.common.proto.Messages.ConfigMsg) msgType_);
+          .computeMessageSize(3, (me.tooster.common.proto.Messages.VisualMsg) msgType_);
       }
       if (msgTypeCase_ == 4) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, (me.tooster.common.proto.Messages.ChatMsg) msgType_);
-      }
-      if (msgTypeCase_ == 5) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, (me.tooster.common.proto.Messages.CommandMsg) msgType_);
-      }
-      if (msgTypeCase_ == 6) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, (me.tooster.common.proto.Messages.ControlMsg) msgType_);
+          .computeMessageSize(4, (me.tooster.common.proto.Messages.CommandMsg) msgType_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -455,21 +393,17 @@ public final class Messages {
           != other.getID()) return false;
       if (!getMsgTypeCase().equals(other.getMsgTypeCase())) return false;
       switch (msgTypeCase_) {
-        case 3:
-          if (!getConfigMsg()
-              .equals(other.getConfigMsg())) return false;
-          break;
-        case 4:
-          if (!getChatMsg()
-              .equals(other.getChatMsg())) return false;
-          break;
-        case 5:
-          if (!getCommandMsg()
-              .equals(other.getCommandMsg())) return false;
-          break;
-        case 6:
+        case 2:
           if (!getControlMsg()
               .equals(other.getControlMsg())) return false;
+          break;
+        case 3:
+          if (!getVisualMsg()
+              .equals(other.getVisualMsg())) return false;
+          break;
+        case 4:
+          if (!getCommandMsg()
+              .equals(other.getCommandMsg())) return false;
           break;
         case 0:
         default:
@@ -489,21 +423,17 @@ public final class Messages {
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getID());
       switch (msgTypeCase_) {
-        case 3:
-          hash = (37 * hash) + CONFIGMSG_FIELD_NUMBER;
-          hash = (53 * hash) + getConfigMsg().hashCode();
-          break;
-        case 4:
-          hash = (37 * hash) + CHATMSG_FIELD_NUMBER;
-          hash = (53 * hash) + getChatMsg().hashCode();
-          break;
-        case 5:
-          hash = (37 * hash) + COMMANDMSG_FIELD_NUMBER;
-          hash = (53 * hash) + getCommandMsg().hashCode();
-          break;
-        case 6:
+        case 2:
           hash = (37 * hash) + CONTROLMSG_FIELD_NUMBER;
           hash = (53 * hash) + getControlMsg().hashCode();
+          break;
+        case 3:
+          hash = (37 * hash) + VISUALMSG_FIELD_NUMBER;
+          hash = (53 * hash) + getVisualMsg().hashCode();
+          break;
+        case 4:
+          hash = (37 * hash) + COMMANDMSG_FIELD_NUMBER;
+          hash = (53 * hash) + getCommandMsg().hashCode();
           break;
         case 0:
         default:
@@ -672,32 +602,25 @@ public final class Messages {
       public me.tooster.common.proto.Messages.Message buildPartial() {
         me.tooster.common.proto.Messages.Message result = new me.tooster.common.proto.Messages.Message(this);
         result.iD_ = iD_;
-        if (msgTypeCase_ == 3) {
-          if (configMsgBuilder_ == null) {
-            result.msgType_ = msgType_;
-          } else {
-            result.msgType_ = configMsgBuilder_.build();
-          }
-        }
-        if (msgTypeCase_ == 4) {
-          if (chatMsgBuilder_ == null) {
-            result.msgType_ = msgType_;
-          } else {
-            result.msgType_ = chatMsgBuilder_.build();
-          }
-        }
-        if (msgTypeCase_ == 5) {
-          if (commandMsgBuilder_ == null) {
-            result.msgType_ = msgType_;
-          } else {
-            result.msgType_ = commandMsgBuilder_.build();
-          }
-        }
-        if (msgTypeCase_ == 6) {
+        if (msgTypeCase_ == 2) {
           if (controlMsgBuilder_ == null) {
             result.msgType_ = msgType_;
           } else {
             result.msgType_ = controlMsgBuilder_.build();
+          }
+        }
+        if (msgTypeCase_ == 3) {
+          if (visualMsgBuilder_ == null) {
+            result.msgType_ = msgType_;
+          } else {
+            result.msgType_ = visualMsgBuilder_.build();
+          }
+        }
+        if (msgTypeCase_ == 4) {
+          if (commandMsgBuilder_ == null) {
+            result.msgType_ = msgType_;
+          } else {
+            result.msgType_ = commandMsgBuilder_.build();
           }
         }
         result.msgTypeCase_ = msgTypeCase_;
@@ -753,20 +676,16 @@ public final class Messages {
           setID(other.getID());
         }
         switch (other.getMsgTypeCase()) {
-          case CONFIGMSG: {
-            mergeConfigMsg(other.getConfigMsg());
+          case CONTROLMSG: {
+            mergeControlMsg(other.getControlMsg());
             break;
           }
-          case CHATMSG: {
-            mergeChatMsg(other.getChatMsg());
+          case VISUALMSG: {
+            mergeVisualMsg(other.getVisualMsg());
             break;
           }
           case COMMANDMSG: {
             mergeCommandMsg(other.getCommandMsg());
-            break;
-          }
-          case CONTROLMSG: {
-            mergeControlMsg(other.getControlMsg());
             break;
           }
           case MSGTYPE_NOT_SET: {
@@ -856,439 +775,31 @@ public final class Messages {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          me.tooster.common.proto.Messages.ConfigMsg, me.tooster.common.proto.Messages.ConfigMsg.Builder, me.tooster.common.proto.Messages.ConfigMsgOrBuilder> configMsgBuilder_;
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public boolean hasConfigMsg() {
-        return msgTypeCase_ == 3;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public me.tooster.common.proto.Messages.ConfigMsg getConfigMsg() {
-        if (configMsgBuilder_ == null) {
-          if (msgTypeCase_ == 3) {
-            return (me.tooster.common.proto.Messages.ConfigMsg) msgType_;
-          }
-          return me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance();
-        } else {
-          if (msgTypeCase_ == 3) {
-            return configMsgBuilder_.getMessage();
-          }
-          return me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public Builder setConfigMsg(me.tooster.common.proto.Messages.ConfigMsg value) {
-        if (configMsgBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          msgType_ = value;
-          onChanged();
-        } else {
-          configMsgBuilder_.setMessage(value);
-        }
-        msgTypeCase_ = 3;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public Builder setConfigMsg(
-          me.tooster.common.proto.Messages.ConfigMsg.Builder builderForValue) {
-        if (configMsgBuilder_ == null) {
-          msgType_ = builderForValue.build();
-          onChanged();
-        } else {
-          configMsgBuilder_.setMessage(builderForValue.build());
-        }
-        msgTypeCase_ = 3;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public Builder mergeConfigMsg(me.tooster.common.proto.Messages.ConfigMsg value) {
-        if (configMsgBuilder_ == null) {
-          if (msgTypeCase_ == 3 &&
-              msgType_ != me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance()) {
-            msgType_ = me.tooster.common.proto.Messages.ConfigMsg.newBuilder((me.tooster.common.proto.Messages.ConfigMsg) msgType_)
-                .mergeFrom(value).buildPartial();
-          } else {
-            msgType_ = value;
-          }
-          onChanged();
-        } else {
-          if (msgTypeCase_ == 3) {
-            configMsgBuilder_.mergeFrom(value);
-          }
-          configMsgBuilder_.setMessage(value);
-        }
-        msgTypeCase_ = 3;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public Builder clearConfigMsg() {
-        if (configMsgBuilder_ == null) {
-          if (msgTypeCase_ == 3) {
-            msgTypeCase_ = 0;
-            msgType_ = null;
-            onChanged();
-          }
-        } else {
-          if (msgTypeCase_ == 3) {
-            msgTypeCase_ = 0;
-            msgType_ = null;
-          }
-          configMsgBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public me.tooster.common.proto.Messages.ConfigMsg.Builder getConfigMsgBuilder() {
-        return getConfigMsgFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      public me.tooster.common.proto.Messages.ConfigMsgOrBuilder getConfigMsgOrBuilder() {
-        if ((msgTypeCase_ == 3) && (configMsgBuilder_ != null)) {
-          return configMsgBuilder_.getMessageOrBuilder();
-        } else {
-          if (msgTypeCase_ == 3) {
-            return (me.tooster.common.proto.Messages.ConfigMsg) msgType_;
-          }
-          return me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.me.tooster.common.proto.ConfigMsg configMsg = 3;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          me.tooster.common.proto.Messages.ConfigMsg, me.tooster.common.proto.Messages.ConfigMsg.Builder, me.tooster.common.proto.Messages.ConfigMsgOrBuilder> 
-          getConfigMsgFieldBuilder() {
-        if (configMsgBuilder_ == null) {
-          if (!(msgTypeCase_ == 3)) {
-            msgType_ = me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance();
-          }
-          configMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              me.tooster.common.proto.Messages.ConfigMsg, me.tooster.common.proto.Messages.ConfigMsg.Builder, me.tooster.common.proto.Messages.ConfigMsgOrBuilder>(
-                  (me.tooster.common.proto.Messages.ConfigMsg) msgType_,
-                  getParentForChildren(),
-                  isClean());
-          msgType_ = null;
-        }
-        msgTypeCase_ = 3;
-        onChanged();;
-        return configMsgBuilder_;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-          me.tooster.common.proto.Messages.ChatMsg, me.tooster.common.proto.Messages.ChatMsg.Builder, me.tooster.common.proto.Messages.ChatMsgOrBuilder> chatMsgBuilder_;
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public boolean hasChatMsg() {
-        return msgTypeCase_ == 4;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public me.tooster.common.proto.Messages.ChatMsg getChatMsg() {
-        if (chatMsgBuilder_ == null) {
-          if (msgTypeCase_ == 4) {
-            return (me.tooster.common.proto.Messages.ChatMsg) msgType_;
-          }
-          return me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance();
-        } else {
-          if (msgTypeCase_ == 4) {
-            return chatMsgBuilder_.getMessage();
-          }
-          return me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public Builder setChatMsg(me.tooster.common.proto.Messages.ChatMsg value) {
-        if (chatMsgBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          msgType_ = value;
-          onChanged();
-        } else {
-          chatMsgBuilder_.setMessage(value);
-        }
-        msgTypeCase_ = 4;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public Builder setChatMsg(
-          me.tooster.common.proto.Messages.ChatMsg.Builder builderForValue) {
-        if (chatMsgBuilder_ == null) {
-          msgType_ = builderForValue.build();
-          onChanged();
-        } else {
-          chatMsgBuilder_.setMessage(builderForValue.build());
-        }
-        msgTypeCase_ = 4;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public Builder mergeChatMsg(me.tooster.common.proto.Messages.ChatMsg value) {
-        if (chatMsgBuilder_ == null) {
-          if (msgTypeCase_ == 4 &&
-              msgType_ != me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance()) {
-            msgType_ = me.tooster.common.proto.Messages.ChatMsg.newBuilder((me.tooster.common.proto.Messages.ChatMsg) msgType_)
-                .mergeFrom(value).buildPartial();
-          } else {
-            msgType_ = value;
-          }
-          onChanged();
-        } else {
-          if (msgTypeCase_ == 4) {
-            chatMsgBuilder_.mergeFrom(value);
-          }
-          chatMsgBuilder_.setMessage(value);
-        }
-        msgTypeCase_ = 4;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public Builder clearChatMsg() {
-        if (chatMsgBuilder_ == null) {
-          if (msgTypeCase_ == 4) {
-            msgTypeCase_ = 0;
-            msgType_ = null;
-            onChanged();
-          }
-        } else {
-          if (msgTypeCase_ == 4) {
-            msgTypeCase_ = 0;
-            msgType_ = null;
-          }
-          chatMsgBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public me.tooster.common.proto.Messages.ChatMsg.Builder getChatMsgBuilder() {
-        return getChatMsgFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      public me.tooster.common.proto.Messages.ChatMsgOrBuilder getChatMsgOrBuilder() {
-        if ((msgTypeCase_ == 4) && (chatMsgBuilder_ != null)) {
-          return chatMsgBuilder_.getMessageOrBuilder();
-        } else {
-          if (msgTypeCase_ == 4) {
-            return (me.tooster.common.proto.Messages.ChatMsg) msgType_;
-          }
-          return me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.me.tooster.common.proto.ChatMsg chatMsg = 4;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          me.tooster.common.proto.Messages.ChatMsg, me.tooster.common.proto.Messages.ChatMsg.Builder, me.tooster.common.proto.Messages.ChatMsgOrBuilder> 
-          getChatMsgFieldBuilder() {
-        if (chatMsgBuilder_ == null) {
-          if (!(msgTypeCase_ == 4)) {
-            msgType_ = me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance();
-          }
-          chatMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              me.tooster.common.proto.Messages.ChatMsg, me.tooster.common.proto.Messages.ChatMsg.Builder, me.tooster.common.proto.Messages.ChatMsgOrBuilder>(
-                  (me.tooster.common.proto.Messages.ChatMsg) msgType_,
-                  getParentForChildren(),
-                  isClean());
-          msgType_ = null;
-        }
-        msgTypeCase_ = 4;
-        onChanged();;
-        return chatMsgBuilder_;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-          me.tooster.common.proto.Messages.CommandMsg, me.tooster.common.proto.Messages.CommandMsg.Builder, me.tooster.common.proto.Messages.CommandMsgOrBuilder> commandMsgBuilder_;
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public boolean hasCommandMsg() {
-        return msgTypeCase_ == 5;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public me.tooster.common.proto.Messages.CommandMsg getCommandMsg() {
-        if (commandMsgBuilder_ == null) {
-          if (msgTypeCase_ == 5) {
-            return (me.tooster.common.proto.Messages.CommandMsg) msgType_;
-          }
-          return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
-        } else {
-          if (msgTypeCase_ == 5) {
-            return commandMsgBuilder_.getMessage();
-          }
-          return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public Builder setCommandMsg(me.tooster.common.proto.Messages.CommandMsg value) {
-        if (commandMsgBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          msgType_ = value;
-          onChanged();
-        } else {
-          commandMsgBuilder_.setMessage(value);
-        }
-        msgTypeCase_ = 5;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public Builder setCommandMsg(
-          me.tooster.common.proto.Messages.CommandMsg.Builder builderForValue) {
-        if (commandMsgBuilder_ == null) {
-          msgType_ = builderForValue.build();
-          onChanged();
-        } else {
-          commandMsgBuilder_.setMessage(builderForValue.build());
-        }
-        msgTypeCase_ = 5;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public Builder mergeCommandMsg(me.tooster.common.proto.Messages.CommandMsg value) {
-        if (commandMsgBuilder_ == null) {
-          if (msgTypeCase_ == 5 &&
-              msgType_ != me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance()) {
-            msgType_ = me.tooster.common.proto.Messages.CommandMsg.newBuilder((me.tooster.common.proto.Messages.CommandMsg) msgType_)
-                .mergeFrom(value).buildPartial();
-          } else {
-            msgType_ = value;
-          }
-          onChanged();
-        } else {
-          if (msgTypeCase_ == 5) {
-            commandMsgBuilder_.mergeFrom(value);
-          }
-          commandMsgBuilder_.setMessage(value);
-        }
-        msgTypeCase_ = 5;
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public Builder clearCommandMsg() {
-        if (commandMsgBuilder_ == null) {
-          if (msgTypeCase_ == 5) {
-            msgTypeCase_ = 0;
-            msgType_ = null;
-            onChanged();
-          }
-        } else {
-          if (msgTypeCase_ == 5) {
-            msgTypeCase_ = 0;
-            msgType_ = null;
-          }
-          commandMsgBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public me.tooster.common.proto.Messages.CommandMsg.Builder getCommandMsgBuilder() {
-        return getCommandMsgFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      public me.tooster.common.proto.Messages.CommandMsgOrBuilder getCommandMsgOrBuilder() {
-        if ((msgTypeCase_ == 5) && (commandMsgBuilder_ != null)) {
-          return commandMsgBuilder_.getMessageOrBuilder();
-        } else {
-          if (msgTypeCase_ == 5) {
-            return (me.tooster.common.proto.Messages.CommandMsg) msgType_;
-          }
-          return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 5;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          me.tooster.common.proto.Messages.CommandMsg, me.tooster.common.proto.Messages.CommandMsg.Builder, me.tooster.common.proto.Messages.CommandMsgOrBuilder> 
-          getCommandMsgFieldBuilder() {
-        if (commandMsgBuilder_ == null) {
-          if (!(msgTypeCase_ == 5)) {
-            msgType_ = me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
-          }
-          commandMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              me.tooster.common.proto.Messages.CommandMsg, me.tooster.common.proto.Messages.CommandMsg.Builder, me.tooster.common.proto.Messages.CommandMsgOrBuilder>(
-                  (me.tooster.common.proto.Messages.CommandMsg) msgType_,
-                  getParentForChildren(),
-                  isClean());
-          msgType_ = null;
-        }
-        msgTypeCase_ = 5;
-        onChanged();;
-        return commandMsgBuilder_;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
           me.tooster.common.proto.Messages.ControlMsg, me.tooster.common.proto.Messages.ControlMsg.Builder, me.tooster.common.proto.Messages.ControlMsgOrBuilder> controlMsgBuilder_;
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public boolean hasControlMsg() {
-        return msgTypeCase_ == 6;
+        return msgTypeCase_ == 2;
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public me.tooster.common.proto.Messages.ControlMsg getControlMsg() {
         if (controlMsgBuilder_ == null) {
-          if (msgTypeCase_ == 6) {
+          if (msgTypeCase_ == 2) {
             return (me.tooster.common.proto.Messages.ControlMsg) msgType_;
           }
           return me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
         } else {
-          if (msgTypeCase_ == 6) {
+          if (msgTypeCase_ == 2) {
             return controlMsgBuilder_.getMessage();
           }
           return me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
         }
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public Builder setControlMsg(me.tooster.common.proto.Messages.ControlMsg value) {
         if (controlMsgBuilder_ == null) {
@@ -1300,11 +811,11 @@ public final class Messages {
         } else {
           controlMsgBuilder_.setMessage(value);
         }
-        msgTypeCase_ = 6;
+        msgTypeCase_ = 2;
         return this;
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public Builder setControlMsg(
           me.tooster.common.proto.Messages.ControlMsg.Builder builderForValue) {
@@ -1314,15 +825,15 @@ public final class Messages {
         } else {
           controlMsgBuilder_.setMessage(builderForValue.build());
         }
-        msgTypeCase_ = 6;
+        msgTypeCase_ = 2;
         return this;
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public Builder mergeControlMsg(me.tooster.common.proto.Messages.ControlMsg value) {
         if (controlMsgBuilder_ == null) {
-          if (msgTypeCase_ == 6 &&
+          if (msgTypeCase_ == 2 &&
               msgType_ != me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance()) {
             msgType_ = me.tooster.common.proto.Messages.ControlMsg.newBuilder((me.tooster.common.proto.Messages.ControlMsg) msgType_)
                 .mergeFrom(value).buildPartial();
@@ -1331,26 +842,26 @@ public final class Messages {
           }
           onChanged();
         } else {
-          if (msgTypeCase_ == 6) {
+          if (msgTypeCase_ == 2) {
             controlMsgBuilder_.mergeFrom(value);
           }
           controlMsgBuilder_.setMessage(value);
         }
-        msgTypeCase_ = 6;
+        msgTypeCase_ = 2;
         return this;
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public Builder clearControlMsg() {
         if (controlMsgBuilder_ == null) {
-          if (msgTypeCase_ == 6) {
+          if (msgTypeCase_ == 2) {
             msgTypeCase_ = 0;
             msgType_ = null;
             onChanged();
           }
         } else {
-          if (msgTypeCase_ == 6) {
+          if (msgTypeCase_ == 2) {
             msgTypeCase_ = 0;
             msgType_ = null;
           }
@@ -1359,32 +870,32 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public me.tooster.common.proto.Messages.ControlMsg.Builder getControlMsgBuilder() {
         return getControlMsgFieldBuilder().getBuilder();
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       public me.tooster.common.proto.Messages.ControlMsgOrBuilder getControlMsgOrBuilder() {
-        if ((msgTypeCase_ == 6) && (controlMsgBuilder_ != null)) {
+        if ((msgTypeCase_ == 2) && (controlMsgBuilder_ != null)) {
           return controlMsgBuilder_.getMessageOrBuilder();
         } else {
-          if (msgTypeCase_ == 6) {
+          if (msgTypeCase_ == 2) {
             return (me.tooster.common.proto.Messages.ControlMsg) msgType_;
           }
           return me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
         }
       }
       /**
-       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 6;</code>
+       * <code>.me.tooster.common.proto.ControlMsg controlMsg = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           me.tooster.common.proto.Messages.ControlMsg, me.tooster.common.proto.Messages.ControlMsg.Builder, me.tooster.common.proto.Messages.ControlMsgOrBuilder> 
           getControlMsgFieldBuilder() {
         if (controlMsgBuilder_ == null) {
-          if (!(msgTypeCase_ == 6)) {
+          if (!(msgTypeCase_ == 2)) {
             msgType_ = me.tooster.common.proto.Messages.ControlMsg.getDefaultInstance();
           }
           controlMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1394,9 +905,281 @@ public final class Messages {
                   isClean());
           msgType_ = null;
         }
-        msgTypeCase_ = 6;
+        msgTypeCase_ = 2;
         onChanged();;
         return controlMsgBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          me.tooster.common.proto.Messages.VisualMsg, me.tooster.common.proto.Messages.VisualMsg.Builder, me.tooster.common.proto.Messages.VisualMsgOrBuilder> visualMsgBuilder_;
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public boolean hasVisualMsg() {
+        return msgTypeCase_ == 3;
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public me.tooster.common.proto.Messages.VisualMsg getVisualMsg() {
+        if (visualMsgBuilder_ == null) {
+          if (msgTypeCase_ == 3) {
+            return (me.tooster.common.proto.Messages.VisualMsg) msgType_;
+          }
+          return me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance();
+        } else {
+          if (msgTypeCase_ == 3) {
+            return visualMsgBuilder_.getMessage();
+          }
+          return me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public Builder setVisualMsg(me.tooster.common.proto.Messages.VisualMsg value) {
+        if (visualMsgBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          msgType_ = value;
+          onChanged();
+        } else {
+          visualMsgBuilder_.setMessage(value);
+        }
+        msgTypeCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public Builder setVisualMsg(
+          me.tooster.common.proto.Messages.VisualMsg.Builder builderForValue) {
+        if (visualMsgBuilder_ == null) {
+          msgType_ = builderForValue.build();
+          onChanged();
+        } else {
+          visualMsgBuilder_.setMessage(builderForValue.build());
+        }
+        msgTypeCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public Builder mergeVisualMsg(me.tooster.common.proto.Messages.VisualMsg value) {
+        if (visualMsgBuilder_ == null) {
+          if (msgTypeCase_ == 3 &&
+              msgType_ != me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance()) {
+            msgType_ = me.tooster.common.proto.Messages.VisualMsg.newBuilder((me.tooster.common.proto.Messages.VisualMsg) msgType_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            msgType_ = value;
+          }
+          onChanged();
+        } else {
+          if (msgTypeCase_ == 3) {
+            visualMsgBuilder_.mergeFrom(value);
+          }
+          visualMsgBuilder_.setMessage(value);
+        }
+        msgTypeCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public Builder clearVisualMsg() {
+        if (visualMsgBuilder_ == null) {
+          if (msgTypeCase_ == 3) {
+            msgTypeCase_ = 0;
+            msgType_ = null;
+            onChanged();
+          }
+        } else {
+          if (msgTypeCase_ == 3) {
+            msgTypeCase_ = 0;
+            msgType_ = null;
+          }
+          visualMsgBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public me.tooster.common.proto.Messages.VisualMsg.Builder getVisualMsgBuilder() {
+        return getVisualMsgFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      public me.tooster.common.proto.Messages.VisualMsgOrBuilder getVisualMsgOrBuilder() {
+        if ((msgTypeCase_ == 3) && (visualMsgBuilder_ != null)) {
+          return visualMsgBuilder_.getMessageOrBuilder();
+        } else {
+          if (msgTypeCase_ == 3) {
+            return (me.tooster.common.proto.Messages.VisualMsg) msgType_;
+          }
+          return me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.me.tooster.common.proto.VisualMsg visualMsg = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          me.tooster.common.proto.Messages.VisualMsg, me.tooster.common.proto.Messages.VisualMsg.Builder, me.tooster.common.proto.Messages.VisualMsgOrBuilder> 
+          getVisualMsgFieldBuilder() {
+        if (visualMsgBuilder_ == null) {
+          if (!(msgTypeCase_ == 3)) {
+            msgType_ = me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance();
+          }
+          visualMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              me.tooster.common.proto.Messages.VisualMsg, me.tooster.common.proto.Messages.VisualMsg.Builder, me.tooster.common.proto.Messages.VisualMsgOrBuilder>(
+                  (me.tooster.common.proto.Messages.VisualMsg) msgType_,
+                  getParentForChildren(),
+                  isClean());
+          msgType_ = null;
+        }
+        msgTypeCase_ = 3;
+        onChanged();;
+        return visualMsgBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          me.tooster.common.proto.Messages.CommandMsg, me.tooster.common.proto.Messages.CommandMsg.Builder, me.tooster.common.proto.Messages.CommandMsgOrBuilder> commandMsgBuilder_;
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public boolean hasCommandMsg() {
+        return msgTypeCase_ == 4;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public me.tooster.common.proto.Messages.CommandMsg getCommandMsg() {
+        if (commandMsgBuilder_ == null) {
+          if (msgTypeCase_ == 4) {
+            return (me.tooster.common.proto.Messages.CommandMsg) msgType_;
+          }
+          return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
+        } else {
+          if (msgTypeCase_ == 4) {
+            return commandMsgBuilder_.getMessage();
+          }
+          return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public Builder setCommandMsg(me.tooster.common.proto.Messages.CommandMsg value) {
+        if (commandMsgBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          msgType_ = value;
+          onChanged();
+        } else {
+          commandMsgBuilder_.setMessage(value);
+        }
+        msgTypeCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public Builder setCommandMsg(
+          me.tooster.common.proto.Messages.CommandMsg.Builder builderForValue) {
+        if (commandMsgBuilder_ == null) {
+          msgType_ = builderForValue.build();
+          onChanged();
+        } else {
+          commandMsgBuilder_.setMessage(builderForValue.build());
+        }
+        msgTypeCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public Builder mergeCommandMsg(me.tooster.common.proto.Messages.CommandMsg value) {
+        if (commandMsgBuilder_ == null) {
+          if (msgTypeCase_ == 4 &&
+              msgType_ != me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance()) {
+            msgType_ = me.tooster.common.proto.Messages.CommandMsg.newBuilder((me.tooster.common.proto.Messages.CommandMsg) msgType_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            msgType_ = value;
+          }
+          onChanged();
+        } else {
+          if (msgTypeCase_ == 4) {
+            commandMsgBuilder_.mergeFrom(value);
+          }
+          commandMsgBuilder_.setMessage(value);
+        }
+        msgTypeCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public Builder clearCommandMsg() {
+        if (commandMsgBuilder_ == null) {
+          if (msgTypeCase_ == 4) {
+            msgTypeCase_ = 0;
+            msgType_ = null;
+            onChanged();
+          }
+        } else {
+          if (msgTypeCase_ == 4) {
+            msgTypeCase_ = 0;
+            msgType_ = null;
+          }
+          commandMsgBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public me.tooster.common.proto.Messages.CommandMsg.Builder getCommandMsgBuilder() {
+        return getCommandMsgFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      public me.tooster.common.proto.Messages.CommandMsgOrBuilder getCommandMsgOrBuilder() {
+        if ((msgTypeCase_ == 4) && (commandMsgBuilder_ != null)) {
+          return commandMsgBuilder_.getMessageOrBuilder();
+        } else {
+          if (msgTypeCase_ == 4) {
+            return (me.tooster.common.proto.Messages.CommandMsg) msgType_;
+          }
+          return me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.me.tooster.common.proto.CommandMsg commandMsg = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          me.tooster.common.proto.Messages.CommandMsg, me.tooster.common.proto.Messages.CommandMsg.Builder, me.tooster.common.proto.Messages.CommandMsgOrBuilder> 
+          getCommandMsgFieldBuilder() {
+        if (commandMsgBuilder_ == null) {
+          if (!(msgTypeCase_ == 4)) {
+            msgType_ = me.tooster.common.proto.Messages.CommandMsg.getDefaultInstance();
+          }
+          commandMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              me.tooster.common.proto.Messages.CommandMsg, me.tooster.common.proto.Messages.CommandMsg.Builder, me.tooster.common.proto.Messages.CommandMsgOrBuilder>(
+                  (me.tooster.common.proto.Messages.CommandMsg) msgType_,
+                  getParentForChildren(),
+                  isClean());
+          msgType_ = null;
+        }
+        msgTypeCase_ = 4;
+        onChanged();;
+        return commandMsgBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -1451,736 +1234,8 @@ public final class Messages {
 
   }
 
-  public interface ConfigMsgOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:me.tooster.common.proto.ConfigMsg)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-    int getConfigurationCount();
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-    boolean containsConfiguration(
-        java.lang.String key);
-    /**
-     * Use {@link #getConfigurationMap()} instead.
-     */
-    @java.lang.Deprecated
-    java.util.Map<java.lang.String, java.lang.String>
-    getConfiguration();
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-    java.util.Map<java.lang.String, java.lang.String>
-    getConfigurationMap();
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-
-    java.lang.String getConfigurationOrDefault(
-        java.lang.String key,
-        java.lang.String defaultValue);
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-
-    java.lang.String getConfigurationOrThrow(
-        java.lang.String key);
-  }
-  /**
-   * Protobuf type {@code me.tooster.common.proto.ConfigMsg}
-   */
-  public  static final class ConfigMsg extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:me.tooster.common.proto.ConfigMsg)
-      ConfigMsgOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use ConfigMsg.newBuilder() to construct.
-    private ConfigMsg(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private ConfigMsg() {
-    }
-
-    @java.lang.Override
-    @SuppressWarnings({"unused"})
-    protected java.lang.Object newInstance(
-        UnusedPrivateParameter unused) {
-      return new ConfigMsg();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private ConfigMsg(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-                configuration_ = com.google.protobuf.MapField.newMapField(
-                    ConfigurationDefaultEntryHolder.defaultEntry);
-                mutable_bitField0_ |= 0x00000001;
-              }
-              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-              configuration__ = input.readMessage(
-                  ConfigurationDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              configuration_.getMutableMap().put(
-                  configuration__.getKey(), configuration__.getValue());
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ConfigMsg_descriptor;
-    }
-
-    @SuppressWarnings({"rawtypes"})
-    @java.lang.Override
-    protected com.google.protobuf.MapField internalGetMapField(
-        int number) {
-      switch (number) {
-        case 1:
-          return internalGetConfiguration();
-        default:
-          throw new RuntimeException(
-              "Invalid map field number: " + number);
-      }
-    }
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ConfigMsg_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              me.tooster.common.proto.Messages.ConfigMsg.class, me.tooster.common.proto.Messages.ConfigMsg.Builder.class);
-    }
-
-    public static final int CONFIGURATION_FIELD_NUMBER = 1;
-    private static final class ConfigurationDefaultEntryHolder {
-      static final com.google.protobuf.MapEntry<
-          java.lang.String, java.lang.String> defaultEntry =
-              com.google.protobuf.MapEntry
-              .<java.lang.String, java.lang.String>newDefaultInstance(
-                  me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ConfigMsg_ConfigurationEntry_descriptor, 
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "",
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "");
-    }
-    private com.google.protobuf.MapField<
-        java.lang.String, java.lang.String> configuration_;
-    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-    internalGetConfiguration() {
-      if (configuration_ == null) {
-        return com.google.protobuf.MapField.emptyMapField(
-            ConfigurationDefaultEntryHolder.defaultEntry);
-      }
-      return configuration_;
-    }
-
-    public int getConfigurationCount() {
-      return internalGetConfiguration().getMap().size();
-    }
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-
-    public boolean containsConfiguration(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      return internalGetConfiguration().getMap().containsKey(key);
-    }
-    /**
-     * Use {@link #getConfigurationMap()} instead.
-     */
-    @java.lang.Deprecated
-    public java.util.Map<java.lang.String, java.lang.String> getConfiguration() {
-      return getConfigurationMap();
-    }
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-
-    public java.util.Map<java.lang.String, java.lang.String> getConfigurationMap() {
-      return internalGetConfiguration().getMap();
-    }
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-
-    public java.lang.String getConfigurationOrDefault(
-        java.lang.String key,
-        java.lang.String defaultValue) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetConfiguration().getMap();
-      return map.containsKey(key) ? map.get(key) : defaultValue;
-    }
-    /**
-     * <code>map&lt;string, string&gt; configuration = 1;</code>
-     */
-
-    public java.lang.String getConfigurationOrThrow(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetConfiguration().getMap();
-      if (!map.containsKey(key)) {
-        throw new java.lang.IllegalArgumentException();
-      }
-      return map.get(key);
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      com.google.protobuf.GeneratedMessageV3
-        .serializeStringMapTo(
-          output,
-          internalGetConfiguration(),
-          ConfigurationDefaultEntryHolder.defaultEntry,
-          1);
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
-           : internalGetConfiguration().getMap().entrySet()) {
-        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-        configuration__ = ConfigurationDefaultEntryHolder.defaultEntry.newBuilderForType()
-            .setKey(entry.getKey())
-            .setValue(entry.getValue())
-            .build();
-        size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(1, configuration__);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof me.tooster.common.proto.Messages.ConfigMsg)) {
-        return super.equals(obj);
-      }
-      me.tooster.common.proto.Messages.ConfigMsg other = (me.tooster.common.proto.Messages.ConfigMsg) obj;
-
-      if (!internalGetConfiguration().equals(
-          other.internalGetConfiguration())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (!internalGetConfiguration().getMap().isEmpty()) {
-        hash = (37 * hash) + CONFIGURATION_FIELD_NUMBER;
-        hash = (53 * hash) + internalGetConfiguration().hashCode();
-      }
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static me.tooster.common.proto.Messages.ConfigMsg parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(me.tooster.common.proto.Messages.ConfigMsg prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code me.tooster.common.proto.ConfigMsg}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:me.tooster.common.proto.ConfigMsg)
-        me.tooster.common.proto.Messages.ConfigMsgOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ConfigMsg_descriptor;
-      }
-
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapField internalGetMapField(
-          int number) {
-        switch (number) {
-          case 1:
-            return internalGetConfiguration();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapField internalGetMutableMapField(
-          int number) {
-        switch (number) {
-          case 1:
-            return internalGetMutableConfiguration();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ConfigMsg_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                me.tooster.common.proto.Messages.ConfigMsg.class, me.tooster.common.proto.Messages.ConfigMsg.Builder.class);
-      }
-
-      // Construct using me.tooster.common.proto.Messages.ConfigMsg.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        internalGetMutableConfiguration().clear();
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ConfigMsg_descriptor;
-      }
-
-      @java.lang.Override
-      public me.tooster.common.proto.Messages.ConfigMsg getDefaultInstanceForType() {
-        return me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public me.tooster.common.proto.Messages.ConfigMsg build() {
-        me.tooster.common.proto.Messages.ConfigMsg result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public me.tooster.common.proto.Messages.ConfigMsg buildPartial() {
-        me.tooster.common.proto.Messages.ConfigMsg result = new me.tooster.common.proto.Messages.ConfigMsg(this);
-        int from_bitField0_ = bitField0_;
-        result.configuration_ = internalGetConfiguration();
-        result.configuration_.makeImmutable();
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof me.tooster.common.proto.Messages.ConfigMsg) {
-          return mergeFrom((me.tooster.common.proto.Messages.ConfigMsg)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(me.tooster.common.proto.Messages.ConfigMsg other) {
-        if (other == me.tooster.common.proto.Messages.ConfigMsg.getDefaultInstance()) return this;
-        internalGetMutableConfiguration().mergeFrom(
-            other.internalGetConfiguration());
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        me.tooster.common.proto.Messages.ConfigMsg parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (me.tooster.common.proto.Messages.ConfigMsg) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      private com.google.protobuf.MapField<
-          java.lang.String, java.lang.String> configuration_;
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetConfiguration() {
-        if (configuration_ == null) {
-          return com.google.protobuf.MapField.emptyMapField(
-              ConfigurationDefaultEntryHolder.defaultEntry);
-        }
-        return configuration_;
-      }
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetMutableConfiguration() {
-        onChanged();;
-        if (configuration_ == null) {
-          configuration_ = com.google.protobuf.MapField.newMapField(
-              ConfigurationDefaultEntryHolder.defaultEntry);
-        }
-        if (!configuration_.isMutable()) {
-          configuration_ = configuration_.copy();
-        }
-        return configuration_;
-      }
-
-      public int getConfigurationCount() {
-        return internalGetConfiguration().getMap().size();
-      }
-      /**
-       * <code>map&lt;string, string&gt; configuration = 1;</code>
-       */
-
-      public boolean containsConfiguration(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        return internalGetConfiguration().getMap().containsKey(key);
-      }
-      /**
-       * Use {@link #getConfigurationMap()} instead.
-       */
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String> getConfiguration() {
-        return getConfigurationMap();
-      }
-      /**
-       * <code>map&lt;string, string&gt; configuration = 1;</code>
-       */
-
-      public java.util.Map<java.lang.String, java.lang.String> getConfigurationMap() {
-        return internalGetConfiguration().getMap();
-      }
-      /**
-       * <code>map&lt;string, string&gt; configuration = 1;</code>
-       */
-
-      public java.lang.String getConfigurationOrDefault(
-          java.lang.String key,
-          java.lang.String defaultValue) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetConfiguration().getMap();
-        return map.containsKey(key) ? map.get(key) : defaultValue;
-      }
-      /**
-       * <code>map&lt;string, string&gt; configuration = 1;</code>
-       */
-
-      public java.lang.String getConfigurationOrThrow(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetConfiguration().getMap();
-        if (!map.containsKey(key)) {
-          throw new java.lang.IllegalArgumentException();
-        }
-        return map.get(key);
-      }
-
-      public Builder clearConfiguration() {
-        internalGetMutableConfiguration().getMutableMap()
-            .clear();
-        return this;
-      }
-      /**
-       * <code>map&lt;string, string&gt; configuration = 1;</code>
-       */
-
-      public Builder removeConfiguration(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableConfiguration().getMutableMap()
-            .remove(key);
-        return this;
-      }
-      /**
-       * Use alternate mutation accessors instead.
-       */
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String>
-      getMutableConfiguration() {
-        return internalGetMutableConfiguration().getMutableMap();
-      }
-      /**
-       * <code>map&lt;string, string&gt; configuration = 1;</code>
-       */
-      public Builder putConfiguration(
-          java.lang.String key,
-          java.lang.String value) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        if (value == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableConfiguration().getMutableMap()
-            .put(key, value);
-        return this;
-      }
-      /**
-       * <code>map&lt;string, string&gt; configuration = 1;</code>
-       */
-
-      public Builder putAllConfiguration(
-          java.util.Map<java.lang.String, java.lang.String> values) {
-        internalGetMutableConfiguration().getMutableMap()
-            .putAll(values);
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:me.tooster.common.proto.ConfigMsg)
-    }
-
-    // @@protoc_insertion_point(class_scope:me.tooster.common.proto.ConfigMsg)
-    private static final me.tooster.common.proto.Messages.ConfigMsg DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new me.tooster.common.proto.Messages.ConfigMsg();
-    }
-
-    public static me.tooster.common.proto.Messages.ConfigMsg getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<ConfigMsg>
-        PARSER = new com.google.protobuf.AbstractParser<ConfigMsg>() {
-      @java.lang.Override
-      public ConfigMsg parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ConfigMsg(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<ConfigMsg> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ConfigMsg> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public me.tooster.common.proto.Messages.ConfigMsg getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface ChatMsgOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:me.tooster.common.proto.ChatMsg)
+  public interface VisualMsgOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:me.tooster.common.proto.VisualMsg)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -2228,6 +1283,23 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getMsgBytes();
+
+    /**
+     * <pre>
+     * optional hint for message formatting
+     * </pre>
+     *
+     * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+     */
+    int getVariantValue();
+    /**
+     * <pre>
+     * optional hint for message formatting
+     * </pre>
+     *
+     * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+     */
+    me.tooster.common.proto.Messages.VisualMsg.Variant getVariant();
   }
   /**
    * <pre>
@@ -2241,28 +1313,29 @@ public final class Messages {
    *   what : S bc : S dm : H bc : H dm : local : shout : dm
    * </pre>
    *
-   * Protobuf type {@code me.tooster.common.proto.ChatMsg}
+   * Protobuf type {@code me.tooster.common.proto.VisualMsg}
    */
-  public  static final class ChatMsg extends
+  public  static final class VisualMsg extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:me.tooster.common.proto.ChatMsg)
-      ChatMsgOrBuilder {
+      // @@protoc_insertion_point(message_implements:me.tooster.common.proto.VisualMsg)
+      VisualMsgOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use ChatMsg.newBuilder() to construct.
-    private ChatMsg(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use VisualMsg.newBuilder() to construct.
+    private VisualMsg(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private ChatMsg() {
+    private VisualMsg() {
       from_ = "";
       to_ = "";
       msg_ = "";
+      variant_ = 0;
     }
 
     @java.lang.Override
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new ChatMsg();
+      return new VisualMsg();
     }
 
     @java.lang.Override
@@ -2270,7 +1343,7 @@ public final class Messages {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private ChatMsg(
+    private VisualMsg(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2306,6 +1379,12 @@ public final class Messages {
               msg_ = s;
               break;
             }
+            case 32: {
+              int rawValue = input.readEnum();
+
+              variant_ = rawValue;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2327,15 +1406,157 @@ public final class Messages {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ChatMsg_descriptor;
+      return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_VisualMsg_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ChatMsg_fieldAccessorTable
+      return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_VisualMsg_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              me.tooster.common.proto.Messages.ChatMsg.class, me.tooster.common.proto.Messages.ChatMsg.Builder.class);
+              me.tooster.common.proto.Messages.VisualMsg.class, me.tooster.common.proto.Messages.VisualMsg.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code me.tooster.common.proto.VisualMsg.Variant}
+     */
+    public enum Variant
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>CHAT = 0;</code>
+       */
+      CHAT(0),
+      /**
+       * <pre>
+       * less than error
+       * </pre>
+       *
+       * <code>INVALID = 1;</code>
+       */
+      INVALID(1),
+      /**
+       * <code>ERROR = 2;</code>
+       */
+      ERROR(2),
+      /**
+       * <code>TIP = 3;</code>
+       */
+      TIP(3),
+      /**
+       * <code>PROMPT = 4;</code>
+       */
+      PROMPT(4),
+      /**
+       * <code>INFO = 5;</code>
+       */
+      INFO(5),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <code>CHAT = 0;</code>
+       */
+      public static final int CHAT_VALUE = 0;
+      /**
+       * <pre>
+       * less than error
+       * </pre>
+       *
+       * <code>INVALID = 1;</code>
+       */
+      public static final int INVALID_VALUE = 1;
+      /**
+       * <code>ERROR = 2;</code>
+       */
+      public static final int ERROR_VALUE = 2;
+      /**
+       * <code>TIP = 3;</code>
+       */
+      public static final int TIP_VALUE = 3;
+      /**
+       * <code>PROMPT = 4;</code>
+       */
+      public static final int PROMPT_VALUE = 4;
+      /**
+       * <code>INFO = 5;</code>
+       */
+      public static final int INFO_VALUE = 5;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static Variant valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static Variant forNumber(int value) {
+        switch (value) {
+          case 0: return CHAT;
+          case 1: return INVALID;
+          case 2: return ERROR;
+          case 3: return TIP;
+          case 4: return PROMPT;
+          case 5: return INFO;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Variant>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          Variant> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Variant>() {
+              public Variant findValueByNumber(int number) {
+                return Variant.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return me.tooster.common.proto.Messages.VisualMsg.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Variant[] VALUES = values();
+
+      public static Variant valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private Variant(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:me.tooster.common.proto.VisualMsg.Variant)
     }
 
     public static final int FROM_FIELD_NUMBER = 1;
@@ -2456,6 +1677,31 @@ public final class Messages {
       }
     }
 
+    public static final int VARIANT_FIELD_NUMBER = 4;
+    private int variant_;
+    /**
+     * <pre>
+     * optional hint for message formatting
+     * </pre>
+     *
+     * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+     */
+    public int getVariantValue() {
+      return variant_;
+    }
+    /**
+     * <pre>
+     * optional hint for message formatting
+     * </pre>
+     *
+     * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+     */
+    public me.tooster.common.proto.Messages.VisualMsg.Variant getVariant() {
+      @SuppressWarnings("deprecation")
+      me.tooster.common.proto.Messages.VisualMsg.Variant result = me.tooster.common.proto.Messages.VisualMsg.Variant.valueOf(variant_);
+      return result == null ? me.tooster.common.proto.Messages.VisualMsg.Variant.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2479,6 +1725,9 @@ public final class Messages {
       if (!getMsgBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, msg_);
       }
+      if (variant_ != me.tooster.common.proto.Messages.VisualMsg.Variant.CHAT.getNumber()) {
+        output.writeEnum(4, variant_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2497,6 +1746,10 @@ public final class Messages {
       if (!getMsgBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, msg_);
       }
+      if (variant_ != me.tooster.common.proto.Messages.VisualMsg.Variant.CHAT.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(4, variant_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -2507,10 +1760,10 @@ public final class Messages {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof me.tooster.common.proto.Messages.ChatMsg)) {
+      if (!(obj instanceof me.tooster.common.proto.Messages.VisualMsg)) {
         return super.equals(obj);
       }
-      me.tooster.common.proto.Messages.ChatMsg other = (me.tooster.common.proto.Messages.ChatMsg) obj;
+      me.tooster.common.proto.Messages.VisualMsg other = (me.tooster.common.proto.Messages.VisualMsg) obj;
 
       if (!getFrom()
           .equals(other.getFrom())) return false;
@@ -2518,6 +1771,7 @@ public final class Messages {
           .equals(other.getTo())) return false;
       if (!getMsg()
           .equals(other.getMsg())) return false;
+      if (variant_ != other.variant_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2535,74 +1789,76 @@ public final class Messages {
       hash = (53 * hash) + getTo().hashCode();
       hash = (37 * hash) + MSG_FIELD_NUMBER;
       hash = (53 * hash) + getMsg().hashCode();
+      hash = (37 * hash) + VARIANT_FIELD_NUMBER;
+      hash = (53 * hash) + variant_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(byte[] data)
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(java.io.InputStream input)
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseDelimitedFrom(java.io.InputStream input)
+    public static me.tooster.common.proto.Messages.VisualMsg parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseDelimitedFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static me.tooster.common.proto.Messages.ChatMsg parseFrom(
+    public static me.tooster.common.proto.Messages.VisualMsg parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -2615,7 +1871,7 @@ public final class Messages {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(me.tooster.common.proto.Messages.ChatMsg prototype) {
+    public static Builder newBuilder(me.tooster.common.proto.Messages.VisualMsg prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -2642,26 +1898,26 @@ public final class Messages {
      *   what : S bc : S dm : H bc : H dm : local : shout : dm
      * </pre>
      *
-     * Protobuf type {@code me.tooster.common.proto.ChatMsg}
+     * Protobuf type {@code me.tooster.common.proto.VisualMsg}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:me.tooster.common.proto.ChatMsg)
-        me.tooster.common.proto.Messages.ChatMsgOrBuilder {
+        // @@protoc_insertion_point(builder_implements:me.tooster.common.proto.VisualMsg)
+        me.tooster.common.proto.Messages.VisualMsgOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ChatMsg_descriptor;
+        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_VisualMsg_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ChatMsg_fieldAccessorTable
+        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_VisualMsg_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                me.tooster.common.proto.Messages.ChatMsg.class, me.tooster.common.proto.Messages.ChatMsg.Builder.class);
+                me.tooster.common.proto.Messages.VisualMsg.class, me.tooster.common.proto.Messages.VisualMsg.Builder.class);
       }
 
-      // Construct using me.tooster.common.proto.Messages.ChatMsg.newBuilder()
+      // Construct using me.tooster.common.proto.Messages.VisualMsg.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -2685,23 +1941,25 @@ public final class Messages {
 
         msg_ = "";
 
+        variant_ = 0;
+
         return this;
       }
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ChatMsg_descriptor;
+        return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_VisualMsg_descriptor;
       }
 
       @java.lang.Override
-      public me.tooster.common.proto.Messages.ChatMsg getDefaultInstanceForType() {
-        return me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance();
+      public me.tooster.common.proto.Messages.VisualMsg getDefaultInstanceForType() {
+        return me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance();
       }
 
       @java.lang.Override
-      public me.tooster.common.proto.Messages.ChatMsg build() {
-        me.tooster.common.proto.Messages.ChatMsg result = buildPartial();
+      public me.tooster.common.proto.Messages.VisualMsg build() {
+        me.tooster.common.proto.Messages.VisualMsg result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -2709,11 +1967,12 @@ public final class Messages {
       }
 
       @java.lang.Override
-      public me.tooster.common.proto.Messages.ChatMsg buildPartial() {
-        me.tooster.common.proto.Messages.ChatMsg result = new me.tooster.common.proto.Messages.ChatMsg(this);
+      public me.tooster.common.proto.Messages.VisualMsg buildPartial() {
+        me.tooster.common.proto.Messages.VisualMsg result = new me.tooster.common.proto.Messages.VisualMsg(this);
         result.from_ = from_;
         result.to_ = to_;
         result.msg_ = msg_;
+        result.variant_ = variant_;
         onBuilt();
         return result;
       }
@@ -2752,16 +2011,16 @@ public final class Messages {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof me.tooster.common.proto.Messages.ChatMsg) {
-          return mergeFrom((me.tooster.common.proto.Messages.ChatMsg)other);
+        if (other instanceof me.tooster.common.proto.Messages.VisualMsg) {
+          return mergeFrom((me.tooster.common.proto.Messages.VisualMsg)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(me.tooster.common.proto.Messages.ChatMsg other) {
-        if (other == me.tooster.common.proto.Messages.ChatMsg.getDefaultInstance()) return this;
+      public Builder mergeFrom(me.tooster.common.proto.Messages.VisualMsg other) {
+        if (other == me.tooster.common.proto.Messages.VisualMsg.getDefaultInstance()) return this;
         if (!other.getFrom().isEmpty()) {
           from_ = other.from_;
           onChanged();
@@ -2773,6 +2032,9 @@ public final class Messages {
         if (!other.getMsg().isEmpty()) {
           msg_ = other.msg_;
           onChanged();
+        }
+        if (other.variant_ != 0) {
+          setVariantValue(other.getVariantValue());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2789,11 +2051,11 @@ public final class Messages {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        me.tooster.common.proto.Messages.ChatMsg parsedMessage = null;
+        me.tooster.common.proto.Messages.VisualMsg parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (me.tooster.common.proto.Messages.ChatMsg) e.getUnfinishedMessage();
+          parsedMessage = (me.tooster.common.proto.Messages.VisualMsg) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -3049,6 +2311,71 @@ public final class Messages {
         onChanged();
         return this;
       }
+
+      private int variant_ = 0;
+      /**
+       * <pre>
+       * optional hint for message formatting
+       * </pre>
+       *
+       * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+       */
+      public int getVariantValue() {
+        return variant_;
+      }
+      /**
+       * <pre>
+       * optional hint for message formatting
+       * </pre>
+       *
+       * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+       */
+      public Builder setVariantValue(int value) {
+        variant_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * optional hint for message formatting
+       * </pre>
+       *
+       * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+       */
+      public me.tooster.common.proto.Messages.VisualMsg.Variant getVariant() {
+        @SuppressWarnings("deprecation")
+        me.tooster.common.proto.Messages.VisualMsg.Variant result = me.tooster.common.proto.Messages.VisualMsg.Variant.valueOf(variant_);
+        return result == null ? me.tooster.common.proto.Messages.VisualMsg.Variant.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * optional hint for message formatting
+       * </pre>
+       *
+       * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+       */
+      public Builder setVariant(me.tooster.common.proto.Messages.VisualMsg.Variant value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        variant_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * optional hint for message formatting
+       * </pre>
+       *
+       * <code>.me.tooster.common.proto.VisualMsg.Variant variant = 4;</code>
+       */
+      public Builder clearVariant() {
+        
+        variant_ = 0;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3062,41 +2389,41 @@ public final class Messages {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:me.tooster.common.proto.ChatMsg)
+      // @@protoc_insertion_point(builder_scope:me.tooster.common.proto.VisualMsg)
     }
 
-    // @@protoc_insertion_point(class_scope:me.tooster.common.proto.ChatMsg)
-    private static final me.tooster.common.proto.Messages.ChatMsg DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:me.tooster.common.proto.VisualMsg)
+    private static final me.tooster.common.proto.Messages.VisualMsg DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new me.tooster.common.proto.Messages.ChatMsg();
+      DEFAULT_INSTANCE = new me.tooster.common.proto.Messages.VisualMsg();
     }
 
-    public static me.tooster.common.proto.Messages.ChatMsg getDefaultInstance() {
+    public static me.tooster.common.proto.Messages.VisualMsg getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<ChatMsg>
-        PARSER = new com.google.protobuf.AbstractParser<ChatMsg>() {
+    private static final com.google.protobuf.Parser<VisualMsg>
+        PARSER = new com.google.protobuf.AbstractParser<VisualMsg>() {
       @java.lang.Override
-      public ChatMsg parsePartialFrom(
+      public VisualMsg parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ChatMsg(input, extensionRegistry);
+        return new VisualMsg(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<ChatMsg> parser() {
+    public static com.google.protobuf.Parser<VisualMsg> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<ChatMsg> getParserForType() {
+    public com.google.protobuf.Parser<VisualMsg> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public me.tooster.common.proto.Messages.ChatMsg getDefaultInstanceForType() {
+    public me.tooster.common.proto.Messages.VisualMsg getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -3115,15 +2442,6 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getCommandBytes();
-
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-     */
-    int getFormatHintValue();
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-     */
-    me.tooster.common.proto.Messages.CommandMsg.FormatHint getFormatHint();
   }
   /**
    * <pre>
@@ -3144,7 +2462,6 @@ public final class Messages {
     }
     private CommandMsg() {
       command_ = "";
-      formatHint_ = 0;
     }
 
     @java.lang.Override
@@ -3183,12 +2500,6 @@ public final class Messages {
               command_ = s;
               break;
             }
-            case 16: {
-              int rawValue = input.readEnum();
-
-              formatHint_ = rawValue;
-              break;
-            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3219,113 +2530,6 @@ public final class Messages {
       return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_CommandMsg_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               me.tooster.common.proto.Messages.CommandMsg.class, me.tooster.common.proto.Messages.CommandMsg.Builder.class);
-    }
-
-    /**
-     * Protobuf enum {@code me.tooster.common.proto.CommandMsg.FormatHint}
-     */
-    public enum FormatHint
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>ERROR = 0;</code>
-       */
-      ERROR(0),
-      /**
-       * <code>INFO = 1;</code>
-       */
-      INFO(1),
-      /**
-       * <code>TIP = 2;</code>
-       */
-      TIP(2),
-      UNRECOGNIZED(-1),
-      ;
-
-      /**
-       * <code>ERROR = 0;</code>
-       */
-      public static final int ERROR_VALUE = 0;
-      /**
-       * <code>INFO = 1;</code>
-       */
-      public static final int INFO_VALUE = 1;
-      /**
-       * <code>TIP = 2;</code>
-       */
-      public static final int TIP_VALUE = 2;
-
-
-      public final int getNumber() {
-        if (this == UNRECOGNIZED) {
-          throw new java.lang.IllegalArgumentException(
-              "Can't get the number of an unknown enum value.");
-        }
-        return value;
-      }
-
-      /**
-       * @deprecated Use {@link #forNumber(int)} instead.
-       */
-      @java.lang.Deprecated
-      public static FormatHint valueOf(int value) {
-        return forNumber(value);
-      }
-
-      public static FormatHint forNumber(int value) {
-        switch (value) {
-          case 0: return ERROR;
-          case 1: return INFO;
-          case 2: return TIP;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<FormatHint>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static final com.google.protobuf.Internal.EnumLiteMap<
-          FormatHint> internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<FormatHint>() {
-              public FormatHint findValueByNumber(int number) {
-                return FormatHint.forNumber(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(ordinal());
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return me.tooster.common.proto.Messages.CommandMsg.getDescriptor().getEnumTypes().get(0);
-      }
-
-      private static final FormatHint[] VALUES = values();
-
-      public static FormatHint valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        if (desc.getIndex() == -1) {
-          return UNRECOGNIZED;
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      private final int value;
-
-      private FormatHint(int value) {
-        this.value = value;
-      }
-
-      // @@protoc_insertion_point(enum_scope:me.tooster.common.proto.CommandMsg.FormatHint)
     }
 
     public static final int COMMAND_FIELD_NUMBER = 1;
@@ -3362,23 +2566,6 @@ public final class Messages {
       }
     }
 
-    public static final int FORMATHINT_FIELD_NUMBER = 2;
-    private int formatHint_;
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-     */
-    public int getFormatHintValue() {
-      return formatHint_;
-    }
-    /**
-     * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-     */
-    public me.tooster.common.proto.Messages.CommandMsg.FormatHint getFormatHint() {
-      @SuppressWarnings("deprecation")
-      me.tooster.common.proto.Messages.CommandMsg.FormatHint result = me.tooster.common.proto.Messages.CommandMsg.FormatHint.valueOf(formatHint_);
-      return result == null ? me.tooster.common.proto.Messages.CommandMsg.FormatHint.UNRECOGNIZED : result;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3396,9 +2583,6 @@ public final class Messages {
       if (!getCommandBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, command_);
       }
-      if (formatHint_ != me.tooster.common.proto.Messages.CommandMsg.FormatHint.ERROR.getNumber()) {
-        output.writeEnum(2, formatHint_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -3410,10 +2594,6 @@ public final class Messages {
       size = 0;
       if (!getCommandBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, command_);
-      }
-      if (formatHint_ != me.tooster.common.proto.Messages.CommandMsg.FormatHint.ERROR.getNumber()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(2, formatHint_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3432,7 +2612,6 @@ public final class Messages {
 
       if (!getCommand()
           .equals(other.getCommand())) return false;
-      if (formatHint_ != other.formatHint_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3446,8 +2625,6 @@ public final class Messages {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + COMMAND_FIELD_NUMBER;
       hash = (53 * hash) + getCommand().hashCode();
-      hash = (37 * hash) + FORMATHINT_FIELD_NUMBER;
-      hash = (53 * hash) + formatHint_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3588,8 +2765,6 @@ public final class Messages {
         super.clear();
         command_ = "";
 
-        formatHint_ = 0;
-
         return this;
       }
 
@@ -3617,7 +2792,6 @@ public final class Messages {
       public me.tooster.common.proto.Messages.CommandMsg buildPartial() {
         me.tooster.common.proto.Messages.CommandMsg result = new me.tooster.common.proto.Messages.CommandMsg(this);
         result.command_ = command_;
-        result.formatHint_ = formatHint_;
         onBuilt();
         return result;
       }
@@ -3669,9 +2843,6 @@ public final class Messages {
         if (!other.getCommand().isEmpty()) {
           command_ = other.command_;
           onChanged();
-        }
-        if (other.formatHint_ != 0) {
-          setFormatHintValue(other.getFormatHintValue());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3770,51 +2941,6 @@ public final class Messages {
         onChanged();
         return this;
       }
-
-      private int formatHint_ = 0;
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-       */
-      public int getFormatHintValue() {
-        return formatHint_;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-       */
-      public Builder setFormatHintValue(int value) {
-        formatHint_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-       */
-      public me.tooster.common.proto.Messages.CommandMsg.FormatHint getFormatHint() {
-        @SuppressWarnings("deprecation")
-        me.tooster.common.proto.Messages.CommandMsg.FormatHint result = me.tooster.common.proto.Messages.CommandMsg.FormatHint.valueOf(formatHint_);
-        return result == null ? me.tooster.common.proto.Messages.CommandMsg.FormatHint.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-       */
-      public Builder setFormatHint(me.tooster.common.proto.Messages.CommandMsg.FormatHint value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        
-        formatHint_ = value.getNumber();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.me.tooster.common.proto.CommandMsg.FormatHint formatHint = 2;</code>
-       */
-      public Builder clearFormatHint() {
-        
-        formatHint_ = 0;
-        onChanged();
-        return this;
-      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3880,10 +3006,64 @@ public final class Messages {
      * <code>.me.tooster.common.proto.ControlMsg.Code code = 1;</code>
      */
     me.tooster.common.proto.Messages.ControlMsg.Code getCode();
+
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+    int getConfigurationCount();
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+    boolean containsConfiguration(
+        java.lang.String key);
+    /**
+     * Use {@link #getConfigurationMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getConfiguration();
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getConfigurationMap();
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+
+    java.lang.String getConfigurationOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+
+    java.lang.String getConfigurationOrThrow(
+        java.lang.String key);
   }
   /**
    * <pre>
-   * handshake/PingPong/disconnect
+   * handshake/PingPong/disconnect/config
    * </pre>
    *
    * Protobuf type {@code me.tooster.common.proto.ControlMsg}
@@ -3921,6 +3101,7 @@ public final class Messages {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -3935,6 +3116,19 @@ public final class Messages {
               int rawValue = input.readEnum();
 
               code_ = rawValue;
+              break;
+            }
+            case 18: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                configuration_ = com.google.protobuf.MapField.newMapField(
+                    ConfigurationDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000001;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              configuration__ = input.readMessage(
+                  ConfigurationDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              configuration_.getMutableMap().put(
+                  configuration__.getKey(), configuration__.getValue());
               break;
             }
             default: {
@@ -3961,6 +3155,18 @@ public final class Messages {
       return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ControlMsg_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 2:
+          return internalGetConfiguration();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -3991,29 +3197,41 @@ public final class Messages {
        */
       PONG(1),
       /**
-       * <pre>
-       * received on client
-       * </pre>
-       *
-       * <code>SERVER_HELLO = 2;</code>
+       * <code>CLIENT_HELLO = 2;</code>
        */
-      SERVER_HELLO(2),
+      CLIENT_HELLO(2),
       /**
        * <pre>
        * received on client
        * </pre>
        *
-       * <code>SERVER_DENY = 3;</code>
+       * <code>SERVER_HELLO = 3;</code>
        */
-      SERVER_DENY(3),
+      SERVER_HELLO(3),
+      /**
+       * <pre>
+       * received on client
+       * </pre>
+       *
+       * <code>SERVER_DENY = 4;</code>
+       */
+      SERVER_DENY(4),
       /**
        * <pre>
        * received on server
        * </pre>
        *
-       * <code>CLIENT_DISCONNECT = 4;</code>
+       * <code>CLIENT_DISCONNECT = 5;</code>
        */
-      CLIENT_DISCONNECT(4),
+      CLIENT_DISCONNECT(5),
+      /**
+       * <pre>
+       * any config messages without initial handshake config
+       * </pre>
+       *
+       * <code>CONFIG = 6;</code>
+       */
+      CONFIG(6),
       UNRECOGNIZED(-1),
       ;
 
@@ -4034,29 +3252,41 @@ public final class Messages {
        */
       public static final int PONG_VALUE = 1;
       /**
-       * <pre>
-       * received on client
-       * </pre>
-       *
-       * <code>SERVER_HELLO = 2;</code>
+       * <code>CLIENT_HELLO = 2;</code>
        */
-      public static final int SERVER_HELLO_VALUE = 2;
+      public static final int CLIENT_HELLO_VALUE = 2;
       /**
        * <pre>
        * received on client
        * </pre>
        *
-       * <code>SERVER_DENY = 3;</code>
+       * <code>SERVER_HELLO = 3;</code>
        */
-      public static final int SERVER_DENY_VALUE = 3;
+      public static final int SERVER_HELLO_VALUE = 3;
+      /**
+       * <pre>
+       * received on client
+       * </pre>
+       *
+       * <code>SERVER_DENY = 4;</code>
+       */
+      public static final int SERVER_DENY_VALUE = 4;
       /**
        * <pre>
        * received on server
        * </pre>
        *
-       * <code>CLIENT_DISCONNECT = 4;</code>
+       * <code>CLIENT_DISCONNECT = 5;</code>
        */
-      public static final int CLIENT_DISCONNECT_VALUE = 4;
+      public static final int CLIENT_DISCONNECT_VALUE = 5;
+      /**
+       * <pre>
+       * any config messages without initial handshake config
+       * </pre>
+       *
+       * <code>CONFIG = 6;</code>
+       */
+      public static final int CONFIG_VALUE = 6;
 
 
       public final int getNumber() {
@@ -4079,9 +3309,11 @@ public final class Messages {
         switch (value) {
           case 0: return PING;
           case 1: return PONG;
-          case 2: return SERVER_HELLO;
-          case 3: return SERVER_DENY;
-          case 4: return CLIENT_DISCONNECT;
+          case 2: return CLIENT_HELLO;
+          case 3: return SERVER_HELLO;
+          case 4: return SERVER_DENY;
+          case 5: return CLIENT_DISCONNECT;
+          case 6: return CONFIG;
           default: return null;
         }
       }
@@ -4151,6 +3383,98 @@ public final class Messages {
       return result == null ? me.tooster.common.proto.Messages.ControlMsg.Code.UNRECOGNIZED : result;
     }
 
+    public static final int CONFIGURATION_FIELD_NUMBER = 2;
+    private static final class ConfigurationDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ControlMsg_ConfigurationEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> configuration_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetConfiguration() {
+      if (configuration_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            ConfigurationDefaultEntryHolder.defaultEntry);
+      }
+      return configuration_;
+    }
+
+    public int getConfigurationCount() {
+      return internalGetConfiguration().getMap().size();
+    }
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+
+    public boolean containsConfiguration(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetConfiguration().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getConfigurationMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getConfiguration() {
+      return getConfigurationMap();
+    }
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getConfigurationMap() {
+      return internalGetConfiguration().getMap();
+    }
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+
+    public java.lang.String getConfigurationOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetConfiguration().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; configuration = 2;</code>
+     */
+
+    public java.lang.String getConfigurationOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetConfiguration().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4168,6 +3492,12 @@ public final class Messages {
       if (code_ != me.tooster.common.proto.Messages.ControlMsg.Code.PING.getNumber()) {
         output.writeEnum(1, code_);
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetConfiguration(),
+          ConfigurationDefaultEntryHolder.defaultEntry,
+          2);
       unknownFields.writeTo(output);
     }
 
@@ -4180,6 +3510,16 @@ public final class Messages {
       if (code_ != me.tooster.common.proto.Messages.ControlMsg.Code.PING.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, code_);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetConfiguration().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        configuration__ = ConfigurationDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(2, configuration__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4197,6 +3537,8 @@ public final class Messages {
       me.tooster.common.proto.Messages.ControlMsg other = (me.tooster.common.proto.Messages.ControlMsg) obj;
 
       if (code_ != other.code_) return false;
+      if (!internalGetConfiguration().equals(
+          other.internalGetConfiguration())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -4210,6 +3552,10 @@ public final class Messages {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + CODE_FIELD_NUMBER;
       hash = (53 * hash) + code_;
+      if (!internalGetConfiguration().getMap().isEmpty()) {
+        hash = (37 * hash) + CONFIGURATION_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetConfiguration().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4307,7 +3653,7 @@ public final class Messages {
     }
     /**
      * <pre>
-     * handshake/PingPong/disconnect
+     * handshake/PingPong/disconnect/config
      * </pre>
      *
      * Protobuf type {@code me.tooster.common.proto.ControlMsg}
@@ -4321,6 +3667,28 @@ public final class Messages {
         return me.tooster.common.proto.Messages.internal_static_me_tooster_common_proto_ControlMsg_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 2:
+            return internalGetConfiguration();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 2:
+            return internalGetMutableConfiguration();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -4349,6 +3717,7 @@ public final class Messages {
         super.clear();
         code_ = 0;
 
+        internalGetMutableConfiguration().clear();
         return this;
       }
 
@@ -4375,7 +3744,10 @@ public final class Messages {
       @java.lang.Override
       public me.tooster.common.proto.Messages.ControlMsg buildPartial() {
         me.tooster.common.proto.Messages.ControlMsg result = new me.tooster.common.proto.Messages.ControlMsg(this);
+        int from_bitField0_ = bitField0_;
         result.code_ = code_;
+        result.configuration_ = internalGetConfiguration();
+        result.configuration_.makeImmutable();
         onBuilt();
         return result;
       }
@@ -4427,6 +3799,8 @@ public final class Messages {
         if (other.code_ != 0) {
           setCodeValue(other.getCodeValue());
         }
+        internalGetMutableConfiguration().mergeFrom(
+            other.internalGetConfiguration());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -4455,6 +3829,7 @@ public final class Messages {
         }
         return this;
       }
+      private int bitField0_;
 
       private int code_ = 0;
       /**
@@ -4498,6 +3873,157 @@ public final class Messages {
         
         code_ = 0;
         onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> configuration_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetConfiguration() {
+        if (configuration_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              ConfigurationDefaultEntryHolder.defaultEntry);
+        }
+        return configuration_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableConfiguration() {
+        onChanged();;
+        if (configuration_ == null) {
+          configuration_ = com.google.protobuf.MapField.newMapField(
+              ConfigurationDefaultEntryHolder.defaultEntry);
+        }
+        if (!configuration_.isMutable()) {
+          configuration_ = configuration_.copy();
+        }
+        return configuration_;
+      }
+
+      public int getConfigurationCount() {
+        return internalGetConfiguration().getMap().size();
+      }
+      /**
+       * <pre>
+       * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; configuration = 2;</code>
+       */
+
+      public boolean containsConfiguration(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetConfiguration().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getConfigurationMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getConfiguration() {
+        return getConfigurationMap();
+      }
+      /**
+       * <pre>
+       * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; configuration = 2;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getConfigurationMap() {
+        return internalGetConfiguration().getMap();
+      }
+      /**
+       * <pre>
+       * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; configuration = 2;</code>
+       */
+
+      public java.lang.String getConfigurationOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetConfiguration().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; configuration = 2;</code>
+       */
+
+      public java.lang.String getConfigurationOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetConfiguration().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearConfiguration() {
+        internalGetMutableConfiguration().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; configuration = 2;</code>
+       */
+
+      public Builder removeConfiguration(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableConfiguration().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableConfiguration() {
+        return internalGetMutableConfiguration().getMutableMap();
+      }
+      /**
+       * <pre>
+       * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; configuration = 2;</code>
+       */
+      public Builder putConfiguration(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableConfiguration().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * optional configuration TODO: use JsonFormat sine v3.1.0 to parse yaml
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; configuration = 2;</code>
+       */
+
+      public Builder putAllConfiguration(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableConfiguration().getMutableMap()
+            .putAll(values);
         return this;
       }
       @java.lang.Override
@@ -4559,20 +4085,10 @@ public final class Messages {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_me_tooster_common_proto_Message_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_me_tooster_common_proto_ConfigMsg_descriptor;
+    internal_static_me_tooster_common_proto_VisualMsg_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_me_tooster_common_proto_ConfigMsg_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_me_tooster_common_proto_ConfigMsg_ConfigurationEntry_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_me_tooster_common_proto_ConfigMsg_ConfigurationEntry_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_me_tooster_common_proto_ChatMsg_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_me_tooster_common_proto_ChatMsg_fieldAccessorTable;
+      internal_static_me_tooster_common_proto_VisualMsg_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_me_tooster_common_proto_CommandMsg_descriptor;
   private static final 
@@ -4583,6 +4099,11 @@ public final class Messages {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_me_tooster_common_proto_ControlMsg_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_me_tooster_common_proto_ControlMsg_ConfigurationEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_me_tooster_common_proto_ControlMsg_ConfigurationEntry_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4593,26 +4114,25 @@ public final class Messages {
   static {
     java.lang.String[] descriptorData = {
       "\n\016messages.proto\022\027me.tooster.common.prot" +
-      "o\"\204\002\n\007Message\022\n\n\002ID\030\001 \001(\003\0227\n\tconfigMsg\030\003" +
-      " \001(\0132\".me.tooster.common.proto.ConfigMsg" +
-      "H\000\0223\n\007chatMsg\030\004 \001(\0132 .me.tooster.common." +
-      "proto.ChatMsgH\000\0229\n\ncommandMsg\030\005 \001(\0132#.me" +
-      ".tooster.common.proto.CommandMsgH\000\0229\n\nco" +
-      "ntrolMsg\030\006 \001(\0132#.me.tooster.common.proto" +
-      ".ControlMsgH\000B\t\n\007msgType\"\217\001\n\tConfigMsg\022L" +
-      "\n\rconfiguration\030\001 \003(\01325.me.tooster.commo" +
-      "n.proto.ConfigMsg.ConfigurationEntry\0324\n\022" +
-      "ConfigurationEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value" +
-      "\030\002 \001(\t:\0028\001\"0\n\007ChatMsg\022\014\n\004from\030\001 \001(\t\022\n\n\002t" +
-      "o\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\"\215\001\n\nCommandMsg\022\017\n\007c" +
-      "ommand\030\001 \001(\t\022B\n\nformatHint\030\002 \001(\0162..me.to" +
-      "oster.common.proto.CommandMsg.FormatHint" +
-      "\"*\n\nFormatHint\022\t\n\005ERROR\020\000\022\010\n\004INFO\020\001\022\007\n\003T" +
-      "IP\020\002\"\232\001\n\nControlMsg\0226\n\004code\030\001 \001(\0162(.me.t" +
-      "ooster.common.proto.ControlMsg.Code\"T\n\004C" +
-      "ode\022\010\n\004PING\020\000\022\010\n\004PONG\020\001\022\020\n\014SERVER_HELLO\020" +
-      "\002\022\017\n\013SERVER_DENY\020\003\022\025\n\021CLIENT_DISCONNECT\020" +
-      "\004b\006proto3"
+      "o\"\317\001\n\007Message\022\n\n\002ID\030\001 \001(\003\0229\n\ncontrolMsg\030" +
+      "\002 \001(\0132#.me.tooster.common.proto.ControlM" +
+      "sgH\000\0227\n\tvisualMsg\030\003 \001(\0132\".me.tooster.com" +
+      "mon.proto.VisualMsgH\000\0229\n\ncommandMsg\030\004 \001(" +
+      "\0132#.me.tooster.common.proto.CommandMsgH\000" +
+      "B\t\n\007msgType\"\273\001\n\tVisualMsg\022\014\n\004from\030\001 \001(\t\022" +
+      "\n\n\002to\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\022;\n\007variant\030\004 \001(" +
+      "\0162*.me.tooster.common.proto.VisualMsg.Va" +
+      "riant\"J\n\007Variant\022\010\n\004CHAT\020\000\022\013\n\007INVALID\020\001\022" +
+      "\t\n\005ERROR\020\002\022\007\n\003TIP\020\003\022\n\n\006PROMPT\020\004\022\010\n\004INFO\020" +
+      "\005\"\035\n\nCommandMsg\022\017\n\007command\030\001 \001(\t\"\275\002\n\nCon" +
+      "trolMsg\0226\n\004code\030\001 \001(\0162(.me.tooster.commo" +
+      "n.proto.ControlMsg.Code\022M\n\rconfiguration" +
+      "\030\002 \003(\01326.me.tooster.common.proto.Control" +
+      "Msg.ConfigurationEntry\0324\n\022ConfigurationE" +
+      "ntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"r\n\004" +
+      "Code\022\010\n\004PING\020\000\022\010\n\004PONG\020\001\022\020\n\014CLIENT_HELLO" +
+      "\020\002\022\020\n\014SERVER_HELLO\020\003\022\017\n\013SERVER_DENY\020\004\022\025\n" +
+      "\021CLIENT_DISCONNECT\020\005\022\n\n\006CONFIG\020\006b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4623,37 +4143,31 @@ public final class Messages {
     internal_static_me_tooster_common_proto_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_me_tooster_common_proto_Message_descriptor,
-        new java.lang.String[] { "ID", "ConfigMsg", "ChatMsg", "CommandMsg", "ControlMsg", "MsgType", });
-    internal_static_me_tooster_common_proto_ConfigMsg_descriptor =
+        new java.lang.String[] { "ID", "ControlMsg", "VisualMsg", "CommandMsg", "MsgType", });
+    internal_static_me_tooster_common_proto_VisualMsg_descriptor =
       getDescriptor().getMessageTypes().get(1);
-    internal_static_me_tooster_common_proto_ConfigMsg_fieldAccessorTable = new
+    internal_static_me_tooster_common_proto_VisualMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_me_tooster_common_proto_ConfigMsg_descriptor,
-        new java.lang.String[] { "Configuration", });
-    internal_static_me_tooster_common_proto_ConfigMsg_ConfigurationEntry_descriptor =
-      internal_static_me_tooster_common_proto_ConfigMsg_descriptor.getNestedTypes().get(0);
-    internal_static_me_tooster_common_proto_ConfigMsg_ConfigurationEntry_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_me_tooster_common_proto_ConfigMsg_ConfigurationEntry_descriptor,
-        new java.lang.String[] { "Key", "Value", });
-    internal_static_me_tooster_common_proto_ChatMsg_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_me_tooster_common_proto_ChatMsg_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_me_tooster_common_proto_ChatMsg_descriptor,
-        new java.lang.String[] { "From", "To", "Msg", });
+        internal_static_me_tooster_common_proto_VisualMsg_descriptor,
+        new java.lang.String[] { "From", "To", "Msg", "Variant", });
     internal_static_me_tooster_common_proto_CommandMsg_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_me_tooster_common_proto_CommandMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_me_tooster_common_proto_CommandMsg_descriptor,
-        new java.lang.String[] { "Command", "FormatHint", });
+        new java.lang.String[] { "Command", });
     internal_static_me_tooster_common_proto_ControlMsg_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_me_tooster_common_proto_ControlMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_me_tooster_common_proto_ControlMsg_descriptor,
-        new java.lang.String[] { "Code", });
+        new java.lang.String[] { "Code", "Configuration", });
+    internal_static_me_tooster_common_proto_ControlMsg_ConfigurationEntry_descriptor =
+      internal_static_me_tooster_common_proto_ControlMsg_descriptor.getNestedTypes().get(0);
+    internal_static_me_tooster_common_proto_ControlMsg_ConfigurationEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_me_tooster_common_proto_ControlMsg_ConfigurationEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
