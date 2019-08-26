@@ -17,6 +17,7 @@ enum ServerCommand implements Command {
 
     HUB_ADD_USER, HUB_REMOVE_USER,
 
+    // -----------------------------------------------------
     @Alias("/ready") @Help("switches the ready/not ready state.") READY,
 
     ;

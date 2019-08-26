@@ -27,7 +27,7 @@ class Client {
     private static final int TIMEOUT_MSG_MS          = 0; //15_000; // timeout between messages
     //----------------------------------------------------------------------------------------------------------------------------
     String serverIP;  // currently connected server's IP
-    long   serverPort; // currently connected server's port
+    Integer   serverPort; // currently connected server's port
 
     private Socket       socket;
     private OutputStream out;
@@ -151,8 +151,7 @@ class Client {
             this.socket = socket;
             listenRemoteThread = Thread.currentThread();
 
-            socket.connect(new InetSocketAddress(config.get("serverIP"), Integer.parseInt(config.get("serverPort"))),
-                    2 * TIMEOUT_MSG_MS); // await for connection...
+            socket.connect(new InetSocketAddress(serverIP, serverPort), 2 * TIMEOUT_MSG_MS); // await for connection...
 
             out = socket.getOutputStream();
             in = socket.getInputStream();

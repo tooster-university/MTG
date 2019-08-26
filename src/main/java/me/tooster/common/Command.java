@@ -1,10 +1,12 @@
 package me.tooster.common;
 
+import me.tooster.MTG.Mana;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Field;
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Objects;
@@ -77,13 +79,24 @@ public interface Command {
     }
 
     /**
-     * Checks if input matches exactly (ignoring case) any alias of this command
+     * Checks if input matches on prefix (ignoring case and whitespaces) any alias of this command
+     * For example @Alias("/test alias") will match against "/test alias" " /TeSt   AlIaS some other arguments"
+     * but not "/test" nor "/test aliases"
      *
      * @param input input string to match against
      * @return true if input equals (ignoring case) to any of the aliases
      */
     default boolean matches(String input) {
-        return (Arrays.stream(aliases()).anyMatch(s -> s.equalsIgnoreCase(input)));
+        String[] inputParts = Formatter.splitParts(input).toArray(new String[0]);
+        for (var alias : aliases()) {
+            var aliasParts = Formatter.splitParts(alias).toArray(new String[0]);
+            boolean match = aliasParts.length <= inputParts.length;
+            // zip two parts
+            for (int i = 0; i < aliasParts.length && match; i++) match = aliasParts[i].equalsIgnoreCase(inputParts[i]);
+
+            if (match) return true;
+        }
+        return false;
     }
 
     /**
@@ -207,23 +220,22 @@ public interface Command {
          */
         public boolean isMasked(CMD command) { return commandMask.contains(command);}
 
+        //TODO: add 'rawInput' field to Compiled
+
         /**
          * Parses the input and returns compiled command. If command didn't parse, then parsed command is null and
-         * arg0 is raw input string. If parsed, args contain raw parts of command.
+         * arg0 is raw input string. If parsed, args contain raw parts of command. Parsing is done as described in
+         * {@link me.tooster.common.Command#matches(String)}.
          *
          * @param input input string to parse
          * @return compiled command with command and string argument list if parse was a success,
          * null and raw input as first argument otherwise
          */
         public @NotNull Compiled<CMD> parse(@NotNull String input) {
-            var parts = Formatter.splitParts(input);
-            if (parts.size() > 0) {
-                String cname = parts.get(0); // command name
-                for (CMD c : commandEnumClass.getEnumConstants())
-                    if (c.matches(cname))
-                        return compile(c, parts.toArray(new String[0])); // rest is argument's list
-            }
-            return compile(null, input); // returns default command with input
+            for (CMD c : commandEnumClass.getEnumConstants())
+                if (c.matches(input))
+                    return compile(c, Formatter.splitParts(input).toArray(new String[0])); // argument list is command split onto parts
+            return compile(null, input); // not parsed is null with raw input as arg0
         }
 
         /**
@@ -236,6 +248,7 @@ public interface Command {
         public Compiled<CMD> compile(@Nullable CMD command, String... args) {
             return new Compiled<>(this, command, args);
         }
+
     }
 
     /**

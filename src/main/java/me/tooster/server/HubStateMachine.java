@@ -36,7 +36,16 @@ class HubStateMachine extends FiniteStateMachine<HubStateMachine.State, HubState
             public State process(HubStateMachine fsm, Command.Compiled<ServerCommand>... command) {
                 var cmd = command[0].cmd;
                 User user = (User) command[0].controller.owner;
-                switch (cmd) {
+                if (cmd == null) {
+                    var mtgcmd = user.mtgCommandController.parse(command[0].args[0]);
+                    if (mtgcmd.cmd == null)
+                        user.transmit(VisualMsg.newBuilder()
+                                .setFrom("SERVER")
+                                .setMsg(String.join("\n",
+                                        user.mtgCommandController.enabledCommands.stream()
+                                                .map(c -> Command.help(c))
+                                                .toArray(String[]::new))));
+                } else switch (cmd) {
                     case HUB_ADD_USER:
                         user.serverCommandController.enable(READY);
                         user.setReady(false);

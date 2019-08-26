@@ -35,9 +35,13 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
                 if (compiled.cmd == null) {
                     System.out.println(Formatter.invalid("Unrecognized input."));
                     return this;
-                }
-                else if (compiled.cmd == CONNECT)
+                } else if (compiled.cmd == CONNECT) {
+                    fsm.client.serverIP = compiled.arg(1);
+                    try {fsm.client.serverPort = Integer.parseInt(compiled.arg(2));} catch (NumberFormatException ignored) {}
+                    if(fsm.client.serverIP.isBlank()) fsm.client.serverIP = fsm.client.config.get("serverIP");
+                    if(fsm.client.serverPort == null) fsm.client.serverPort = Integer.valueOf(fsm.client.config.get("serverPort"));
                     return CONNECTING;
+                }
 
                 return this;
             }
@@ -46,8 +50,7 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
         CONNECTING {
             @Override
             public void onEnter(ClientStateMachine fsm, State prevState) {
-                Client.LOGGER.info(String.format("Connecting to the server at %s:%s...",
-                        fsm.client.config.get("serverIP"), fsm.client.config.get("serverPort")));
+                Client.LOGGER.info(String.format("Connecting to the server at %s:%s...", fsm.client.serverIP, fsm.client.serverPort));
                 fsm.client.commandController.setEnabled(DISCONNECT);
                 new Thread(fsm.client::listenRemote).start();
             }

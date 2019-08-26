@@ -1,35 +1,31 @@
 package me.tooster.MTG;
 
 import me.tooster.common.Command;
+
+import java.util.EnumSet;
+
 public enum MTGCommand implements Command {
+
+    // --- all purpose decks ------------------------------
+    @Alias("/deck select") @Help("selects a deck.") DECK_SELECT,
+    @Alias({"/deck list", "/decks"}) @Help("lists all available decks.") DECK_LIST,
+    @Alias("/deck") @Help("/deck [deckName] Displays info about selected or given deck.") DECK_SHOW,
+
     // game phase
     // ----------------------------------------------------
-    @Alias({" ", "P", "PASS"}) PASS_PRIORITY,
-    @Alias({"A", "ATK", "ATTACK", "DECLARE"}) DECLARE_ATTACK,
-    @Alias({"D", "DEF", "DEFEND", "DECLARE"}) DECLARE_DEFEND,
+    @Alias("/mulligan") MULLIGAN,
 
-    @Alias({"T", "TAP"}) TAP
-//            ((player, args) -> args.stream().allMatch(
-//            ID -> ((Card) player.getHub().getObject(Integer.parseInt(ID)))
-//                    .getFlags().contains(Card.Flag.CAN_TAP)))
-    ,
-    @Alias({"U", "UNTAP"}) UNTAP
-//            ((player, args) -> args.stream().allMatch(
-//            ID -> ((Card) player.getHub().getObject(Integer.parseInt(ID)))
-//                    .getFlags().contains(Card.Flag.CAN_UNTAP)))
-    ,
-    @Alias({"DR", "DRAW"}) DRAW,
-    @Alias({"M", "MULLIGAN"}) MULLIGAN,
-    @Alias({"!", "C", "CAST"}) CAST,
+    @Alias({"/", "/pass"}) PASS_PRIORITY,
+    @Alias({"/a", "/atk", "/attack"}) DECLARE_ATTACK,
+    @Alias({"/d", "/def", "/defend"}) DECLARE_DEFEND,
 
-    // fixme: "select" without parameters returns "null not imported"
-    @Alias({"S", "select"}) SELECT_DECK
-    //((player, args) -> args.size() >= 1 && ResourceManager.getInstance().getDecks().contains(args.get(0)))
-    ,
-    @Alias({"L", "decks"}) LIST_DECKS,
-    @Alias({"D", "show"}) SHOW_DECK,
-    @Alias({"K", "ok", "ready"}) READY;                    // marks player as ready serverIn deck select gamePhase
+    @Alias({"/t", "/tap"}) TAP,
+    @Alias({"/u", "/untap"}) UNTAP,
+    @Alias({"/dr", "/draw"}) DRAW,
+    @Alias({"/c", "/cast"}) CAST,
+    ;
 
+    public static final
+    EnumSet<MTGCommand> commands = EnumSet.allOf(MTGCommand.class);
 
-    public static final MTGCommand[] cachedValues = MTGCommand.values();
 }

@@ -39,6 +39,7 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
     }
 
     enum State implements FiniteStateMachine.State<MTGStateMachine.State, MTGStateMachine, Compiled<MTGCommand>>{
+
         DRAW_HAND, // mulligans phase
 
         // game gamePhase

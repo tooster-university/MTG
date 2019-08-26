@@ -12,9 +12,9 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import static me.tooster.server.ServerCommand.*;
+import static me.tooster.MTG.MTGCommand.*;
 import static me.tooster.common.proto.Messages.*;
 
 /**
@@ -66,6 +66,8 @@ public class User {
         serverCommandController.setMasked(HELP, WHISPER, SAY, SHOUT, WHO);
 
         mtgCommandController = new Controller<>(MTGCommand.class, this);
+        mtgCommandController.setEnabled(DECK_SELECT, DECK_LIST, DECK_SHOW);
+        mtgCommandController.setMasked(DECK_LIST, DECK_SHOW);
 
         config = new ConcurrentHashMap<>() {{
             put("nick", "anon");
@@ -165,6 +167,9 @@ public class User {
             case COMMANDMSG: { // client sent command
                 String input = msg.getCommandMsg().getCommand();
                 var parsed = serverCommandController.parse(input);
+                if (parsed.cmd == null) // FIXME: un-fuckup: right now, if command doesn't parse to server it's replied as unknows
+                                        //   instead of being passed as mtgCommand
+                    mtgCommandController.parse(input);
 
                 if (parsed.cmd == null) { // defaulting to SAY
                     input = "/say " + input;
@@ -173,8 +178,8 @@ public class User {
 
                 if (!parsed.isEnabled()) {
                     transmit(VisualMsg.newBuilder()
-                    .setVariant(VisualMsg.Variant.ERROR)
-                    .setMsg("Command not available right now."));
+                            .setVariant(VisualMsg.Variant.ERROR)
+                            .setMsg("Command not available right now."));
                 } else switch (parsed.cmd) {
                     case SHOUT:
                     case SAY: {
@@ -222,8 +227,7 @@ public class User {
                         if (parsed.args.length > 1) { // help for specific command
                             var helpCmd = serverCommandController.parse(parsed.arg(1)).cmd;
                             transmit(VisualMsg.newBuilder()
-                                    .setVariant(
-                                            helpCmd == null || !helpCmd.hasAlias() ? VisualMsg.Variant.INVALID : VisualMsg.Variant.CHAT)
+                                    .setVariant(helpCmd == null || !helpCmd.hasAlias() ? VisualMsg.Variant.INVALID : VisualMsg.Variant.CHAT)
                                     .setFrom("SERVER")
                                     .setMsg(Command.help(helpCmd)));
                         } else // global help
