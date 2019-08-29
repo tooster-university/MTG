@@ -26,8 +26,8 @@ class Client {
     private static final int TIMEOUT_SERVER_HELLO_MS = 5_000; // timeout between CLIENT_HELLO and SERVER_HELLO
     private static final int TIMEOUT_MSG_MS          = 0; //15_000; // timeout between messages
     //----------------------------------------------------------------------------------------------------------------------------
-    String serverIP;  // currently connected server's IP
-    Integer   serverPort; // currently connected server's port
+    String  serverIP;  // currently connected server's IP
+    Integer serverPort; // currently connected server's port
 
     private Socket       socket;
     private OutputStream out;
@@ -67,7 +67,7 @@ class Client {
         System.out.println(String.format("%s%s--==: MTG Client started :==--%s", Formatter.CYAN, Formatter.INVERT, Formatter.RESET));
         LOGGER.finest("Local config: " + config.toString());
 
-        cFSM.process(commandController.compile(ClientCommand.CONNECT, config.get("serverIP"), config.get("serverPort")));
+        cFSM.process(commandController.compile(ClientCommand.CONNECT));
 
         Scanner cliScanner = new Scanner(System.in);
         String input;

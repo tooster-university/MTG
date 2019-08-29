@@ -6,7 +6,10 @@ import java.util.EnumSet;
 
 public enum MTGCommand implements Command {
 
-    // --- all purpose decks ------------------------------
+    // ----------------------------------------------------
+    @Alias("/ready") @Help("switches the ready/not ready state.") READY,
+
+    // --- all purpose ------------------------------------
     @Alias("/deck select") @Help("selects a deck.") DECK_SELECT,
     @Alias({"/deck list", "/decks"}) @Help("lists all available decks.") DECK_LIST,
     @Alias("/deck") @Help("/deck [deckName] Displays info about selected or given deck.") DECK_SHOW,

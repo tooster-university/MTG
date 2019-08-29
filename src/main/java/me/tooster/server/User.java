@@ -167,91 +167,93 @@ public class User {
             case COMMANDMSG: { // client sent command
                 String input = msg.getCommandMsg().getCommand();
                 var parsed = serverCommandController.parse(input);
-                if (parsed.cmd == null) // FIXME: un-fuckup: right now, if command doesn't parse to server it's replied as unknows
-                                        //   instead of being passed as mtgCommand
-                    mtgCommandController.parse(input);
 
-                if (parsed.cmd == null) { // defaulting to SAY
-                    input = "/say " + input;
-                    parsed = serverCommandController.parse(input); // parse again to SAY
-                }
-
-                if (!parsed.isEnabled()) {
-                    transmit(VisualMsg.newBuilder()
-                            .setVariant(VisualMsg.Variant.ERROR)
-                            .setMsg("Command not available right now."));
-                } else switch (parsed.cmd) {
-                    case SHOUT:
-                    case SAY: {
-                        if (parsed.args.length < 2) { // if single /say or /shout without text was received, send usage
-                            transmit(VisualMsg.newBuilder()
-                                    .setVariant(VisualMsg.Variant.INVALID)
-                                    .setMsg(parsed.cmd.help()));
-                            return;
-                        }
-                        // remove command from text and strip if it is shout
-                        var text = Formatter.removePart(0, input);
-
-                        // if say and hub exists -> say, otherwise shout to server
-                        if (parsed.cmd == SAY && hub != null) hub.shout(this, text);
-                        else Server.getInstance().shout(this, text);
-                        break;
+                if (parsed.cmd == null) {
+                    var mtgParsed = mtgCommandController.parse(input); // try to parse mtg command
+                    if (mtgParsed.cmd != null)
+                        hub.fsm.process(mtgParsed);
+                    else { // default to '/say'
+                        input = SAY.mainAlias() + " " + input;
+                        parsed = serverCommandController.parse(input); // parse again to SAY
                     }
-                    case WHISPER: {
-                        if (parsed.args.length < 3) { // if whisper doesn't have recipient and text specified, send usage
-                            transmit(VisualMsg.newBuilder()
-                                    .setVariant(VisualMsg.Variant.INVALID)
-                                    .setMsg(parsed.cmd.help()));
-                            return;
-                        }
-                        // remove command and recipient from command
-                        var text = Formatter.removePart(0, Formatter.removePart(1, input));
-
-                        User target = Server.getInstance().findUser(parsed.args[1]);
-                        if (target == null || target == this)
-                            transmit(VisualMsg.newBuilder()
-                                    .setVariant(VisualMsg.Variant.INVALID)
-                                    .setMsg("User is offline or too many matching recipients."));
-                        else {
-                            var chat = VisualMsg.newBuilder()
-                                    .setVariant(VisualMsg.Variant.CHAT)
-                                    .setFrom(this.toString())
-                                    .setTo(target.toString())
-                                    .setMsg(text);
-                            target.transmit(chat);
-                            this.transmit(chat);
-                        }
-                        break;
-                    }
-                    case HELP: {
-                        if (parsed.args.length > 1) { // help for specific command
-                            var helpCmd = serverCommandController.parse(parsed.arg(1)).cmd;
-                            transmit(VisualMsg.newBuilder()
-                                    .setVariant(helpCmd == null || !helpCmd.hasAlias() ? VisualMsg.Variant.INVALID : VisualMsg.Variant.CHAT)
-                                    .setFrom("SERVER")
-                                    .setMsg(Command.help(helpCmd)));
-                        } else // global help
-                            transmit(VisualMsg.newBuilder()
-                                    .setFrom("SERVER")
-                                    .setMsg(String.join("\n",
-                                            serverCommandController.enabledCommands.stream()
-                                                    .map(c -> Command.help(c))
-                                                    .toArray(String[]::new))));
-                        break;
-                    }
-                    case WHO: {
+                } else {
+                    if (!parsed.isEnabled()) {
                         transmit(VisualMsg.newBuilder()
-                                .setFrom("SERVER")
-                                .setMsg("Online users: " + String.join(", ",
-                                        Server.getInstance().users.values().stream().map(User::toString).toArray(String[]::new))));
-                    }
-                    default:
-                        if (hub != null) hub.hubFSM.process(parsed);
-                        break;
-                }
-                break;
-            }
+                                .setVariant(VisualMsg.Variant.ERROR)
+                                .setMsg("Command not available right now."));
+                    } else switch (parsed.cmd) {
+                        case SHOUT:
+                        case SAY: {
+                            if (parsed.args.length < 2) { // if single /say or /shout without text was received, send usage
+                                transmit(VisualMsg.newBuilder()
+                                        .setVariant(VisualMsg.Variant.INVALID)
+                                        .setMsg(parsed.cmd.help()));
+                                return;
+                            }
+                            // remove command from text and strip if it is shout
+                            var text = Formatter.removePart(0, input);
 
+                            // if say and hub exists -> say, otherwise shout to server
+                            if (parsed.cmd == SAY && hub != null) hub.shout(this, text);
+                            else Server.getInstance().shout(this, text);
+                            break;
+                        }
+
+                        case WHISPER: {
+                            if (parsed.args.length < 3) { // if whisper doesn't have recipient and text specified, send usage
+                                transmit(VisualMsg.newBuilder()
+                                        .setVariant(VisualMsg.Variant.INVALID)
+                                        .setMsg(parsed.cmd.help()));
+                                return;
+                            }
+                            // remove command and recipient from command
+                            var text = Formatter.removePart(0, Formatter.removePart(1, input));
+
+                            User target = Server.getInstance().findUser(parsed.args[1]);
+                            if (target == null || target == this)
+                                transmit(VisualMsg.newBuilder()
+                                        .setVariant(VisualMsg.Variant.INVALID)
+                                        .setMsg("User is offline or too many matching recipients."));
+                            else {
+                                var chat = VisualMsg.newBuilder()
+                                        .setVariant(VisualMsg.Variant.CHAT)
+                                        .setFrom(this.toString())
+                                        .setTo(target.toString())
+                                        .setMsg(text);
+                                target.transmit(chat);
+                                this.transmit(chat);
+                            }
+                            break;
+                        }
+
+                        case HELP: {
+                            if (parsed.args.length > 1) { // help for specific command
+                                var helpCmd = serverCommandController.parse(parsed.arg(1)).cmd;
+                                transmit(VisualMsg.newBuilder()
+                                        .setVariant(
+                                                helpCmd == null || !helpCmd.hasAlias() ? VisualMsg.Variant.INVALID : VisualMsg.Variant.CHAT)
+                                        .setFrom("SERVER")
+                                        .setMsg(Command.help(helpCmd)));
+                            } else // global help
+                                transmit(VisualMsg.newBuilder()
+                                        .setFrom("SERVER")
+                                        .setMsg(String.join("\n",
+                                                serverCommandController.enabledCommands.stream()
+                                                        .map(c -> Command.help(c))
+                                                        .toArray(String[]::new))));
+                            break;
+                        }
+
+                        case WHO: {
+                            transmit(VisualMsg.newBuilder()
+                                    .setFrom("SERVER")
+                                    .setMsg("Online users: " + String.join(", ",
+                                            Server.getInstance().users.values().stream().map(User::toString).toArray(String[]::new))));
+                        }
+                    }
+                    break;
+                }
+            }
             case MSGTYPE_NOT_SET: {
                 Server.LOGGER.warning("Received empty message while listening.");
                 break;

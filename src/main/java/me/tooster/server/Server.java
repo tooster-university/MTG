@@ -52,7 +52,7 @@ public class Server implements ChatRoom<User> {
             ResourceManager.getInstance(); // prefetch decks
 
             LOGGER.fine("Initializing the hub.");
-            hub = new Hub();
+            hub = Hub.makeHub(2);
             // listen for clients
             LOGGER.fine("Waiting for incoming client connections...");
             while (!Thread.interrupted()) {

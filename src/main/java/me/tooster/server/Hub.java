@@ -1,14 +1,15 @@
 package me.tooster.server;
 
 
+import me.tooster.MTG.MTGCommand;
+import me.tooster.MTG.MTGStateMachine;
 import me.tooster.common.ChatRoom;
 import me.tooster.common.Formatter;
 import me.tooster.common.proto.Messages;
 
 import java.util.*;
-import java.util.logging.Logger;
 
-import static me.tooster.server.ServerCommand.*;
+import static me.tooster.MTG.MTGCommand.*;
 
 
 /**
@@ -16,26 +17,28 @@ import static me.tooster.server.ServerCommand.*;
  */
 public class Hub implements ChatRoom<User> {
 
-    public static final Logger LOGGER;
-
-    static {
-        System.setProperty("java.util.logging.config.file",
-                Hub.class.getClassLoader().getResource("logging.properties").getFile());
-        LOGGER = Logger.getLogger(Hub.class.getName());
-    }
-
-    public final HubStateMachine hubFSM;
-
     public final Map<Long, User> users;// users connected to session
     public       Integer         userSlots;
+    public       MTGStateMachine fsm;
 
-    public Hub() {
-        hubFSM = new HubStateMachine(this);
+    private Hub() {
         users = Collections.synchronizedMap(new HashMap<>(2));
         userSlots = 2;
-        hubFSM.start();
     }
 
+    /**
+     * Static factory method to make new hubs
+     *
+     * @param slots
+     * @return
+     */
+    public static Hub makeHub(int slots) {
+        Hub hub = new Hub();
+        hub.userSlots = slots;
+        hub.fsm = new MTGStateMachine(hub, slots);
+        hub.fsm.start();
+        return hub;
+    }
     //------------------------------------------------------------------------------------------------------------------
 
     /**
@@ -45,24 +48,35 @@ public class Hub implements ChatRoom<User> {
      * Sends welcome message to user
      *
      * @param user user to add
+     * @return returns true if player was added to the hub and false otherwise
      */
-    void addUser(User user) {
-        assert (!users.containsKey(user.serverTag));
+    synchronized boolean addUser(User user) {
+        if (users.size() == userSlots || users.containsKey(user.serverTag)) return false;
         users.put(user.serverTag, user);
         user.hub = this;
         broadcast(String.format("%s joined the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
-
-        hubFSM.process(user.serverCommandController.compile(HUB_ADD_USER));
+        synchronized (fsm) {
+            if (fsm.getCurrentState() == MTGStateMachine.State.GAME_PREPARE) {
+                user.setReady(false);
+                user.mtgCommandController.enable(READY);
+                user.transmit(Messages.VisualMsg.newBuilder()
+                        .setFrom("HUB")
+                        .setTo(user.toString())
+                        .setMsg("When you are ready, type '" + READY.mainAlias() + "'."));
+            } else user.transmit(Messages.VisualMsg.newBuilder()
+                    .setVariant(Messages.VisualMsg.Variant.INVALID)
+                    .setMsg("Wait for the game to start"));
+        }
+        return true;
     }
 
-    void removeUser(User user) {
-        assert (users.containsValue(user));
+    synchronized void removeUser(User user) {
         users.remove(user.serverTag);
         user.hub = null;
         user.setReady(false);
+        user.mtgCommandController.disable(READY);
         broadcast(String.format("%s left the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
-
-        hubFSM.process(user.serverCommandController.compile(HUB_REMOVE_USER));
+        // TODO: forfeit
     }
 
     @Override
@@ -73,10 +87,9 @@ public class Hub implements ChatRoom<User> {
     }
 
     @Override
-    public void shout(User user, String message){
-        synchronized (users){
+    public void shout(User user, String message) {
+        synchronized (users) {
             users.values().forEach(u -> u.transmit(Messages.VisualMsg.newBuilder().setFrom(user.toString()).setTo("HUB").setMsg(message)));
         }
     }
-
 }

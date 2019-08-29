@@ -81,11 +81,7 @@ public enum Formatter {
      * @return formatted message
      */
     public static String response(@NotNull String msg) { // FIXME
-        return BLUE +
-                "#==============================================================================#\n" +
-                formatAllLines("#= %-74s =#", msg) + "\n" +
-                "#==============================================================================#" +
-                RESET;
+        return INVERT + formatAllLines("#= %-74s =#", msg) + "\n" + RESET;
     }
 
     /**
