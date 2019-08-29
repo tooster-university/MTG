@@ -1,7 +1,7 @@
 package me.tooster.MTG;
 
 /**
- * Contains standard MTG keywords ,which can be later used serverIn configuration files.
+ * Contains standard MTG keywords ,which can be later used in configuration files.
  */
 public enum Keyword {
     // keyword actions

@@ -3,6 +3,7 @@ package me.tooster.common;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,7 +82,7 @@ public enum Formatter {
      * @return formatted message
      */
     public static String response(@NotNull String msg) { // FIXME
-        return INVERT + formatAllLines("#= %-74s =#", msg) + "\n" + RESET;
+        return formatAllLines(INVERT+" %-40s\t"+RESET+"\n", msg);
     }
 
     /**
@@ -149,7 +150,7 @@ public enum Formatter {
      * </pre>
      *
      * @param elements array of string elements
-     * @return single formatted string representing array of elements as serverIn the order as serverIn <b>elements</b>
+     * @return single formatted string representing array of elements as in the order as in <b>elements</b>
      */
     public static String list(@NotNull Object[] elements) {
         String[] t = new String[elements.length];
@@ -168,10 +169,15 @@ public enum Formatter {
      */
     public static String formatAllLines(String format, String msg, String... args) {
         String[] lines = msg.split("\\r?\\n");
+        var formatArgs = new ArrayList<String>();
+        formatArgs.add(""); // add dummy to be replaced by line
+        formatArgs.addAll(Arrays.asList(args)); // append other args
 
         StringBuilder sb = new StringBuilder();
-        for (String line : lines)
-            sb.append(String.format(format, line, args));
+        for (String line : lines) {
+            formatArgs.set(0, line);
+            sb.append(String.format(format, formatArgs.toArray()));
+        }
 
         return sb.toString();
     }
@@ -214,7 +220,7 @@ public enum Formatter {
                 start = regexMatcher.start();
                 end = regexMatcher.end();
             }
-        return input.substring(0,start) + input.substring(end);
+        return input.substring(0, start) + input.substring(end);
     }
 
     /**

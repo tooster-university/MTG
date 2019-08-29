@@ -55,7 +55,6 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
     }
 
 
-
     public enum State implements FiniteStateMachine.State<State, MTGStateMachine, Compiled<MTGCommand>> {
         GAME_PREPARE {
             @Override
@@ -81,8 +80,14 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
 
                     case DECK_SHOW: {
                         try {
-                            String deckName = input[0].arg(2);
-                            Set<Map.Entry<String, Object>> cards = ResourceManager.getInstance().getDeck(deckName).entrySet();
+                            String deckName = input[0].arg(1);
+                            if (deckName.isBlank()) {
+                                user.transmit(VisualMsg.newBuilder()
+                                        .setVariant(VisualMsg.Variant.INVALID)
+                                        .setMsg("You have to specify deck's name."));
+                                return this;
+                            }
+                            var cards = ((Map<String, Integer>) ResourceManager.getInstance().getDeck(deckName).get("library")).entrySet();
                             String[] strings = cards.stream().map(e -> e.getKey() + " x" + e.getValue()).toArray(String[]::new);
                             Arrays.sort(strings);
                             user.transmit(VisualMsg.newBuilder()
@@ -93,12 +98,23 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
                                     .setVariant(VisualMsg.Variant.ERROR)
                                     .setMsg(e.getMessage()));
                         }
+                        break;
                     }
 
                     case DECK_SELECT: {
                         try {
                             String deckName = input[0].arg(2);
+                            if (deckName.isBlank()) {
+                                user.transmit(VisualMsg.newBuilder()
+                                        .setVariant(VisualMsg.Variant.INVALID)
+                                        .setMsg("You have to specify deck's name."));
+                                return this;
+                            }
                             Deck.build(user, deckName);
+                            user.transmit(VisualMsg.newBuilder()
+                                    .setFrom("HUB")
+                                    .setTo(user.toString())
+                                    .setMsg(String.format("You'r deck: '%s'.", user.deck.getProperties().get("name"))));
                         } catch (DeckException e) {
                             user.transmit(VisualMsg.newBuilder()
                                     .setVariant(VisualMsg.Variant.ERROR)
@@ -141,7 +157,17 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
             }
         }, // deck select etc.
 
-        DRAW_HAND, // mulligans phase
+        DRAW_HAND{
+            @Override
+            public void onEnter(MTGStateMachine fsm, State prevState) {
+                fsm.hub.broadcast("Game started. Order: " + fsm.users.toString());
+            }
+
+            @Override
+            public State process(MTGStateMachine fsm, Compiled<MTGCommand>... input) {
+                return super.process(fsm, input);
+            }
+        }, // mulligans phase
 
         // game gamePhase
         UNTAP,

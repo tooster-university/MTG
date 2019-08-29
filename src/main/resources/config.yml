@@ -13,7 +13,7 @@ initial_HP: 20
 max_hand: 7
 # minimal library size
 min_library: 60
-# maximum number of rules serverIn sideboard
+# maximum number of rules in sideboard
 max_sideboard: 15
 # acceptable: new(london), old(vancouver)
 mulligan: new

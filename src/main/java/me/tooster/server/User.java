@@ -165,51 +165,58 @@ public class User {
             }
 
             case COMMANDMSG: { // client sent command
-                String input = msg.getCommandMsg().getCommand();
-                var parsed = serverCommandController.parse(input);
 
-                if (parsed.cmd == null) {
-                    var mtgParsed = mtgCommandController.parse(input); // try to parse mtg command
-                    if (mtgParsed.cmd != null)
-                        hub.fsm.process(mtgParsed);
-                    else { // default to '/say'
-                        input = SAY.mainAlias() + " " + input;
-                        parsed = serverCommandController.parse(input); // parse again to SAY
-                    }
+                String input = msg.getCommandMsg().getCommand();
+                Compiled mtgParsed = mtgCommandController.parse(input);
+                Compiled parsed = serverCommandController.parse(input);
+
+                if (mtgParsed.cmd != null && !mtgParsed.isEnabled() ||
+                        parsed.cmd != null && !parsed.isEnabled()) { // mtgCMD has priority over serverCMD
+                    transmit(VisualMsg.newBuilder()
+                            .setVariant(VisualMsg.Variant.ERROR)
+                            .setMsg("Command not available right now."));
+                    return;
+                }
+
+                if (mtgParsed.cmd != null) {
+                    hub.fsm.process(mtgParsed);
                 } else {
-                    if (!parsed.isEnabled()) {
-                        transmit(VisualMsg.newBuilder()
-                                .setVariant(VisualMsg.Variant.ERROR)
-                                .setMsg("Command not available right now."));
-                    } else switch (parsed.cmd) {
+                    Compiled<ServerCommand> command = parsed;
+                    if (command.cmd == null) { // default to '/say'
+                        input = SAY.mainAlias() + " " + input;
+                        command = serverCommandController.parse(input); // parse again to SAY
+                    }
+                    if (!command.isEnabled()) throw new IllegalArgumentException();
+
+                    switch (command.cmd) {
                         case SHOUT:
                         case SAY: {
-                            if (parsed.args.length < 2) { // if single /say or /shout without text was received, send usage
+                            if (command.args.length < 2) { // if single /say or /shout without text was received, send usage
                                 transmit(VisualMsg.newBuilder()
                                         .setVariant(VisualMsg.Variant.INVALID)
-                                        .setMsg(parsed.cmd.help()));
+                                        .setMsg(command.cmd.help()));
                                 return;
                             }
                             // remove command from text and strip if it is shout
                             var text = Formatter.removePart(0, input);
 
                             // if say and hub exists -> say, otherwise shout to server
-                            if (parsed.cmd == SAY && hub != null) hub.shout(this, text);
+                            if (command.cmd == SAY && hub != null) hub.shout(this, text);
                             else Server.getInstance().shout(this, text);
                             break;
                         }
 
                         case WHISPER: {
-                            if (parsed.args.length < 3) { // if whisper doesn't have recipient and text specified, send usage
+                            if (command.args.length < 3) { // if whisper doesn't have recipient and text specified, send usage
                                 transmit(VisualMsg.newBuilder()
                                         .setVariant(VisualMsg.Variant.INVALID)
-                                        .setMsg(parsed.cmd.help()));
+                                        .setMsg(command.cmd.help()));
                                 return;
                             }
                             // remove command and recipient from command
                             var text = Formatter.removePart(0, Formatter.removePart(1, input));
 
-                            User target = Server.getInstance().findUser(parsed.args[1]);
+                            User target = Server.getInstance().findUser(command.args[1]);
                             if (target == null || target == this)
                                 transmit(VisualMsg.newBuilder()
                                         .setVariant(VisualMsg.Variant.INVALID)
@@ -227,20 +234,33 @@ public class User {
                         }
 
                         case HELP: {
-                            if (parsed.args.length > 1) { // help for specific command
-                                var helpCmd = serverCommandController.parse(parsed.arg(1)).cmd;
+                            if (command.args.length > 1) { // help for specific command
+                                var helpCmd = serverCommandController.parse(command.arg(1)).cmd;
+                                if (helpCmd != null) {
+                                    transmit(VisualMsg.newBuilder()
+                                            .setVariant(VisualMsg.Variant.CHAT)
+                                            .setFrom("SERVER")
+                                            .setMsg(Command.help(helpCmd)));
+
+                                } else {
+                                    var helpMtgCmd = mtgCommandController.parse(command.arg(1)).cmd;
+                                    transmit(VisualMsg.newBuilder()
+                                            .setVariant(helpMtgCmd == null || !helpMtgCmd.hasHelp() ? VisualMsg.Variant.INVALID
+                                                                                                    : VisualMsg.Variant.CHAT)
+                                            .setFrom("SERVER")
+                                            .setMsg(Command.help(helpCmd)));
+                                }
+                            } else {// global help
                                 transmit(VisualMsg.newBuilder()
-                                        .setVariant(
-                                                helpCmd == null || !helpCmd.hasAlias() ? VisualMsg.Variant.INVALID : VisualMsg.Variant.CHAT)
                                         .setFrom("SERVER")
-                                        .setMsg(Command.help(helpCmd)));
-                            } else // global help
+                                        .setMsg(String.join("\n", serverCommandController.enabledCommands.stream()
+                                                .map(c -> Command.help(c)).toArray(String[]::new))));
+
                                 transmit(VisualMsg.newBuilder()
-                                        .setFrom("SERVER")
-                                        .setMsg(String.join("\n",
-                                                serverCommandController.enabledCommands.stream()
-                                                        .map(c -> Command.help(c))
-                                                        .toArray(String[]::new))));
+                                        .setFrom("HUB")
+                                        .setMsg(String.join("\n", mtgCommandController.enabledCommands.stream()
+                                                .map(c -> Command.help(c)).toArray(String[]::new))));
+                            }
                             break;
                         }
 
@@ -251,14 +271,16 @@ public class User {
                                             Server.getInstance().users.values().stream().map(User::toString).toArray(String[]::new))));
                         }
                     }
-                    break;
                 }
+                break;
             }
+
             case MSGTYPE_NOT_SET: {
                 Server.LOGGER.warning("Received empty message while listening.");
                 break;
             }
         }
+
     }
 
     /**

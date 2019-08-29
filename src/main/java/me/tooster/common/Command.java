@@ -12,7 +12,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 
 /**
- * Interface for commands with alias. Each command can be compiled with code serverIn format
+ * Interface for commands with alias. Each command can be compiled with code in format
  * <pre>new ServerCommand.Compiled(ServerCommand.ECHO, data)</pre>
  * Command interface works best when used with enums.
  * All non-internal commands(without alias) should have help annotation
@@ -191,7 +191,7 @@ public interface Command {
         /**
          * Sets the mask anew. Masked command is not affected by enable/disable/setEnabled commands.
          *
-         * @param commands commands to set serverIn the mask, rest will be unset
+         * @param commands commands to set in the mask, rest will be unset
          */
         public void setMasked(CMD... commands) {
             commandMask.clear();
@@ -216,7 +216,7 @@ public interface Command {
          * Checks if command is in mask. Masked command is not affected by enable/disable/setEnabled commands.
          *
          * @param command command to check
-         * @return true iff command is set serverIn mask
+         * @return true iff command is set in mask
          */
         public boolean isMasked(CMD command) { return commandMask.contains(command);}
 
@@ -288,7 +288,7 @@ public interface Command {
         public boolean isEnabled() { return controller.isEnabled(this.cmd); }
 
         /**
-         * @return true iff command is serverIn mask serverIn it's controller
+         * @return true iff command is in mask in it's controller
          */
         public boolean isMasked() {return controller.isMasked(this.cmd);}
 

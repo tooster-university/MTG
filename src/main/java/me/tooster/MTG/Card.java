@@ -8,13 +8,13 @@ import me.tooster.MTG.exceptions.ManaFormatException;
 import java.util.*;
 
 /**
- * @brief represents card-object, be it serverIn the hand, graveyard or on the board
+ * @brief represents card-object, be it in the hand, graveyard or on the board
  */
 public class Card {
     private       Integer             ID;                                 // integer id that will be displayed on the board.
     // Set by engine
     private final Deck                deck;                            // deck containing the card
-    private       Deck.Pile           pile;                             // pile serverIn which the card currently is
+    private       Deck.Pile           pile;                             // pile in which the card currently is
     private       User                owner;                               // owner of the card i.e. player, whose deck
     // contained this card
     private       User                controller;                          // pile containing current card
@@ -40,7 +40,7 @@ public class Card {
 
     /**
      * Card-instance specific flags that modify it's behaviour.
-     * For example blocker that due to enchantment can attack will have CAN_ATTACK enabled serverIn it's set
+     * For example blocker that due to enchantment can attack will have CAN_ATTACK enabled in it's set
      */
     public enum Flag {
         CAN_TAP, CAN_UNTAP, CAN_ATTACK, CAN_DEFEND,
