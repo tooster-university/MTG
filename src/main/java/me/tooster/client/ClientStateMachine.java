@@ -38,8 +38,8 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
                 } else if (compiled.cmd == CONNECT) {
                     fsm.client.serverIP = compiled.arg(1);
                     try {fsm.client.serverPort = Integer.parseInt(compiled.arg(2));} catch (NumberFormatException ignored) {}
-                    if(fsm.client.serverIP.isBlank()) fsm.client.serverIP = fsm.client.config.get("serverIP");
-                    if(fsm.client.serverPort == null) fsm.client.serverPort = Integer.valueOf(fsm.client.config.get("serverPort"));
+                    if (fsm.client.serverIP.isBlank()) fsm.client.serverIP = fsm.client.config.get("serverIP");
+                    if (fsm.client.serverPort == null) fsm.client.serverPort = Integer.valueOf(fsm.client.config.get("serverPort"));
                     return CONNECTING;
                 }
 
@@ -93,10 +93,10 @@ class ClientStateMachine extends FiniteStateMachine<ClientStateMachine.State, Cl
                 }
                 switch (compiled.cmd) {
                     case CONFIG: // send only changed option
-                        fsm.client.transmit(ControlMsg.newBuilder()
+                        if (compiled.args.length < 3) fsm.client.transmit(ControlMsg.newBuilder().setCode(ControlMsg.Code.CONFIG));
+                        else fsm.client.transmit(ControlMsg.newBuilder()
                                 .setCode(ControlMsg.Code.CONFIG)
                                 .putConfiguration(compiled.arg(1), compiled.arg(2)));
-                        System.out.println(compiled.toString());
                         return this;
                     case DISCONNECT:
                     case CONNECTION_CLOSED:

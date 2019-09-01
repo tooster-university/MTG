@@ -55,28 +55,15 @@ public class Hub implements ChatRoom<User> {
         users.put(user.serverTag, user);
         user.hub = this;
         broadcast(String.format("%s joined the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
-        synchronized (fsm) {
-            if (fsm.getCurrentState() == MTGStateMachine.State.GAME_PREPARE) {
-                user.setReady(false);
-                user.mtgCommandController.enable(READY);
-                user.transmit(Messages.VisualMsg.newBuilder()
-                        .setFrom("HUB")
-                        .setTo(user.toString())
-                        .setMsg("When you are ready, type '" + READY.mainAlias() + "'."));
-            } else user.transmit(Messages.VisualMsg.newBuilder()
-                    .setVariant(Messages.VisualMsg.Variant.INVALID)
-                    .setMsg("Wait for the game to start"));
-        }
+        fsm.tryAddUser(user); // TODO: add to waiting queue if tryAddUser was a fail
         return true;
     }
 
     synchronized void removeUser(User user) {
         users.remove(user.serverTag);
         user.hub = null;
-        user.setReady(false);
-        user.mtgCommandController.disable(READY);
+        fsm.removeUser(user);
         broadcast(String.format("%s left the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
-        // TODO: forfeit
     }
 
     @Override

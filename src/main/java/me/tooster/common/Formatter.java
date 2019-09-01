@@ -82,7 +82,7 @@ public enum Formatter {
      * @return formatted message
      */
     public static String response(@NotNull String msg) { // FIXME
-        return formatAllLines(INVERT+" %-40s\t"+RESET+"\n", msg);
+        return formatAllLines(INVERT + " %-40s\t" + RESET + "\n", msg);
     }
 
     /**
@@ -141,6 +141,19 @@ public enum Formatter {
     }
 
     /**
+     * Formats the warning as:
+     * <pre>
+     * Warning in yellow inverted
+     * </pre>
+     *
+     * @param msg string to format
+     * @return formatted message
+     */
+    public static String warning(@NotNull String msg) {
+        return String.format("%s%s%s%s", Formatter.YELLOW, Formatter.INVERT, msg, Formatter.RESET);
+    }
+
+    /**
      * Formats the list of elements as:
      * <pre>
      * - element 1
@@ -157,7 +170,7 @@ public enum Formatter {
         for (int i = 0; i < elements.length; i++)
             t[i] = elements[i].toString();
 
-        return "- " + String.join("\n- ", t);
+        return elements.length == 0 ? "" : "- " + String.join("\n- ", t);
     }
 
     /**

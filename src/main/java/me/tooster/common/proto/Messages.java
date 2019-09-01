@@ -1443,13 +1443,17 @@ public final class Messages {
        */
       TIP(3),
       /**
-       * <code>PROMPT = 4;</code>
+       * <code>WARNING = 4;</code>
        */
-      PROMPT(4),
+      WARNING(4),
       /**
-       * <code>INFO = 5;</code>
+       * <code>PROMPT = 5;</code>
        */
-      INFO(5),
+      PROMPT(5),
+      /**
+       * <code>INFO = 6;</code>
+       */
+      INFO(6),
       UNRECOGNIZED(-1),
       ;
 
@@ -1474,13 +1478,17 @@ public final class Messages {
        */
       public static final int TIP_VALUE = 3;
       /**
-       * <code>PROMPT = 4;</code>
+       * <code>WARNING = 4;</code>
        */
-      public static final int PROMPT_VALUE = 4;
+      public static final int WARNING_VALUE = 4;
       /**
-       * <code>INFO = 5;</code>
+       * <code>PROMPT = 5;</code>
        */
-      public static final int INFO_VALUE = 5;
+      public static final int PROMPT_VALUE = 5;
+      /**
+       * <code>INFO = 6;</code>
+       */
+      public static final int INFO_VALUE = 6;
 
 
       public final int getNumber() {
@@ -1505,8 +1513,9 @@ public final class Messages {
           case 1: return INVALID;
           case 2: return ERROR;
           case 3: return TIP;
-          case 4: return PROMPT;
-          case 5: return INFO;
+          case 4: return WARNING;
+          case 5: return PROMPT;
+          case 6: return INFO;
           default: return null;
         }
       }
@@ -4119,20 +4128,21 @@ public final class Messages {
       "sgH\000\0227\n\tvisualMsg\030\003 \001(\0132\".me.tooster.com" +
       "mon.proto.VisualMsgH\000\0229\n\ncommandMsg\030\004 \001(" +
       "\0132#.me.tooster.common.proto.CommandMsgH\000" +
-      "B\t\n\007msgType\"\273\001\n\tVisualMsg\022\014\n\004from\030\001 \001(\t\022" +
+      "B\t\n\007msgType\"\310\001\n\tVisualMsg\022\014\n\004from\030\001 \001(\t\022" +
       "\n\n\002to\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\022;\n\007variant\030\004 \001(" +
       "\0162*.me.tooster.common.proto.VisualMsg.Va" +
-      "riant\"J\n\007Variant\022\010\n\004CHAT\020\000\022\013\n\007INVALID\020\001\022" +
-      "\t\n\005ERROR\020\002\022\007\n\003TIP\020\003\022\n\n\006PROMPT\020\004\022\010\n\004INFO\020" +
-      "\005\"\035\n\nCommandMsg\022\017\n\007command\030\001 \001(\t\"\275\002\n\nCon" +
-      "trolMsg\0226\n\004code\030\001 \001(\0162(.me.tooster.commo" +
-      "n.proto.ControlMsg.Code\022M\n\rconfiguration" +
-      "\030\002 \003(\01326.me.tooster.common.proto.Control" +
-      "Msg.ConfigurationEntry\0324\n\022ConfigurationE" +
-      "ntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"r\n\004" +
-      "Code\022\010\n\004PING\020\000\022\010\n\004PONG\020\001\022\020\n\014CLIENT_HELLO" +
-      "\020\002\022\020\n\014SERVER_HELLO\020\003\022\017\n\013SERVER_DENY\020\004\022\025\n" +
-      "\021CLIENT_DISCONNECT\020\005\022\n\n\006CONFIG\020\006b\006proto3"
+      "riant\"W\n\007Variant\022\010\n\004CHAT\020\000\022\013\n\007INVALID\020\001\022" +
+      "\t\n\005ERROR\020\002\022\007\n\003TIP\020\003\022\013\n\007WARNING\020\004\022\n\n\006PROM" +
+      "PT\020\005\022\010\n\004INFO\020\006\"\035\n\nCommandMsg\022\017\n\007command\030" +
+      "\001 \001(\t\"\275\002\n\nControlMsg\0226\n\004code\030\001 \001(\0162(.me." +
+      "tooster.common.proto.ControlMsg.Code\022M\n\r" +
+      "configuration\030\002 \003(\01326.me.tooster.common." +
+      "proto.ControlMsg.ConfigurationEntry\0324\n\022C" +
+      "onfigurationEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
+      "\002 \001(\t:\0028\001\"r\n\004Code\022\010\n\004PING\020\000\022\010\n\004PONG\020\001\022\020\n" +
+      "\014CLIENT_HELLO\020\002\022\020\n\014SERVER_HELLO\020\003\022\017\n\013SER" +
+      "VER_DENY\020\004\022\025\n\021CLIENT_DISCONNECT\020\005\022\n\n\006CON" +
+      "FIG\020\006b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

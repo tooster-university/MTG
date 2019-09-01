@@ -28,8 +28,9 @@ message VisualMsg {
         INVALID = 1; // less than error
         ERROR = 2;
         TIP = 3;
-        PROMPT = 4;
-        INFO = 5;
+        WARNING = 4;
+        PROMPT = 5;
+        INFO = 6;
     }
 }
 

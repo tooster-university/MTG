@@ -234,6 +234,8 @@ class Client {
                         break;
                     case TIP: System.out.println(Formatter.tip(text));
                         break;
+                    case WARNING: System.out.println(Formatter.warning(text));
+                        break;
                     case PROMPT: System.out.println(Formatter.prompt(text));
                         break;
                     case UNRECOGNIZED:
@@ -263,7 +265,7 @@ class Client {
             e.printStackTrace();
             listenLocalThread.interrupt(); // re-set the interrupt status
         }
-        System.out.println(String.format("%s%sDisconnected.%s", Formatter.YELLOW, Formatter.INVERT, Formatter.RESET));
+        System.out.println(Formatter.warning("Disconnected."));
     }
 
     /**

@@ -39,10 +39,6 @@ public class User {
 
     public Hub hub;
 
-    //========= MTG DATA =========
-    private boolean ready;
-    public  Deck    deck;
-
     //----------------------------------------------------------------------------------------------------------------------------
 
     /**
@@ -66,12 +62,11 @@ public class User {
         serverCommandController.setMasked(HELP, WHISPER, SAY, SHOUT, WHO);
 
         mtgCommandController = new Controller<>(MTGCommand.class, this);
-        mtgCommandController.setEnabled(DECK_SELECT, DECK_LIST, DECK_SHOW);
-        mtgCommandController.setMasked(DECK_LIST, DECK_SHOW);
 
         config = new ConcurrentHashMap<>() {{
             put("nick", "anon");
             put("fullControl", "true");
+            put("deck", "default");
         }};
     }
 
@@ -148,10 +143,14 @@ public class User {
                         break;
                     case CONFIG: // config sent later
                         Server.LOGGER.finest(String.format("#%s received config:\n%s", serverTag, msg.toString()));
-                        var oldNick = this.toString();
-                        config.putAll(receivedConfig);
-                        if (!oldNick.equals(this.toString())) // if nick changed - inform all
-                            Server.getInstance().broadcast(oldNick + " is now " + toString());
+                        if (receivedConfig.isEmpty()) {
+                            transmit(VisualMsg.newBuilder().setFrom("SERVER").setTo(this.toString()).setMsg(config.toString()));
+                        } else {
+                            var oldNick = this.toString();
+                            config.putAll(receivedConfig);
+                            if (!oldNick.equals(this.toString())) // if nick changed - inform all
+                                Server.getInstance().broadcast(oldNick + " is now " + toString());
+                        }
                         break;
                     case CLIENT_DISCONNECT: // handle disconnect cleanup work
                         Server.LOGGER.info(toString() + " requested disconnect.");
@@ -166,111 +165,112 @@ public class User {
 
             case COMMANDMSG: { // client sent command
 
-                String input = msg.getCommandMsg().getCommand();
-                Compiled mtgParsed = mtgCommandController.parse(input);
-                Compiled parsed = serverCommandController.parse(input);
 
-                if (mtgParsed.cmd != null && !mtgParsed.isEnabled() ||
-                        parsed.cmd != null && !parsed.isEnabled()) { // mtgCMD has priority over serverCMD
-                    transmit(VisualMsg.newBuilder()
-                            .setVariant(VisualMsg.Variant.ERROR)
-                            .setMsg("Command not available right now."));
-                    return;
-                }
+                try {
+                    String input = msg.getCommandMsg().getCommand();
+                    Compiled mtgParsed = mtgCommandController.parse(input);
+                    Compiled parsed = serverCommandController.parse(input);
 
-                if (mtgParsed.cmd != null) {
-                    hub.fsm.process(mtgParsed);
-                } else {
-                    Compiled<ServerCommand> command = parsed;
-                    if (command.cmd == null) { // default to '/say'
-                        input = SAY.mainAlias() + " " + input;
-                        command = serverCommandController.parse(input); // parse again to SAY
-                    }
-                    if (!command.isEnabled()) throw new IllegalArgumentException();
+                    if (mtgParsed.cmd != null && !mtgParsed.isEnabled()) throw new Command.CommandDisabledException((Command) mtgParsed.cmd);
 
-                    switch (command.cmd) {
-                        case SHOUT:
-                        case SAY: {
-                            if (command.args.length < 2) { // if single /say or /shout without text was received, send usage
-                                transmit(VisualMsg.newBuilder()
-                                        .setVariant(VisualMsg.Variant.INVALID)
-                                        .setMsg(command.cmd.help()));
-                                return;
-                            }
-                            // remove command from text and strip if it is shout
-                            var text = Formatter.removePart(0, input);
-
-                            // if say and hub exists -> say, otherwise shout to server
-                            if (command.cmd == SAY && hub != null) hub.shout(this, text);
-                            else Server.getInstance().shout(this, text);
-                            break;
+                    if (mtgParsed.cmd != null) {
+                        hub.fsm.process(mtgParsed);
+                    } else {
+                        Compiled<ServerCommand> command = parsed;
+                        if (command.cmd == null) { // default to '/say'
+                            input = SAY.mainAlias() + " " + input;
+                            command = serverCommandController.parse(input); // parse again to SAY
                         }
+                        if (!command.isEnabled()) throw new IllegalArgumentException();
 
-                        case WHISPER: {
-                            if (command.args.length < 3) { // if whisper doesn't have recipient and text specified, send usage
-                                transmit(VisualMsg.newBuilder()
-                                        .setVariant(VisualMsg.Variant.INVALID)
-                                        .setMsg(command.cmd.help()));
-                                return;
-                            }
-                            // remove command and recipient from command
-                            var text = Formatter.removePart(0, Formatter.removePart(1, input));
-
-                            User target = Server.getInstance().findUser(command.args[1]);
-                            if (target == null || target == this)
-                                transmit(VisualMsg.newBuilder()
-                                        .setVariant(VisualMsg.Variant.INVALID)
-                                        .setMsg("User is offline or too many matching recipients."));
-                            else {
-                                var chat = VisualMsg.newBuilder()
-                                        .setVariant(VisualMsg.Variant.CHAT)
-                                        .setFrom(this.toString())
-                                        .setTo(target.toString())
-                                        .setMsg(text);
-                                target.transmit(chat);
-                                this.transmit(chat);
-                            }
-                            break;
-                        }
-
-                        case HELP: {
-                            if (command.args.length > 1) { // help for specific command
-                                var helpCmd = serverCommandController.parse(command.arg(1)).cmd;
-                                if (helpCmd != null) {
+                        switch (command.cmd) {
+                            case SHOUT:
+                            case SAY: {
+                                if (command.args.length < 2) { // if single /say or /shout without text was received, send usage
                                     transmit(VisualMsg.newBuilder()
-                                            .setVariant(VisualMsg.Variant.CHAT)
-                                            .setFrom("SERVER")
-                                            .setMsg(Command.help(helpCmd)));
-
-                                } else {
-                                    var helpMtgCmd = mtgCommandController.parse(command.arg(1)).cmd;
-                                    transmit(VisualMsg.newBuilder()
-                                            .setVariant(helpMtgCmd == null || !helpMtgCmd.hasHelp() ? VisualMsg.Variant.INVALID
-                                                                                                    : VisualMsg.Variant.CHAT)
-                                            .setFrom("SERVER")
-                                            .setMsg(Command.help(helpCmd)));
+                                            .setVariant(VisualMsg.Variant.INVALID)
+                                            .setMsg(command.cmd.help()));
+                                    return;
                                 }
-                            } else {// global help
+                                // remove command from text and strip if it is shout
+                                var text = Formatter.removePart(0, input);
+
+                                // if say and hub exists -> say, otherwise shout to server
+                                if (command.cmd == SAY && hub != null) hub.shout(this, text);
+                                else Server.getInstance().shout(this, text);
+                                break;
+                            }
+
+                            case WHISPER: {
+                                if (command.args.length < 3) { // if whisper doesn't have recipient and text specified, send usage
+                                    transmit(VisualMsg.newBuilder()
+                                            .setVariant(VisualMsg.Variant.INVALID)
+                                            .setMsg(command.cmd.help()));
+                                    return;
+                                }
+                                // remove command and recipient from command
+                                var text = Formatter.removePart(0, Formatter.removePart(1, input));
+
+                                User target = Server.getInstance().findUser(command.args[1]);
+                                if (target == null || target == this)
+                                    transmit(VisualMsg.newBuilder()
+                                            .setVariant(VisualMsg.Variant.INVALID)
+                                            .setMsg("User is offline or too many matching recipients."));
+                                else {
+                                    var chat = VisualMsg.newBuilder()
+                                            .setVariant(VisualMsg.Variant.CHAT)
+                                            .setFrom(this.toString())
+                                            .setTo(target.toString())
+                                            .setMsg(text);
+                                    target.transmit(chat);
+                                    this.transmit(chat);
+                                }
+                                break;
+                            }
+
+                            case HELP: {
+                                if (command.args.length > 1) { // help for specific command
+                                    var helpCmd = serverCommandController.parse(command.arg(1)).cmd;
+                                    if (helpCmd != null) {
+                                        transmit(VisualMsg.newBuilder()
+                                                .setVariant(VisualMsg.Variant.CHAT)
+                                                .setFrom("SERVER")
+                                                .setMsg(Command.help(helpCmd)));
+
+                                    } else {
+                                        var helpMtgCmd = mtgCommandController.parse(command.arg(1)).cmd;
+                                        transmit(VisualMsg.newBuilder()
+                                                .setVariant(helpMtgCmd == null || !helpMtgCmd.hasHelp() ? VisualMsg.Variant.INVALID
+                                                                                                        : VisualMsg.Variant.CHAT)
+                                                .setFrom("SERVER")
+                                                .setMsg(Command.help(helpCmd)));
+                                    }
+                                } else {// global help
+                                    transmit(VisualMsg.newBuilder()
+                                            .setFrom("SERVER")
+                                            .setMsg(String.join("\n", serverCommandController.enabledCommands.stream()
+                                                    .map(c -> Command.help(c)).toArray(String[]::new))));
+
+                                    transmit(VisualMsg.newBuilder()
+                                            .setFrom("HUB")
+                                            .setMsg(String.join("\n", mtgCommandController.enabledCommands.stream()
+                                                    .map(c -> Command.help(c)).toArray(String[]::new))));
+                                }
+                                break;
+                            }
+
+                            case WHO: {
                                 transmit(VisualMsg.newBuilder()
                                         .setFrom("SERVER")
-                                        .setMsg(String.join("\n", serverCommandController.enabledCommands.stream()
-                                                .map(c -> Command.help(c)).toArray(String[]::new))));
-
-                                transmit(VisualMsg.newBuilder()
-                                        .setFrom("HUB")
-                                        .setMsg(String.join("\n", mtgCommandController.enabledCommands.stream()
-                                                .map(c -> Command.help(c)).toArray(String[]::new))));
+                                        .setMsg("Online users: " + String.join(", ",
+                                                Server.getInstance().users.values().stream().map(User::toString).toArray(String[]::new))));
                             }
-                            break;
-                        }
-
-                        case WHO: {
-                            transmit(VisualMsg.newBuilder()
-                                    .setFrom("SERVER")
-                                    .setMsg("Online users: " + String.join(", ",
-                                            Server.getInstance().users.values().stream().map(User::toString).toArray(String[]::new))));
                         }
                     }
+                } catch (CommandDisabledException e) {
+                    transmit(VisualMsg.newBuilder()
+                            .setVariant(VisualMsg.Variant.ERROR)
+                            .setMsg(e.getMessage()));
                 }
                 break;
             }
@@ -326,15 +326,6 @@ public class User {
     }
 
     //----------------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Sets player ready to game status and returns true if he is indeed ready and false otherwise
-     */
-    public boolean setReady(boolean ready) {
-        return this.ready = ready && deck != null;
-    }
-
-    public boolean isReady() { return ready;}
 
 
     /**

@@ -30,12 +30,13 @@ public class ResourceManager {
 
     private static final ResourceManager instance = new ResourceManager();
 
-    public static ResourceManager getInstance() { return instance; }
+    public static ResourceManager instance() { return instance; }
 
     private ResourceManager() { importAll(); }
     //------------------------------------------------------------------------------------------------------------------
 
 
+    private Map<String, Object>              config    = new HashMap<>(); // config.yml
     private Map<String, Map<String, Object>> decksYAML = new HashMap<>(); // mapping deck_name -> deckYML
     private Map<String, Map<String, Object>> cardsYAML = new HashMap<>(); // mappings card_name -> cardYML
 
@@ -57,6 +58,22 @@ public class ResourceManager {
 
         } else
             throw new IllegalArgumentException("No such yaml file.");
+    }
+
+    /**
+     * Re-imports the config file.
+     * @param configPath path to the config.yml file
+     * @return returns true if config was imported successfully
+     */
+    public boolean importConfig(Path configPath) {
+        try {
+            config = loadYAML(configPath);
+            LOGGER.config("Imported config.yml");
+            return true;
+        } catch (FileNotFoundException e) {
+            LOGGER.severe("Couldn't import config.yml");
+            return false;
+        }
     }
 
     /**
@@ -97,8 +114,11 @@ public class ResourceManager {
      * (re)imports deck from decks/ folder
      * yml/yaml extension can be omitted.
      * Fails silently with error to error stream if deck didn't import correctly
+     *
+     * @param deckPath path to the deck
+     * @return returns tru if import was successful, false otherwise
      */
-    public void importDeck(Path deckPath) {
+    public boolean importDeck(Path deckPath) {
         try {
             Map<String, Object> deckYAML = loadYAML(deckPath);
             String name = (String) deckYAML.get("name");
@@ -122,15 +142,21 @@ public class ResourceManager {
 
             decksYAML.put(name, deckYAML); // save to decks map in library
             LOGGER.config("Imported deck '" + name + "'");
+            return true;
         } catch (YAMLException | FileNotFoundException e) {
             LOGGER.warning("Couldn't import deck '" + deckPath.getFileName() + "': \n" + e.toString());
+            return false;
         }
     }
 
+    /**
+     * Imports all resources - cards, decks and config.yml file
+     */
     public void importAll() {
         // walk the cards files
-        Stream<Path> cards = null;
         try {
+            importConfig(Paths.get(getClass().getResource("/config.yml").toURI()));
+            Stream<Path> cards = null;
             cards = Files.walk(Paths.get(getClass().getResource("/cards").toURI()));
             cards.filter(Files::isRegularFile).forEach(this::importCard);
 
@@ -141,6 +167,11 @@ public class ResourceManager {
             throw new RuntimeException("ResourceManager critical error. Cannot load cards or decks folder");
         }
     }
+
+    /**
+     * @return Returns loaded config
+     */
+    public Map<String, Object> getConfig() {return Collections.unmodifiableMap(config);}
 
     /**
      * Returns propertiesYML file for imported card

@@ -1,15 +1,11 @@
 package me.tooster.common;
 
-import me.tooster.MTG.Mana;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.*;
-import java.lang.reflect.Field;
-import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Objects;
 
 /**
  * Interface for commands with alias. Each command can be compiled with code in format
@@ -149,7 +145,7 @@ public interface Command {
         }
 
         /**
-         * Sets the enabled commands anew with respect to the mask.
+         * Sets the enabled commands anew only if commands are not in the mask..
          *
          * @param commands commands to set as enabled, rest will be disabled
          */
@@ -161,7 +157,7 @@ public interface Command {
         }
 
         /**
-         * Enables commands with respect to the mask.
+         * Enables commands only if commands are not in the mask.
          *
          * @param commands commands to enable
          */
@@ -172,7 +168,7 @@ public interface Command {
         }
 
         /**
-         * Disables commands with respect to the mask.
+         * Disables commands only if commands are not in the mask.
          *
          * @param commands commands to disable
          */
@@ -310,6 +306,12 @@ public interface Command {
         @Override
         public String toString() {
             return cmd + "> " + String.join(" ", args);
+        }
+    }
+
+    class CommandDisabledException extends RuntimeException{
+        public CommandDisabledException(Command command) {
+            super(command + " is disabled right now.");
         }
     }
 

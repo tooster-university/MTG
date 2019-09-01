@@ -54,6 +54,7 @@ public class Mana {
 
     /**
      * Creates mana object representing mana cost or mana poll.
+     *
      * @param mana Mana format consisting of any combination of:
      *             <ul>
      *             <li>color mana symbols: W,U,B,R,G</li>
@@ -64,7 +65,7 @@ public class Mana {
      *             </ul>
      */
     public Mana(String mana) throws ManaFormatException {
-        if(mana == null || mana.equals("0"))
+        if (mana == null || mana.equals("0"))
             return;
 
         Pattern manaRegex = Pattern.compile("[\\dWUBRGCX]+");
@@ -84,6 +85,11 @@ public class Mana {
             if (color != null) pool.put(color, pool.getOrDefault(color, 0) + 1);
         }
     }
+
+    /**
+     * See {@link me.tooster.MTG.Mana#Mana(String)}.
+     */
+    public Mana() {this(null);}
 
     /**
      * @return Returns representation of mana object with standard symbols: W, U, B, R, G, C, &lt;integer&gt;

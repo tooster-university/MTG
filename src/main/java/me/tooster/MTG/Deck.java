@@ -1,52 +1,51 @@
 package me.tooster.MTG;
 
-import me.tooster.server.User;
 import me.tooster.server.ResourceManager;
 import me.tooster.MTG.exceptions.CardException;
 import me.tooster.MTG.exceptions.DeckException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class Deck {
 
-    private       User                           owner;
-    private final Map<String, Object>            properties; // properties from YAML file
+    public final  PlayerData                     owner;
+    public final  Map<String, Object>            model; // model from YAML file
     private final EnumMap<Pile, ArrayList<Card>> piles = new EnumMap<>(Pile.class);
+    private       int                            size; // initial size of deck, useful for when we don't want to count tokens on board
+    private       int                            sideboardSize;
 
 
     public enum Pile {
-        LIBRARY, HAND, GRAVEYARD, EXILE, SIDEBOARD, TABLE;
+        LIBRARY, HAND, GRAVEYARD, EXILE, SIDEBOARD, BOARD;
 
         private static final Pile[] cached = Pile.values();
 
         public static Pile[] cachedValues() { return cached;}
     }
 
-
-    private Deck(@NotNull User owner, @NotNull Map<String, Object> properties) throws CardException {
-        this.properties = properties;
+    //------------------------------------
+    private Deck(@NotNull PlayerData owner, @NotNull Map<String, Object> model) throws CardException {
+        this.model = model;
         this.owner = owner;
         for (Pile pile : Pile.cachedValues()) piles.put(pile, new ArrayList<>());
     }
 
-    public void setOwner(User owner) { this.owner = owner; }
-
-    public User getOwner() { return owner; }
-
-    public Map<String, Object> getProperties() { return properties; }
+    /**
+     * @return Returns size of this deck i.e. sum of cards in all the piles
+     */
+    public int size(boolean withSideboard) { return withSideboard ? size + sideboardSize : size; }
 
     /**
      * Returns unmodifiable list of cards in the given pile
      *
-     * @param pile
-     * @return
+     * @param pile pile to get
+     * @return Returns UNMODIFIABLE list of piles
      */
     public List<Card> getPile(Pile pile) {
-        return
-                Collections.unmodifiableList(piles.get(pile));
+        return Collections.unmodifiableList(piles.get(pile));
     }
-
 
     /**
      * Resets deck - puts all cards in library, shuffles, changes mulligan counter to 0
@@ -90,32 +89,48 @@ public class Deck {
     }
 
     /**
-     * Deck factory. Builds and assigns deck to the player.
+     * Deck factory. Builds and assigns deck to the player, resets the deck to playable state aka clears piles leaving only LIB.
+     * See {@link me.tooster.MTG.Deck#load(Supplier, PlayerData, String)}
      *
-     * @param deckname name of the deck imported into program
-     *                 - should be in the list returned by <code>ResourceManager.getInstance().getDecks()</code>
-     *                 If it was imported, it meets the composition of a deck: compulsory name, library fields and
-     *                 optional sideboard field
-     * @return new Deck object if deck was successfully created
+     * @return returns new Deck with cards only in LIBRARY and SIDEBOARD if deck was successfully created
      */
-    public static Deck build(User owner, String deckname) throws DeckException, CardException {
-        Deck deck = new Deck(owner, ResourceManager.getInstance().getDeck(deckname));
-        owner.deck = deck;
-        for (Pile pile : Pile.cachedValues()) { // for all piles saved in deck.yml file
-            Map<String, Integer> cardsYAML =
-                    (Map<String, Integer>) deck.properties.getOrDefault(pile.toString().toLowerCase(), Collections.emptyMap());
-            ArrayList<Card> cardsPile = deck.piles.get(pile);
-            for (Map.Entry<String, Integer> cardYAML : cardsYAML.entrySet()) // iterate over every card
-                for (int i = 0; i < cardYAML.getValue(); i++) { // add <count> cards to deck
-                    Card c = Card.build(deck, cardYAML.getKey());
-//                    c.setID(owner.hub.nextID());
-//                    owner.hub.registerObject(c.getID(), c);
-                    cardsPile.add(c);
-                }
+    public static Deck build(Supplier<Integer> IDGenerator, @NotNull PlayerData owner, @NotNull String deckName)
+            throws DeckException, CardException {
 
-        }
+        Deck deck = load(IDGenerator, owner, deckName);
+        deck.reset();
         return deck;
     }
 
+    /**
+     * @param IDGenerator generator for unique ID's of objects in game
+     * @param deckName    name of the deck imported into program
+     *                    - should be in the list returned by <code>ResourceManager.instance().getDecks()</code>
+     *                    If it was imported, it meets the composition of a deck: compulsory name, library fields and
+     *                    optional sideboard field
+     * @param owner       to-be-owner of this deck. Decks are not transitive between players.
+     * @return returns new Deck as loaded from YAML (all cards in respective piles) if deck was successfully created
+     */
+    public static Deck load(Supplier<Integer> IDGenerator, @NotNull PlayerData owner, @NotNull String deckName)
+            throws DeckException, CardException {
+
+        Deck deck = new Deck(owner, Collections.unmodifiableMap(ResourceManager.instance().getDeck(deckName)));
+        for (Pile pile : Pile.cachedValues()) { // for all piles saved in deck.yml file
+            Map<String, Integer> cardsYAML =
+                    (Map<String, Integer>) deck.model.getOrDefault(pile.toString().toLowerCase(), Collections.emptyMap());
+            ArrayList<Card> cardsPile = deck.piles.get(pile);
+            for (Map.Entry<String, Integer> cardYAML : cardsYAML.entrySet()) // iterate over every card
+                for (int i = 0; i < cardYAML.getValue(); i++) { // add <count> cards to deck
+                    Card c = Card.build(IDGenerator.get(), deck, cardYAML.getKey());
+                    cardsPile.add(c);
+                }
+
+            deck.size =
+                    deck.piles.entrySet().stream().filter(kv -> kv.getKey() != Pile.SIDEBOARD).mapToInt(kv -> kv.getValue().size()).sum();
+            deck.sideboardSize =
+                    deck.piles.entrySet().stream().filter(kv -> kv.getKey() == Pile.SIDEBOARD).mapToInt(kv -> kv.getValue().size()).sum();
+        }
+        return deck;
+    }
 
 }

@@ -49,7 +49,7 @@ public class Server implements ChatRoom<User> {
             LOGGER.info("Server started at port" + port + ".");
 
             LOGGER.fine("Fetching data from resources...");
-            ResourceManager.getInstance(); // prefetch decks
+            ResourceManager.instance(); // prefetch decks
 
             LOGGER.fine("Initializing the hub.");
             hub = Hub.makeHub(2);
