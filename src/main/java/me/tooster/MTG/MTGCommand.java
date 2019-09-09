@@ -22,6 +22,8 @@ public enum MTGCommand implements Command {
     @Alias("/mulligan") @Help("execute mulligan") MULLIGAN, // todo: make aliases to other commands cuz MULLIGAN === DENY
     @Alias("/keep") @Help("keep the current hand") KEEP,
 
+    @Alias("/discard") @Help("discards a card") DISCARD,
+
     @Alias({"/", "/pass"}) PASS_PRIORITY,
     @Alias({"/a", "/atk", "/attack"}) DECLARE_ATTACK,
     @Alias({"/d", "/def", "/defend"}) DECLARE_DEFEND,

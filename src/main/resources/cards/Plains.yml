@@ -1,3 +1,5 @@
 name: Plains
+supertypes:
+  - basic
 types:
   - land

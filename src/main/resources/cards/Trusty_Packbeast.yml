@@ -1,12 +1,13 @@
 name: Trusty Packbeast
+allow_many: true
 mana: 2W
-typse:
+types:
   - creature
 subtypes:
   - beast
 power: 2
 toughness: 3
-trigges:
+triggers:
   - on: enter
     by: self
     do: return

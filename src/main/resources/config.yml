@@ -5,8 +5,7 @@ version: 0.1
 
 # USER CONFIG HERE. TODO: make it count XD LUL.
 # -------------------------------------------
-# initial player's HP
-initial_HP: 20
+max_same_name_cards_in_deck: 4
 # maximum hand size
 max_hand: 7
 # minimal library size
@@ -15,3 +14,5 @@ min_library: 60
 max_sideboard: 15
 # acceptable: new(london), old(vancouver)
 mulligan: new
+# initial player's HP
+initial_HP: 20

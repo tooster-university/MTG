@@ -1,4 +1,5 @@
 name: Take Vengeance
+allow_many: true
 mana: 1W
 types:
   - sorcery

@@ -2,9 +2,11 @@ package me.tooster.MTG;
 
 import me.tooster.MTG.exceptions.InsufficientManaException;
 import me.tooster.MTG.exceptions.ManaFormatException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,9 +50,20 @@ public class Mana {
         }
     }
 
+    private EnumMap<Color, Integer> pool = new EnumMap<>(Color.class); // color mana will be >0, colorless mana... ?...
 
-    // color mana will be >0, colorless mana
-    private EnumMap<Color, Integer> pool = new EnumMap<>(Color.class);
+    /**
+     * See {@link me.tooster.MTG.Mana#Mana(String)}.
+     */
+    public Mana() {this("0");}
+
+    /**
+     * Clones the mana pool
+     * @param mana mana to clone
+     */
+    public Mana(Mana mana) {
+        pool = new EnumMap<>(mana.pool); // I hope it works as intended and doesn't use boxed primitives
+    }
 
     /**
      * Creates mana object representing mana cost or mana poll.
@@ -64,9 +77,8 @@ public class Mana {
      *             <li>generic mana: &lt;a positive integer&gt;</li>
      *             </ul>
      */
-    public Mana(String mana) throws ManaFormatException {
-        if (mana == null || mana.equals("0"))
-            return;
+    public Mana(@NotNull String mana) throws ManaFormatException {
+        if (mana.equals("0")) return;
 
         Pattern manaRegex = Pattern.compile("[\\dWUBRGCX]+");
         Matcher manaMatcher = manaRegex.matcher(mana);
@@ -85,11 +97,6 @@ public class Mana {
             if (color != null) pool.put(color, pool.getOrDefault(color, 0) + 1);
         }
     }
-
-    /**
-     * See {@link me.tooster.MTG.Mana#Mana(String)}.
-     */
-    public Mana() {this(null);}
 
     /**
      * @return Returns representation of mana object with standard symbols: W, U, B, R, G, C, &lt;integer&gt;
@@ -148,16 +155,14 @@ public class Mana {
      * WHITE, BLUE, BLACK, RED, GREEN, the color is a mix of all of the contained colors.
      * Otherwise the array contains only one item: COLORLESS
      */
-    public ArrayList<Color> getColorIdentity() {
-        ArrayList<Color> colors = new ArrayList<>();
+    public EnumSet<Color> getColorIdentity() {
+        EnumSet<Color> colors = EnumSet.noneOf(Color.class);
         for (Color mana : pool.keySet())
             if (mana.isColored()) colors.add(mana);
 
         if (colors.size() == 0) colors.add(Color.COLORLESS);
 
         return colors;
-
-
     }
 
     /**
@@ -210,7 +215,6 @@ public class Mana {
         }
         return this;
     }
-
 
     /**
      * Tries to pay <b>requiredMana</b> with stored mana pool.

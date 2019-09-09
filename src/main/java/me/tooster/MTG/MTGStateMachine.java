@@ -2,6 +2,7 @@ package me.tooster.MTG;
 
 import me.tooster.MTG.exceptions.CardException;
 import me.tooster.MTG.exceptions.DeckException;
+import me.tooster.MTG.models.DeckModel;
 import me.tooster.common.Command;
 import me.tooster.common.FiniteStateMachine;
 import me.tooster.common.Formatter;
@@ -17,15 +18,15 @@ import static me.tooster.common.proto.Messages.*;
 
 public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, MTGStateMachine, Command.Compiled<MTGCommand>> {
 
+    //TODO: jestem na etapie ładowania decków z yamla do modeli -> potem trza sięwziąć w kolejności za SBA, stack, cast, tap, ATK, DEF
 
-    private final Hub                   hub;
-    private       int                   requiredReadyCount; // how many players must be ready to start a game
-    public        Map<String, Object>   config; // config loaded from main folder
-    private final Map<User, PlayerData> playersData; // players in order
-    private final Vector<User>          playersOrder;
-    private       int                   readyCount;
-    private       int                   turnPlayerIdx;
-    private       int                   priorityPlayerIdx;
+    private final Hub                 hub;
+    private       int                 requiredReadyCount; // how many players must be ready to start a game
+    public        Map<String, Object> config; // config loaded from main folder
+    private final Map<User, Player>   playersData; // players in order
+    private final Vector<User>        playersOrder;
+    private       int                 turnPlayerIdx;
+    private       int                 priorityPlayerIdx;
 
     public MTGStateMachine(Hub hub, int requiredReadyCount) {
         super(State.GAME_PREPARE);
@@ -85,12 +86,13 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
     /**
      * Advance to the user with next priority.
      *
+     * @param verbose if true, informs players who has priority
      * @return this priority's user after advance
      */
-    private User passPriority() {
+    private User passPriority(boolean verbose) {
         priorityPlayerIdx = (++priorityPlayerIdx) % playersOrder.size();
         User priorityPlayer = playersOrder.get(priorityPlayerIdx);
-        hub.broadcast(priorityPlayer.toString() + " has priority.");
+        hub.broadcast("%ss move.", priorityPlayer);
         return priorityPlayer;
     }
 
@@ -102,25 +104,25 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
     private User passTurn() {
         turnPlayerIdx = (++turnPlayerIdx) % playersData.size();
         User turnPlayer = playersOrder.get(turnPlayerIdx);
-        hub.broadcast(turnPlayer + " has his turn.");
+        hub.broadcast("%ss turn begins.", turnPlayer);
         return turnPlayer;
     }
 
     /**
      * Transmits pile info to other user
      *
-     * @param recipient user to tsend pile info to
+     * @param recipient user to send pile info to
      * @param pd
      * @param pile
      */
-    private static void transmitPile(User recipient, PlayerData pd, Deck.Pile pile) {
+    private static void transmitPile(User recipient, Player pd, DeckModel.Pile pile) {
         pd.user.transmit(VisualMsg.newBuilder()
                 .setVariant(VisualMsg.Variant.INFO)
                 .setMsg(String.format("%s %s: [%d]%s",
                         recipient == pd.user ? "your " : pd.user,
                         pile.name().toLowerCase(),
-                        pd.deck.getPile(pile).size(),
-                        Formatter.list(pd.deck.getPile(pile).toArray()))));
+                        pd.deck.piles.get(pile).size(),
+                        Formatter.list(pd.deck.piles.get(pile).toArray()))));
     }
 
     @Override
@@ -133,7 +135,7 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
         GAME_PREPARE {
             @Override
             public void onEnter(MTGStateMachine fsm, State prevState) {
-                fsm.readyCount = fsm.turnPlayerIdx = fsm.priorityPlayerIdx = 0;
+                fsm.turnPlayerIdx = fsm.priorityPlayerIdx = 0;
                 fsm.playersData.clear();
                 fsm.playersOrder.clear();
             }
@@ -146,7 +148,7 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
                 switch (cmd) {
 
                     case DECK_LIST: {
-                        String[] decks = ResourceManager.instance().getDecks().toArray(new String[]{});
+                        String[] decks = ResourceManager.instance().getLoadedDecks().toArray(new String[]{});
                         Arrays.sort(decks);
                         user.transmit(VisualMsg.newBuilder()
                                 .setVariant(VisualMsg.Variant.INFO)
@@ -164,7 +166,7 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
                                         .setMsg("You have to specify deck's name."));
                                 return this;
                             }
-                            var cards = ((Map<String, Integer>) ResourceManager.instance().getDeck(deckName).get("library")).entrySet();
+                            var cards = ((Map<String, Integer>) ResourceManager.instance().getDeckModel(deckName).piles.get(DeckModel.Pile.LIBRARY)).entrySet();
                             String[] strings = cards.stream().map(e -> e.getKey() + " x" + e.getValue()).toArray(String[]::new);
                             Arrays.sort(strings);
                             user.transmit(VisualMsg.newBuilder()
@@ -189,15 +191,14 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
                                 return this;
                             }
                             user.config.put("deck", deckName); // safe deck name in user's config for future use
+                            user.transmit(VisualMsg.newBuilder()
+                                    .setFrom("HUB")
+                                    .setMsg("Selected deck: '" + deckName + "'"));
 
-                            if (!ResourceManager.instance().getDecks().contains(deckName)) {
+                            if (!ResourceManager.instance().getLoadedDecks().contains(deckName))
                                 user.transmit(VisualMsg.newBuilder()
                                         .setVariant(VisualMsg.Variant.WARNING)
-                                        .setMsg("You selected a deck that hasn't been imported."));
-                            } else
-                                user.transmit(VisualMsg.newBuilder()
-                                        .setFrom("HUB")
-                                        .setMsg("Selected deck: '" + deckName + "'"));
+                                        .setMsg("Deck " + deckName + " hasn't been imported."));
 
                         } catch (DeckException e) {
                             user.transmit(VisualMsg.newBuilder()
@@ -219,13 +220,9 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
                         } else {
                             wasReady = false;
                             try {
-                                var pd = new PlayerData(user);
-                                Deck deck = Deck.build(PlayerData::nextID, pd, user.config.get("deck"));
-                                if (deck.size(false) < (int) fsm.config.get("min_library"))
-                                    throw new DeckException("deck must have at least " + fsm.config.get("min_library") + "cards.");
-                                pd.deck = deck;
+                                var pd = new Player(user);
+                                pd.deck = Deck.build(Player::nextID, pd, ResourceManager.instance().getDeckModel(user.config.get("deck")));
                                 fsm.playersData.put(user, pd);
-                                fsm.readyCount += 1;
                                 isReady = true;
                             } catch (DeckException | CardException e) {
                                 user.transmit(VisualMsg.newBuilder()
@@ -235,14 +232,11 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
                             }
                         }
 
-                        // ----------------------===================||||||||||||||||||#####################################
-
-
                         if (wasReady != isReady)
-                            fsm.hub.broadcast(user.toString() + (isReady ? " is ready " : " is not ready ")
-                                    + Formatter.formatProgress(fsm.readyCount, fsm.requiredReadyCount));
+                            fsm.hub.broadcast("%s is %s. Ready players: %s", user, isReady ? "ready" : "not ready",
+                                    Formatter.formatProgress(fsm.playersData.size(), fsm.requiredReadyCount));
 
-                        if (fsm.readyCount == fsm.requiredReadyCount) return DRAW_HAND;
+                        if (fsm.playersData.size() == fsm.requiredReadyCount) return DRAW_HAND;
 
                         break;
                     }
@@ -262,44 +256,56 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
         }, // deck select etc.
 
         DRAW_HAND {
-            private void drawHand(PlayerData pd, int amount) {
-                for (int i = 0; i < amount; i++)
-                    pd.deck.move(Deck.Pile.LIBRARY, 0, Deck.Pile.HAND, 0);
-                MTGStateMachine.transmitPile(pd.user, pd, Deck.Pile.HAND);
+            /**
+             * Performs paris mulligan for player. It returns a hand to library, shuffles it and draws hand with one card less.
+             * If number of cards in hand is 0, no further mulligans can take place
+             * @param pd data of player to perform mulligan on
+             */
+            private void parisMulligan(Player pd) {
+                int size = pd.deck.piles.get(DeckModel.Pile.HAND).size();
+                pd.deck.reset();
+                Collections.shuffle(pd.deck.piles.get(DeckModel.Pile.LIBRARY));
+                drawHand(pd, size - 1);
+                if (size == 0) pd.handChoosen = true; // force start if hand size is 0
             }
 
+            /**
+             * Performs vancouver mulligan, same as paris mulligan but if mulligan was issued, player gains opportunity to scry 1
+             * @param pd data of player to perform mulligan on
+             */
+            private void vancouverMulligan(Player pd) { // same as paris, but adds `scry 1` if mulligan was taken
+                parisMulligan(pd);
+                pd.scry = 1;
+            }
 
             @Override
             public void onEnter(MTGStateMachine fsm, State prevState) {
-                fsm.hub.broadcast("Game started. Order: " +  fsm.playersOrder.toString());
+                fsm.hub.broadcast("Game started. Order: %s", fsm.playersOrder.toString());
                 fsm.playersData.values().forEach(pd -> drawHand(pd, (int) fsm.config.get("max_hand")));
-                fsm.getPriorityUser().mtgCommandController.enable(MULLIGAN, CONFIRM);
+                fsm.getPriorityUser().mtgCommandController.enable(MULLIGAN, KEEP);
             }
 
             @Override
-            public State process(MTGStateMachine fsm, Compiled<MTGCommand>... input) {
+            public State process(MTGStateMachine fsm, Compiled<MTGCommand>... input) { // right now it's paris mulligan
                 var cmd = input[0].cmd;
                 if (cmd == null) return this;
                 User user = (User) input[0].controller.owner;
-                PlayerData pd = fsm.playersData.get(user);
-                pd.handChoosen = cmd == KEEP;
+                Player pd = fsm.playersData.get(user);
+                if (!pd.handChoosen)
+                    fsm.hub.broadcast("%s decided to %s their hand.", user.toString(), cmd == KEEP ? "keep" : "mulligan");
+                if (cmd == KEEP) pd.handChoosen = true;
+                else pd.mulligansTaken++;
 
                 fsm.getPriorityUser().mtgCommandController.disable(MULLIGAN, KEEP);
-                fsm.passPriority();
+                do {fsm.passPriority(false);}
+                while (fsm.playersData.get(fsm.getPriorityUser()).handChoosen && fsm.getPriorityUser() != fsm.playersOrder.get(0));
+
                 if (fsm.getPriorityUser() == fsm.playersOrder.get(0)) { // new round of mulligans
                     fsm.playersData.values().stream()
-                            .filter(_pd -> !_pd.handChoosen).forEach(
-                            _pd -> {
-                                int size = _pd.deck.getPile(Deck.Pile.HAND).size();
-                                _pd.deck.reset();
-                                Collections.shuffle(_pd.deck.getPile(Deck.Pile.LIBRARY));
-                                drawHand(_pd, size - 1);
-                                if (size == 0) _pd.handChoosen = true;
-                            }
-                    );
+                            .filter(_pd -> !_pd.handChoosen).forEach(this::parisMulligan);
                 }
                 fsm.getPriorityUser().mtgCommandController.enable(MULLIGAN, KEEP);
-                return fsm.playersData.values().stream().allMatch(_pd -> _pd.handChoosen) ? UNTAP : this;
+                return fsm.playersData.values().stream().allMatch(_pd -> _pd.handChoosen) ? UNTAP : this; // start game if hands picked
             }
         }, // mulligansUsed phase
 
@@ -323,6 +329,18 @@ public class MTGStateMachine extends FiniteStateMachine<MTGStateMachine.State, M
 
         END_STEP,
         CLEANUP_STEP;
+
+        /**
+         * Draws cards from the top of user's library to hand and informs hub about it.
+         * @param pd data of player that draws cards
+         * @param amount
+         */
+        private static void drawHand(Player pd, int amount) {
+            for (int i = 0; i < amount; i++)
+                pd.deck.move(DeckModel.Pile.LIBRARY, 0, DeckModel.Pile.HAND, 0);
+            pd.user.hub.broadcast("%s drew %d %s", pd.user, amount, amount == 1 ? "card" : "cards");
+            MTGStateMachine.transmitPile(pd.user, pd, DeckModel.Pile.HAND);
+        }
 
         @Override
         @Deprecated

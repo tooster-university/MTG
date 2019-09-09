@@ -1,4 +1,5 @@
 name: Star Crowned Stag
+allow_many: true
 mana: 3W
 types:
   - creature

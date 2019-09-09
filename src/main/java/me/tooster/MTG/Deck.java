@@ -1,5 +1,7 @@
 package me.tooster.MTG;
 
+import me.tooster.MTG.models.CardModel;
+import me.tooster.MTG.models.DeckModel;
 import me.tooster.server.ResourceManager;
 import me.tooster.MTG.exceptions.CardException;
 import me.tooster.MTG.exceptions.DeckException;
@@ -7,44 +9,30 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static me.tooster.MTG.models.DeckModel.Pile;
 
 public class Deck {
 
-    public final  PlayerData                     owner;
-    public final  Map<String, Object>            model; // model from YAML file
-    private final EnumMap<Pile, ArrayList<Card>> piles = new EnumMap<>(Pile.class);
-    private       int                            size; // initial size of deck, useful for when we don't want to count tokens on board
-    private       int                            sideboardSize;
-
-
-    public enum Pile {
-        LIBRARY, HAND, GRAVEYARD, EXILE, SIDEBOARD, BOARD;
-
-        private static final Pile[] cached = Pile.values();
-
-        public static Pile[] cachedValues() { return cached;}
-    }
+    public final DeckModel                      model; // model from YAML file
+    public final Player                         owner;
+    public final EnumMap<Pile, ArrayList<Card>> piles;
 
     //------------------------------------
-    private Deck(@NotNull PlayerData owner, @NotNull Map<String, Object> model) throws CardException {
+
+    /**
+     * Private constructor to create a deck game object that has it's reference to the original model, it's owner and all other fields
+     * ready to safely populate
+     *
+     * @param owner owner of the deck
+     * @param model original model to build the deck from
+     */
+    private Deck(@NotNull Player owner, @NotNull DeckModel model) {
         this.model = model;
         this.owner = owner;
-        for (Pile pile : Pile.cachedValues()) piles.put(pile, new ArrayList<>());
-    }
-
-    /**
-     * @return Returns size of this deck i.e. sum of cards in all the piles
-     */
-    public int size(boolean withSideboard) { return withSideboard ? size + sideboardSize : size; }
-
-    /**
-     * Returns unmodifiable list of cards in the given pile
-     *
-     * @param pile pile to get
-     * @return Returns UNMODIFIABLE list of piles
-     */
-    public List<Card> getPile(Pile pile) {
-        return Collections.unmodifiableList(piles.get(pile));
+        piles = new EnumMap<>(Pile.class);
+        for (Pile pile : Pile.cachedValues) piles.put(pile, new ArrayList<>());
     }
 
     /**
@@ -59,8 +47,7 @@ public class Deck {
         piles.get(Pile.EXILE).clear();
         Collections.shuffle(piles.get(Pile.LIBRARY)); // built-in Fisher-Yates shuffle
 
-        for (Card card : piles.get(Pile.LIBRARY))
-            card.reset();
+        for (Card card : piles.get(Pile.LIBRARY)) card.reset();
 
     }
 
@@ -78,11 +65,11 @@ public class Deck {
      */
     public void move(Pile srcPile, int srcIdx, Pile dstPile, int dstIdx) throws DeckException {
         if (piles.get(srcPile).isEmpty())
-            throw new DeckException("Source pile is empty.");
+            throw new DeckException("Source pile is empty");
         if (srcIdx < 0 || srcIdx >= piles.get(srcPile).size())
-            throw new DeckException("Source index is invalid.");
+            throw new DeckException("Source index is invalid");
         if (dstIdx < 0 || srcIdx > piles.get(dstPile).size())
-            throw new DeckException("Destination index is invalid.");
+            throw new DeckException("Destination index is invalid");
 
         Card c = piles.get(srcPile).remove(srcIdx);
         piles.get(dstPile).add(dstIdx, c);
@@ -90,47 +77,32 @@ public class Deck {
 
     /**
      * Deck factory. Builds and assigns deck to the player, resets the deck to playable state aka clears piles leaving only LIB.
-     * See {@link me.tooster.MTG.Deck#load(Supplier, PlayerData, String)}
      *
-     * @return returns new Deck with cards only in LIBRARY and SIDEBOARD if deck was successfully created
+     * @param IDGenerator generator for unique ID's of objects in game
+     * @param model       model of the deck imported into program
+     * @param owner       to-be-owner of this deck. Decks are not transitive between players, they are assigned permanently.
+     * @return returns new Deck with state ready to play
      */
-    public static Deck build(Supplier<Integer> IDGenerator, @NotNull PlayerData owner, @NotNull String deckName)
+    public static Deck build(Supplier<Integer> IDGenerator, @NotNull Player owner, @NotNull DeckModel model)
             throws DeckException, CardException {
 
-        Deck deck = load(IDGenerator, owner, deckName);
+        Deck deck = new Deck(owner, model);
+
+        // populate piles
+        deck.piles.forEach((pile, cards) -> {
+            deck.model.piles.get(pile).forEach(cardModel -> cards.add(Card.build(IDGenerator, deck, cardModel)));
+        });
+
         deck.reset();
         return deck;
     }
 
     /**
-     * @param IDGenerator generator for unique ID's of objects in game
-     * @param deckName    name of the deck imported into program
-     *                    - should be in the list returned by <code>ResourceManager.instance().getDecks()</code>
-     *                    If it was imported, it meets the composition of a deck: compulsory name, library fields and
-     *                    optional sideboard field
-     * @param owner       to-be-owner of this deck. Decks are not transitive between players.
-     * @return returns new Deck as loaded from YAML (all cards in respective piles) if deck was successfully created
+     * @return Returns stream of cards from this deck, in no particular order.
      */
-    public static Deck load(Supplier<Integer> IDGenerator, @NotNull PlayerData owner, @NotNull String deckName)
-            throws DeckException, CardException {
-
-        Deck deck = new Deck(owner, Collections.unmodifiableMap(ResourceManager.instance().getDeck(deckName)));
-        for (Pile pile : Pile.cachedValues()) { // for all piles saved in deck.yml file
-            Map<String, Integer> cardsYAML =
-                    (Map<String, Integer>) deck.model.getOrDefault(pile.toString().toLowerCase(), Collections.emptyMap());
-            ArrayList<Card> cardsPile = deck.piles.get(pile);
-            for (Map.Entry<String, Integer> cardYAML : cardsYAML.entrySet()) // iterate over every card
-                for (int i = 0; i < cardYAML.getValue(); i++) { // add <count> cards to deck
-                    Card c = Card.build(IDGenerator.get(), deck, cardYAML.getKey());
-                    cardsPile.add(c);
-                }
-
-            deck.size =
-                    deck.piles.entrySet().stream().filter(kv -> kv.getKey() != Pile.SIDEBOARD).mapToInt(kv -> kv.getValue().size()).sum();
-            deck.sideboardSize =
-                    deck.piles.entrySet().stream().filter(kv -> kv.getKey() == Pile.SIDEBOARD).mapToInt(kv -> kv.getValue().size()).sum();
-        }
-        return deck;
+    public Stream<Card> cardStream() {
+        Stream.Builder<Card> sb = Stream.builder();
+        piles.values().stream().flatMap(Collection::stream).forEach(sb::add);
+        return sb.build();
     }
-
 }

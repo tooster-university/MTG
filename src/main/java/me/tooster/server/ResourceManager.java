@@ -1,11 +1,12 @@
 package me.tooster.server;
 
-import me.tooster.MTG.Card;
 import me.tooster.MTG.Deck;
-import me.tooster.MTG.Mana;
 import me.tooster.MTG.exceptions.CardException;
 import me.tooster.MTG.exceptions.DeckException;
 import me.tooster.MTG.exceptions.ManaFormatException;
+import me.tooster.MTG.models.CardModel;
+import me.tooster.MTG.models.DeckModel;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -14,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,77 +38,60 @@ public class ResourceManager {
     //------------------------------------------------------------------------------------------------------------------
 
 
-    private Map<String, Object>              config    = new HashMap<>(); // config.yml
-    private Map<String, Map<String, Object>> decksYAML = new HashMap<>(); // mapping deck_name -> deckYML
-    private Map<String, Map<String, Object>> cardsYAML = new HashMap<>(); // mappings card_name -> cardYML
+    private Map<String, Object>    config     = new HashMap<>(); // config.yml
+    private Map<String, DeckModel> deckModels = new HashMap<>(); // mapping deck_name -> deckYML TODO: model class
+    private Map<String, CardModel> cardModels = new HashMap<>(); // mappings card_name -> cardYML TODO: model class
 
     /**
      * Loads any YAML file with .yml or .yaml suffix, that is also not prefixed wit -- (two dashes)
      *
-     * @param path path to YAML fie
+     * @param resource resource qualified from resources root e.g. cards/falcon[.yaml|.yml]
      * @return YAML object as map
      * @throws IllegalArgumentException if yaml file doesn't exist or has improper format
      */
-    private Map<String, Object> loadYAML(Path path) throws IllegalArgumentException, FileNotFoundException {
-        String s = path.toString().toLowerCase();
+    private Map<String, Object> loadYAML(String resource) throws IllegalArgumentException, URISyntaxException, FileNotFoundException {
+        resource = resource.substring(0, resource.length() - (resource.endsWith(".yaml") ? 5 : resource.endsWith(".yml") ? 4 : 0));
+
+        var found = Paths.get(getClass().getResource(resource).toURI());
+        String s = found.getFileName().toString().toLowerCase();
         if (!s.startsWith("--") && (s.endsWith(".yml") || s.endsWith(".yaml"))) {
             Yaml yaml = new Yaml();
-            Object map = yaml.load(new BufferedInputStream(new FileInputStream(path.toString())));
-            if (!(map instanceof Map))
-                throw new YAMLException("yaml file formatted not correctly");
+            Object map = yaml.load(new BufferedInputStream(new FileInputStream(found.toString())));
+            if (!(map instanceof Map)) throw new YAMLException("yaml file formatted incorrectly");
             return (Map<String, Object>) map;
-
         } else
-            throw new IllegalArgumentException("No such yaml file.");
+            throw new IllegalArgumentException("Yaml fie mustn't start with -- and must end with .yml or .yaml");
     }
 
     /**
      * Re-imports the config file.
-     * @param configPath path to the config.yml file
+     *
      * @return returns true if config was imported successfully
      */
-    public boolean importConfig(Path configPath) {
-        try {
-            config = loadYAML(configPath);
-            LOGGER.config("Imported config.yml");
-            return true;
-        } catch (FileNotFoundException e) {
-            LOGGER.severe("Couldn't import config.yml");
-            return false;
-        }
+    public boolean importConfig() throws FileNotFoundException, URISyntaxException {
+        config = loadYAML("config");
+        LOGGER.config("Imported config.yml");
+        return true;
     }
 
     /**
      * (re)imports card from cards/ folder;
      * yml/yaml extension can be omitted.
      * Fails silently with error to error stream if card didn't import correctly
+     *
+     * @param cardModel name od card model file to load
+     * @return returns loaded model if import was successful, null otherwise
      */
-    public void importCard(Path cardPath) {
+    private CardModel importCardModel(String cardModel) {
         try {
-            Map<String, Object> cardYAML = loadYAML(cardPath);
-            String name = (String) cardYAML.get("name");
-            if (name == null)
-                throw new YAMLException("card has no 'name' field specified");
-
-            // type check
-            List<String> types = (List<String>) cardYAML.getOrDefault("types", Collections.emptyList());
-            for (String type : types)
-                Card.Type.valueOf(type.toUpperCase()); // throws if type doesn't match
-
-            // throws when mana(if exists) has invalid format
-            String mana = (String) cardYAML.get("mana");
-            if (mana != null)
-                new Mana(mana);
-
-            // ATK/DEF for creatures
-            if (types.contains("creature") && !(cardYAML.containsKey("power") && cardYAML.containsKey("toughness")))
-                throw new YAMLException("creature type must have power and toughness specified");
-
+            CardModel cm = new CardModel(loadYAML("cards/" + cardModel));
             // assign reference to default properties for the card
-            cardsYAML.put(name, cardYAML);
-            LOGGER.config("Imported card '" + name + "'");
-        } catch (YAMLException | ManaFormatException | FileNotFoundException e) {
-            LOGGER.warning("Couldn't import card '" + cardPath.getFileName() + "': \n" + e.toString());
+            cardModels.put(cm.name, cm);
+            LOGGER.config("Imported card model '" + cm.name + "'");
+            return cm;
+        } catch (YAMLException | FileNotFoundException | CardException | URISyntaxException e) {
+            LOGGER.warning("Couldn't import card model '" + cardModel + "': \n" + e.toString());
+            return null;
         }
     }
 
@@ -115,37 +100,18 @@ public class ResourceManager {
      * yml/yaml extension can be omitted.
      * Fails silently with error to error stream if deck didn't import correctly
      *
-     * @param deckPath path to the deck
-     * @return returns tru if import was successful, false otherwise
+     * @param deckModel name od deck model file to load
+     * @return returns loaded model if import was successful, null otherwise
      */
-    public boolean importDeck(Path deckPath) {
+    private DeckModel importDeckModel(String deckModel) {
         try {
-            Map<String, Object> deckYAML = loadYAML(deckPath);
-            String name = (String) deckYAML.get("name");
-            if (name == null)
-                throw new YAMLException("deck has no 'name' field specified");
-
-            // load cards
-            for (Deck.Pile pile : Deck.Pile.values()) {
-
-                Map<String, Integer> cards = (Map<String, Integer>) deckYAML.get(pile.toString().toLowerCase());
-                cards = (cards == null ? Collections.emptyMap() : cards);
-                for (Map.Entry<String, Integer> cardEntry : cards.entrySet()) {
-                    if (!cardsYAML.containsKey(cardEntry.getKey())) // if the card wasn't loaded - shit happens
-                        throw new YAMLException("card '" + cardEntry.getKey() + "' wasn't imported");
-                    List<String> types = (List<String>) cardsYAML.get(cardEntry.getKey()).get("types");
-                    if (cardEntry.getValue() > 4 && // more than 4 in deck that are not basic land
-                            types.stream().anyMatch(t -> !t.equals(Card.Type.LAND.toString().toLowerCase())))
-                        throw new YAMLException(("deck can have maximum of 4 non-land cards with the same name"));
-                }
-            }
-
-            decksYAML.put(name, deckYAML); // save to decks map in library
-            LOGGER.config("Imported deck '" + name + "'");
-            return true;
-        } catch (YAMLException | FileNotFoundException e) {
-            LOGGER.warning("Couldn't import deck '" + deckPath.getFileName() + "': \n" + e.toString());
-            return false;
+            DeckModel dm = new DeckModel(loadYAML("decks/" + deckModel));
+            deckModels.put(dm.name, dm); // save to decks map in library
+            LOGGER.config("Imported deck model'" + dm.name + "'");
+            return dm;
+        } catch (YAMLException | FileNotFoundException | DeckException | URISyntaxException e) {
+            LOGGER.warning("Couldn't import deck model '" + deckModel + "': \n" + e.toString());
+            return null;
         }
     }
 
@@ -155,36 +121,53 @@ public class ResourceManager {
     public void importAll() {
         // walk the cards files
         try {
-            importConfig(Paths.get(getClass().getResource("/config.yml").toURI()));
-            Stream<Path> cards = null;
-            cards = Files.walk(Paths.get(getClass().getResource("/cards").toURI()));
-            cards.filter(Files::isRegularFile).forEach(this::importCard);
+            importConfig();
+            Files.walk(Paths.get(getClass().getResource("/cards").toURI()))
+                    .filter(Files::isRegularFile).forEach(f -> importCardModel(f.getFileName().toString()));
 
             // walk the decks files
-            Stream<Path> decks = Files.walk(Paths.get(getClass().getResource("/decks").toURI()));
-            decks.filter(Files::isRegularFile).forEach(this::importDeck);
+            Files.walk(Paths.get(getClass().getResource("/decks").toURI()))
+                    .filter(Files::isRegularFile).forEach(f -> importDeckModel(f.getFileName().toString()));
         } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException("ResourceManager critical error. Cannot load cards or decks folder");
+            LOGGER.severe("ResourceManager critical error. Cannot load cards or decks folder");
+            e.printStackTrace();
         }
     }
 
     /**
-     * @return Returns loaded config
+     * Lazily loads config and returns it.
+     *
+     * @return lazy loads config if not loaded
      */
-    public Map<String, Object> getConfig() {return Collections.unmodifiableMap(config);}
+    public synchronized @NotNull Map<String, Object> getConfig() {
+        if (config == null) {
+            try {
+                importConfig();
+            } catch (URISyntaxException | FileNotFoundException e) {
+                LOGGER.severe("ResourceManager critical error. Cannot get config file");
+                e.printStackTrace();
+            }
+        }
+        return Collections.unmodifiableMap(config);
+    }
 
     /**
-     * Returns propertiesYML file for imported card
+     * Lazily loads card model
      *
      * @param name name of imported card
      * @return YAML object from file
      * @throws CardException if the card wasn't loaded
      */
-    public Map<String, Object> getCard(String name) throws CardException {
-        if (cardsYAML.containsKey(name))
-            return cardsYAML.get(name);
-        else
-            throw new CardException("Card '" + name + "' wasn't imported.");
+    public CardModel getCardModel(String name) throws CardException {
+        if (cardModels.containsKey(name))
+            return cardModels.get(name);
+        else {
+            var model = importCardModel(name);
+            if (model != null) {
+                cardModels.put(model.name, model);
+                return model;
+            } else throw new CardException("Card model '" + name + "' not found.");
+        }
     }
 
     /**
@@ -194,11 +177,16 @@ public class ResourceManager {
      * @return YAML object from file
      * @throws CardException if the deck wasn't loaded
      */
-    public Map<String, Object> getDeck(String name) throws DeckException {
-        if (decksYAML.containsKey(name))
-            return decksYAML.get(name);
-        else
-            throw new DeckException("Deck '" + name + "' wasn't imported.");
+    public DeckModel getDeckModel(String name) throws DeckException {
+        if (deckModels.containsKey(name))
+            return deckModels.get(name);
+        else {
+            var model = importDeckModel(name);
+            if (model != null) {
+                deckModels.put(model.name, model);
+                return model;
+            } else throw new DeckException("Deck model '" + name + "' not found.");
+        }
     }
 
     /**
@@ -206,12 +194,12 @@ public class ResourceManager {
      *
      * @return set of names associated with imported decks
      */
-    public Set<String> getDecks() { return decksYAML.keySet(); }
+    public Set<String> getLoadedDecks() { return deckModels.keySet(); }
 
     /**
      * Returns list of imported cards.
      *
      * @return set of names associated with imported cards
      */
-    public Set<String> getCards() { return cardsYAML.keySet(); }
+    public Set<String> getLoadedCards() { return cardModels.keySet(); }
 }

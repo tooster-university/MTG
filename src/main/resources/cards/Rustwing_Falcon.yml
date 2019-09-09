@@ -1,10 +1,11 @@
 name: Rustwing Falcon
+allow_many: true
 mana: W
+power: 1
+toughness: 2
 types:
   - creature
 subtypes:
   - bird
 abilities:
   - flying
-power: 1
-toughness: 2

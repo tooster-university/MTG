@@ -1,15 +1,12 @@
 package me.tooster.server;
 
 
-import me.tooster.MTG.MTGCommand;
 import me.tooster.MTG.MTGStateMachine;
 import me.tooster.common.ChatRoom;
 import me.tooster.common.Formatter;
 import me.tooster.common.proto.Messages;
 
 import java.util.*;
-
-import static me.tooster.MTG.MTGCommand.*;
 
 
 /**
@@ -54,7 +51,7 @@ public class Hub implements ChatRoom<User> {
         if (users.size() == userSlots || users.containsKey(user.serverTag)) return false;
         users.put(user.serverTag, user);
         user.hub = this;
-        broadcast(String.format("%s joined the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
+        broadcast("%s joined the hub. %s", user.toString(), Formatter.formatProgress(users.size(), userSlots));
         fsm.tryAddUser(user); // TODO: add to waiting queue if tryAddUser was a fail
         return true;
     }
@@ -63,20 +60,26 @@ public class Hub implements ChatRoom<User> {
         users.remove(user.serverTag);
         user.hub = null;
         fsm.removeUser(user);
-        broadcast(String.format("%s left the hub. %s", user, Formatter.formatProgress(users.size(), userSlots)));
+        broadcast("%s left the hub. %s", user.toString(), Formatter.formatProgress(users.size(), userSlots));
     }
 
     @Override
-    public void broadcast(String message) {
+    public void broadcast(String format, Object... args) {
         synchronized (users) {
-            users.values().forEach(u -> u.transmit(Messages.VisualMsg.newBuilder().setFrom("HUB").setTo("HUB").setMsg(message)));
+            users.values().forEach(u -> u.transmit(Messages.VisualMsg.newBuilder()
+                    .setFrom("HUB")
+                    .setTo("HUB")
+                    .setMsg(String.format(format, (Object[]) args))));
         }
     }
 
     @Override
-    public void shout(User user, String message) {
+    public void shout(User user, String format, Object... args) {
         synchronized (users) {
-            users.values().forEach(u -> u.transmit(Messages.VisualMsg.newBuilder().setFrom(user.toString()).setTo("HUB").setMsg(message)));
+            users.values().forEach(u -> u.transmit(Messages.VisualMsg.newBuilder()
+                    .setFrom(user.toString())
+                    .setTo("HUB")
+                    .setMsg(String.format(format, (Object[]) args))));
         }
     }
 }

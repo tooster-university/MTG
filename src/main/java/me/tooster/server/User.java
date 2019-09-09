@@ -1,6 +1,5 @@
 package me.tooster.server;
 
-import me.tooster.MTG.Deck;
 import me.tooster.common.Command;
 import me.tooster.common.Formatter;
 import me.tooster.common.proto.Messages;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static me.tooster.server.ServerCommand.*;
-import static me.tooster.MTG.MTGCommand.*;
 import static me.tooster.common.proto.Messages.*;
 
 /**
@@ -104,7 +102,7 @@ public class User {
             var users = Server.getInstance().users;
             users.put(serverTag, this); // register in users map
             Server.LOGGER.info("Client " + toString() + " connected.");
-            Server.getInstance().broadcast(toString() + " joined the server.");
+            Server.getInstance().broadcast("%s joined the server.", toString());
 
             Server.getInstance().hub.addUser(this);
 
@@ -149,7 +147,7 @@ public class User {
                             var oldNick = this.toString();
                             config.putAll(receivedConfig);
                             if (!oldNick.equals(this.toString())) // if nick changed - inform all
-                                Server.getInstance().broadcast(oldNick + " is now " + toString());
+                                Server.getInstance().broadcast("%s is now %s", oldNick, toString());
                         }
                         break;
                     case CLIENT_DISCONNECT: // handle disconnect cleanup work
@@ -171,7 +169,8 @@ public class User {
                     Compiled mtgParsed = mtgCommandController.parse(input);
                     Compiled parsed = serverCommandController.parse(input);
 
-                    if (mtgParsed.cmd != null && !mtgParsed.isEnabled()) throw new Command.CommandDisabledException((Command) mtgParsed.cmd);
+                    if (mtgParsed.cmd != null && !mtgParsed.isEnabled())
+                        throw new Command.CommandDisabledException((Command) mtgParsed.cmd);
 
                     if (mtgParsed.cmd != null) {
                         hub.fsm.process(mtgParsed);
@@ -316,7 +315,7 @@ public class User {
                 // updates game, sends status to other player etc.
                 if (hub != null) hub.removeUser(this);
                 Server.getInstance().users.remove(serverTag);
-                Server.getInstance().broadcast(toString() + "disconnected.");
+                Server.getInstance().broadcast("%s disconnected.", toString());
                 Server.LOGGER.info("Client " + toString() + " disconnected.");
             }
             listenRemoteThread.interrupt(); // close the streams and halt the thread

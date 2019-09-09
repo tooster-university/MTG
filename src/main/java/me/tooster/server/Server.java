@@ -88,24 +88,24 @@ public class Server implements ChatRoom<User> {
     }
 
     @Override
-    public void broadcast(String message) {
+    public void broadcast(String format, Object... args) {
         synchronized (users) {
             users.values().forEach(u -> u.transmit(VisualMsg.newBuilder()
                     .setVariant(VisualMsg.Variant.CHAT)
                     .setFrom("SERVER")
                     .setTo("SERVER")
-                    .setMsg(message)));
+                    .setMsg(String.format(format, args))));
         }
     }
 
     @Override
-    public void shout(User from, String message) {
+    public void shout(User from, String format, Object... args) {
         synchronized (users) {
             users.values().forEach(u -> u.transmit(VisualMsg.newBuilder()
                     .setVariant(VisualMsg.Variant.CHAT)
                     .setFrom(from.toString())
                     .setTo("SERVER")
-                    .setMsg(message)));
+                    .setMsg(String.format(format, args))));
         }
     }
 
