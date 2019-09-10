@@ -197,13 +197,15 @@ public class Mana {
     }
 
     /**
-     * Converts this objects collectible mana to generic mana. Use only with pool types, not cost types
+     * Converts collectible mana to generic mana.
+     * Mutates the object.
+     * Use only with pool types, not cost types.
      *
      * @param choosenMana mana in current pool to be converted to generic.
      * @return this object with converted generic mana
      * @throws InsufficientManaException if there is not enough mana
      */
-    public Mana withGenericAs(Mana choosenMana) throws InsufficientManaException {
+    public Mana convertToGeneric(Mana choosenMana) throws InsufficientManaException {
         if (!this.satisfies(choosenMana))
             throw new InsufficientManaException(this, choosenMana);
 

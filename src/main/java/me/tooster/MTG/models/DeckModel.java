@@ -47,12 +47,13 @@ public class DeckModel implements Model {
             });
         }
 
-        int minLibSize = (int) data.get("min_library");
-        int maxSideboardSize = (int) data.get("max_sideboard");
+        var config = ResourceManager.instance().getConfig();
+        int minLibSize = (int) config.get("min_library");
+        int maxSideboardSize = (int) config.get("max_sideboard");
         if (size - piles.get(SIDEBOARD).size() < minLibSize) throw new DeckException("Deck must have at least " + minLibSize + "cards");
         if (piles.get(SIDEBOARD).size() > maxSideboardSize) throw new DeckException("Maximum sideboard size: " + maxSideboardSize);
 
-        int limit = (int) ResourceManager.instance().getConfig().getOrDefault("max_same_name_cards_in_deck", 4);
+        int limit = (int) config.getOrDefault("max_same_name_cards_in_deck", 4);
         cardCount.forEach((cm, n) -> {
             if (n > limit && !cm.unlimitedCopiesInDeck)
                 throw new DeckException("Up to " + limit + " of " + cm.name + " can be in the deck.");

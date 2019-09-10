@@ -1,10 +1,9 @@
 package me.tooster.MTG;
 
-import me.tooster.MTG.models.CardModel;
 import me.tooster.MTG.models.DeckModel;
-import me.tooster.server.ResourceManager;
 import me.tooster.MTG.exceptions.CardException;
 import me.tooster.MTG.exceptions.DeckException;
+import me.tooster.server.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -63,7 +62,7 @@ public class Deck {
      *                counting from top as 0
      * @throws DeckException Thrown if index or
      */
-    public void move(Pile srcPile, int srcIdx, Pile dstPile, int dstIdx) throws DeckException {
+    public void move(@NotNull Pile srcPile, int srcIdx, @NotNull Pile dstPile, int dstIdx) throws DeckException {
         if (piles.get(srcPile).isEmpty())
             throw new DeckException("Source pile is empty");
         if (srcIdx < 0 || srcIdx >= piles.get(srcPile).size())
@@ -73,6 +72,25 @@ public class Deck {
 
         Card c = piles.get(srcPile).remove(srcIdx);
         piles.get(dstPile).add(dstIdx, c);
+        c.setPile(dstPile);
+    }
+
+    /**
+     * Moves specified card from one pile to other pile
+     * @param card card to move
+     * @param srcPile source pile
+     * @param dstPile destination pile
+     * @throws DeckException if src pile doesn't contain the desired card
+     */
+    public void move(@NotNull Card card, @NotNull Pile srcPile, @NotNull Pile dstPile) throws DeckException {
+        if (piles.get(srcPile).isEmpty())
+            throw new DeckException("Source pile is empty");
+        int idx = piles.get(srcPile).indexOf(card);
+        if (idx != -1){
+            piles.get(srcPile).remove(idx);
+            piles.get(dstPile).add(card);
+            card.setPile(dstPile);
+        } else throw new DeckException("Tried to move a card from a pile not containing it");
     }
 
     /**
@@ -90,7 +108,11 @@ public class Deck {
 
         // populate piles
         deck.piles.forEach((pile, cards) -> {
-            deck.model.piles.get(pile).forEach(cardModel -> cards.add(Card.build(IDGenerator, deck, cardModel)));
+            deck.model.piles.get(pile).forEach(cardModel -> {
+                Card c = Card.build(IDGenerator, deck, cardModel);
+                cards.add(c);
+                c.setPile(pile);
+            });
         });
 
         deck.reset();
@@ -104,5 +126,16 @@ public class Deck {
         Stream.Builder<Card> sb = Stream.builder();
         piles.values().stream().flatMap(Collection::stream).forEach(sb::add);
         return sb.build();
+    }
+
+    public Card findCard(String identity) {
+        Optional<Card> card = Optional.empty();
+        //return by tag
+        try { card = cardStream().filter(c -> c.ID == Long.parseLong(identity)).findFirst(); } catch (NumberFormatException ignored) {}
+        if (card.isPresent()) return card.get();
+        // return by name
+        var matching = cardStream().filter(c -> c.toString().startsWith(identity)).toArray();
+        if (matching.length != 1) return null;
+        return (Card) matching[0];
     }
 }

@@ -34,7 +34,7 @@ public class ResourceManager {
 
     public static ResourceManager instance() { return instance; }
 
-    private ResourceManager() { importAll(); }
+    private ResourceManager() {}
     //------------------------------------------------------------------------------------------------------------------
 
 
@@ -49,18 +49,18 @@ public class ResourceManager {
      * @return YAML object as map
      * @throws IllegalArgumentException if yaml file doesn't exist or has improper format
      */
-    private Map<String, Object> loadYAML(String resource) throws IllegalArgumentException, URISyntaxException, FileNotFoundException {
+    public Map<String, Object> loadYAML(String resource) throws IllegalArgumentException, URISyntaxException, FileNotFoundException {
         resource = resource.substring(0, resource.length() - (resource.endsWith(".yaml") ? 5 : resource.endsWith(".yml") ? 4 : 0));
-
-        var found = Paths.get(getClass().getResource(resource).toURI());
+        var file = getClass().getResource(resource + ".yaml");
+        if ((file = getClass().getResource(resource + ".yml")) == null)
+            throw new FileNotFoundException("cannot find yaml file '" + resource + "'");
+        var found = Paths.get(file.toURI());
         String s = found.getFileName().toString().toLowerCase();
-        if (!s.startsWith("--") && (s.endsWith(".yml") || s.endsWith(".yaml"))) {
-            Yaml yaml = new Yaml();
-            Object map = yaml.load(new BufferedInputStream(new FileInputStream(found.toString())));
-            if (!(map instanceof Map)) throw new YAMLException("yaml file formatted incorrectly");
-            return (Map<String, Object>) map;
-        } else
-            throw new IllegalArgumentException("Yaml fie mustn't start with -- and must end with .yml or .yaml");
+        if (s.startsWith("--")) throw new IllegalArgumentException("Requested yaml file is disabled.");
+
+        Object map = new Yaml().load(new BufferedInputStream(new FileInputStream(found.toString())));
+        if (!(map instanceof Map)) throw new YAMLException("Error while reading yaml - maybe it has incorrect format?");
+        return (Map<String, Object>) map;
     }
 
     /**
@@ -69,7 +69,7 @@ public class ResourceManager {
      * @return returns true if config was imported successfully
      */
     public boolean importConfig() throws FileNotFoundException, URISyntaxException {
-        config = loadYAML("config");
+        config = loadYAML("/config.yml");
         LOGGER.config("Imported config.yml");
         return true;
     }
@@ -84,7 +84,7 @@ public class ResourceManager {
      */
     private CardModel importCardModel(String cardModel) {
         try {
-            CardModel cm = new CardModel(loadYAML("cards/" + cardModel));
+            CardModel cm = new CardModel(loadYAML("/cards/" + cardModel));
             // assign reference to default properties for the card
             cardModels.put(cm.name, cm);
             LOGGER.config("Imported card model '" + cm.name + "'");
@@ -105,9 +105,9 @@ public class ResourceManager {
      */
     private DeckModel importDeckModel(String deckModel) {
         try {
-            DeckModel dm = new DeckModel(loadYAML("decks/" + deckModel));
+            DeckModel dm = new DeckModel(loadYAML("/decks/" + deckModel));
             deckModels.put(dm.name, dm); // save to decks map in library
-            LOGGER.config("Imported deck model'" + dm.name + "'");
+            LOGGER.config("Imported deck model '" + dm.name + "'");
             return dm;
         } catch (YAMLException | FileNotFoundException | DeckException | URISyntaxException e) {
             LOGGER.warning("Couldn't import deck model '" + deckModel + "': \n" + e.toString());

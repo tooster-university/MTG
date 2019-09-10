@@ -1,5 +1,5 @@
 package me.tooster.MTG.exceptions;
 
-public class CardException extends RuntimeException {
+public class CardException extends MTGException {
     public CardException(String message) { super(message); }
 }

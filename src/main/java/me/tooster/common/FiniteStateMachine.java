@@ -51,20 +51,20 @@ public abstract class FiniteStateMachine<StateT extends FiniteStateMachine.State
     public synchronized FiniteStateMachine<StateT, FsmT, InputT> process(InputT... input) {
         do {
             if (currentState == null) throw new RuntimeException("FSM halted. ");
-            prepcocess(input);
             StateT previousState = currentState;
             try {
+                prepcocess((FsmT) this, input);
                 StateT nextState = currentState.process((FsmT) this, input);
                 if (currentState != nextState) {
                     currentState.onExit((FsmT) this, nextState);
                     currentState = nextState;
                     nextState.onEnter((FsmT) this, previousState);
                 }
+                postprocess((FsmT) this, input);
             } catch (AbortTransition abort) {
                 abort.cleanupHandler.run();
                 currentState = previousState;
             }
-            postprocess(input);
         } while (autoProcess);
         return this;
     }
@@ -110,16 +110,18 @@ public abstract class FiniteStateMachine<StateT extends FiniteStateMachine.State
      * Useful to implement filters of some kind on groups of states without a need to write sub-state machines.
      *
      * @param input input that will be supplied to a state's `process()` method
+     * @throws AbortTransition thrown when on the preprocess stage we want to exit prematurely
      */
-    public void prepcocess(InputT... input) {}
+    public void prepcocess(FsmT fsm, InputT... input) throws AbortTransition {}
 
     /**
      * Event run after every `process()` and `onEnter/onExit` events.
      * Useful to implement filters of some kind on groups of states without a need to write sub-state machines.
      *
      * @param input input that will be supplied to a state's `process()` method
+     * @throws AbortTransition thrown when on the preprocess stage we want to exit prematurely
      */
-    public void postprocess(InputT... input) {}
+    public void postprocess(FsmT fsm, InputT... input) throws AbortTransition {}
 
     /**
      * This throwable is a lightweight object that can be thrown at any point during transition events in FSM to break out of transi

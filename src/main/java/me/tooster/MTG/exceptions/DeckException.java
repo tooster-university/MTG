@@ -1,5 +1,5 @@
 package me.tooster.MTG.exceptions;
 
-public class DeckException extends RuntimeException {
+public class DeckException extends MTGException {
     public DeckException(String message) { super(message); }
 }
