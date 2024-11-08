@@ -1,3 +1,7 @@
+# TL;DR
+
+This was supposed to be an MVP backend and CLI frontend for extenible MTG game engine. It didn't work out. It became a chat server and client with command line argument parser. It can handle local and server commands though and has some interesting annotation-based command declaration system.
+
 # Projekt
 ### by Maksymilian Polarczyk
 
